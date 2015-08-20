@@ -17,9 +17,10 @@ L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 
 // default renderers for common domain types
-var CovLayerFactory = new L.CoverageLayerFactory()
+var LayerFactory = L.CoverageLayerFactory()
 
-CovLayerFactory(cov, {keys: ['salinity']}).on('loaded', function(e) {
+var cov = ... // load Coverage object with another library
+LayerFactory(cov, {keys: ['salinity']}).on('loaded', function(e) {
   var covLayer = e.target
   map.fitBounds(covLayer.getBounds())
 }).addTo(map)
@@ -34,19 +35,19 @@ CovLayerFactory(cov, {keys: ['salinity']}).on('loaded', function(e) {
 ### Custom visualization
 
 ```js
-var CovLayerFactory = new L.CoverageLayerFactory({
+var LayerFactory = L.CoverageLayerFactory({
   renderer: MyGPXTrack
 })
 
 // alternatively, with more control for different domain types:
-var CovLayerFactory = new L.CoverageLayerFactory({
+var LayerFactory = L.CoverageLayerFactory({
   renderers: {
     'http://coveragejson.org/def/domains/Trajectory': MyGPXTrack
   }
 })
 
 
-CovLayerFactory(cov, {keys: ['distance', 'elevation', 'heartrate']}).on('loaded', function(e) {
+LayerFactory(cov, {keys: ['distance', 'elevation', 'heartrate']}).on('loaded', function(e) {
   var covLayer = e.target
   map.fitBounds(covLayer.getBounds())
 }).addTo(map)
@@ -74,7 +75,7 @@ class GridCoverage extends L.TileLayer.Canvas {
     this.param = options.parameters[0]
   }
 }
-
+```
 
 ### Collections
 
@@ -84,9 +85,9 @@ as a single entity.
 TODO write down use cases when this is really needed (probably for profiles)
 
 ```js
-var CovCollectionLayerFactory = new L.CoverageCollectionLayerFactory()
+var LayerFactory = L.CoverageCollectionLayerFactory()
 var covs = ... // many Profiles
-CovCollectionLayerFactory(covs, {keys: ['salinity']}).on('loaded', function(e) {
+LayerFactory(covs, {keys: ['salinity']}).on('loaded', function(e) {
   var covLayer = e.target
   map.fitBounds(covLayer.getBounds())
 }).addTo(map)
