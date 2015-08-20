@@ -20,7 +20,14 @@ L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 var LayerFactory = L.CoverageLayerFactory()
 
 var cov = ... // load Coverage object with another library
-LayerFactory(cov, {keys: ['salinity']}).on('loaded', function(e) {
+var options = {
+  keys: ['salinity'],
+  legend: {
+    id: 'horizontalLegend', // custom HTML template id
+    position: 'bottom' // all other properties except 'id' are handed to the template
+  }
+}
+LayerFactory(cov, options).on('loaded', function(e) {
   var covLayer = e.target
   map.fitBounds(covLayer.getBounds())
 }).addTo(map)
@@ -31,6 +38,12 @@ LayerFactory(cov, {keys: ['salinity']}).on('loaded', function(e) {
 // In some cases a legend is not even desirable, e.g. for certain types of trajectories like GPX tracks, where
 // the information is typically put along the track, on hovering, or in popups.
 ```
+
+TODO need controls for axes (mostly for Grid and maybe profiles)
+     is this the right place to implement that?
+     Grids can have time/depth, so probably yes, however the actual controls
+     should be decoupled since they will be reused for
+     "virtual" axis controls (subsetting with Web API)
 
 ### Custom visualization
 
@@ -68,6 +81,7 @@ class GPXTrackCoverage extends L.FeatureGroup {
   constructor(cov, options) {
     this.params = options.parameters
   }
+  // instead of palettes and legends we could use hovers and popups here
 }
 
 class GridCoverage extends L.TileLayer.Canvas {
