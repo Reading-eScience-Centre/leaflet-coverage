@@ -1,0 +1,31 @@
+{
+  "name": "leaflet-coverage",
+  "version": "0.1.0",
+  "main": "src/coverage",
+  "registry": "jspm",
+  "format": "esm",
+  "scripts": {
+    "test": "standard"
+  },
+  "standard": {
+    "parser": "babel-eslint",
+    "ignore": [
+      "src/config.js"
+    ]
+  },
+  "jspm": {
+    "directories": {
+      "baseURL": "src"
+    },
+    "devDependencies": {
+      "babel": "npm:babel-core@^5.8.22",
+      "babel-runtime": "npm:babel-runtime@^5.8.20",
+      "core-js": "npm:core-js@^1.1.0"
+    }
+  },
+  "devDependencies": {
+    "babel-eslint": "^4.0.10",
+    "jspm": "^0.16.0",
+    "standard": "^5.1.0"
+  }
+}
