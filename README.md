@@ -25,7 +25,9 @@ var options = {
   legend: {
     id: 'horizontalLegend', // custom HTML template id
     position: 'bottom' // all other properties except 'id' are handed to the template
-  }
+  },
+  parameterSync: L.CoverageParameterSync() // handles palette/legend merging of same-observedProperty/unit parameters
+                                           // only useful for more than one coverage 
 }
 LayerFactory(cov, options).on('loaded', function(e) {
   var covLayer = e.target
