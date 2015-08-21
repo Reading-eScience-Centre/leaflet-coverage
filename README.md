@@ -51,13 +51,16 @@ TODO need controls for axes (mostly for Grid and maybe profiles)
 
 ```js
 var LayerFactory = L.CoverageLayerFactory({
-  renderer: MyGPXTrack
+  renderer: GPXTrack
 })
 
-// alternatively, with more control for different domain types:
+// alternatively, with more control for different coverage types:
 var LayerFactory = L.CoverageLayerFactory({
   renderers: {
-    'http://coveragejson.org/def#Trajectory': MyGPXTrack
+    'http://www.topografix.com/GPX#Track': GPXTrack, // coverage type, precedence over domain types
+    'http://www.topografix.com/GPX#Route': GPXRoute,
+    'http://www.topografix.com/GPX#Waypoints': GPXWaypoints,
+    'http://coveragejson.org/def#Trajectory': Trajectory // domain type, fall-back for other trajectory coverages
   }
 })
 
@@ -81,14 +84,14 @@ the Coverage as first argument, and options as second:
 
 ```js
 // anything implementing ILayer
-class GPXTrackCoverage extends L.FeatureGroup {
+class GPXTrack extends L.FeatureGroup {
   constructor(cov, options) {
     this.params = options.parameters
   }
   // instead of palettes and legends we could use hovers and popups here
 }
 
-class GridCoverage extends L.TileLayer.Canvas {
+class Grid extends L.TileLayer.Canvas {
   constructor(cov, options) {
     this.param = options.parameters[0]
   }
