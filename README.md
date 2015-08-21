@@ -57,7 +57,7 @@ var LayerFactory = L.CoverageLayerFactory({
 // alternatively, with more control for different domain types:
 var LayerFactory = L.CoverageLayerFactory({
   renderers: {
-    'http://coveragejson.org/def#TrajectoryCoverage': MyGPXTrack
+    'http://coveragejson.org/def#Trajectory': MyGPXTrack
   }
 })
 
@@ -70,9 +70,11 @@ LayerFactory(cov, {keys: ['distance', 'elevation', 'heartrate']}).on('loaded', f
 ```
 
 It's the job of the CoverageLayerFactory to choose the right renderer for a
-given Coverage object. Currently this happens only based on the `Coverage.type` property.
+given Coverage object. Currently this happens based on the `Coverage.type`
+and `Coverage.domainType` properties, with the latter being a fall-back if
+no renderers for a given `Coverage.type` were found.
 If more control is needed, then renderers can be easily invoked manually, or
-a more sophisticated factory class may be developed. 
+a more sophisticated factory class may be developed.
 
 A renderer is any class implementing the ILayer interface. The constructor must accept
 the Coverage as first argument, and options as second:
