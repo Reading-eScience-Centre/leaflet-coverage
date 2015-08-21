@@ -59,7 +59,6 @@ var LayerFactory = L.CoverageLayerFactory({
   renderers: {
     'http://www.topografix.com/GPX#Track': GPXTrack, // coverage type, precedence over domain types
     'http://www.topografix.com/GPX#Route': GPXRoute,
-    'http://www.topografix.com/GPX#Waypoints': GPXWaypoints,
     'http://coveragejson.org/def#Trajectory': Trajectory // domain type, fall-back for other trajectory coverages
   }
 })
