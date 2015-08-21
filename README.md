@@ -70,7 +70,7 @@ LayerFactory(cov, {keys: ['distance', 'elevation', 'heartrate']}).on('loaded', f
 ```
 
 It's the job of the CoverageLayerFactory to choose the right renderer for a
-given Coverage object. Currently this happens only based on the coverage type.
+given Coverage object. Currently this happens only based on the `Coverage.type` property.
 If more control is needed, then renderers can be easily invoked manually, or
 a more sophisticated factory class may be developed. 
 
