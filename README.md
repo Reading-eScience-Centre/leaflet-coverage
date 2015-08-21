@@ -57,7 +57,7 @@ var LayerFactory = L.CoverageLayerFactory({
 // alternatively, with more control for different domain types:
 var LayerFactory = L.CoverageLayerFactory({
   renderers: {
-    'http://coveragejson.org/def/domains/Trajectory': MyGPXTrack
+    'http://coveragejson.org/def#TrajectoryCoverage': MyGPXTrack
   }
 })
 
@@ -70,7 +70,7 @@ LayerFactory(cov, {keys: ['distance', 'elevation', 'heartrate']}).on('loaded', f
 ```
 
 It's the job of the CoverageLayerFactory to choose the right renderer for a
-given Coverage object. Currently this happens only based on the domain type.
+given Coverage object. Currently this happens only based on the coverage type.
 If more control is needed, then renderers can be easily invoked manually, or
 a more sophisticated factory class may be developed. 
 
