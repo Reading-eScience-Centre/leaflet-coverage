@@ -1,6 +1,6 @@
 # leaflet-coverage
 
-A Leaflet plugin for visualizing [coverages](https://en.wikipedia.org/wiki/Coverage_data) with the help of the [JavaScript Coverage API](https://github.com/neothemachine/coverage-jsapi). Currently, it supports the domain types defined within [CoverageJSON](https://github.com/neothemachine/coveragejson).
+A Leaflet plugin for visualizing [coverages](https://en.wikipedia.org/wiki/Coverage_data) (numerical or categorical data varying in space and time) with the help of the [JavaScript Coverage API](https://github.com/neothemachine/coverage-jsapi). Currently, it supports the domain types defined within [CoverageJSON](https://github.com/neothemachine/coveragejson).
 
 Note that to *load* a coverage you have to use another library, depending on which formats you want to support. The only currently known coverage loader that can be used is the [covjson-reader](https://github.com/neothemachine/covjson-reader) for the [CoverageJSON](https://github.com/neothemachine/coveragejson) format.
 
@@ -51,13 +51,15 @@ TODO need controls for axes (mostly for Grid and maybe profiles)
 
 ```js
 var LayerFactory = L.CoverageLayerFactory({
-  renderer: MyGPXTrack
+  renderer: GPXTrack
 })
 
-// alternatively, with more control for different domain types:
+// alternatively, with more control for different coverage types:
 var LayerFactory = L.CoverageLayerFactory({
   renderers: {
-    'http://coveragejson.org/def#Trajectory': MyGPXTrack
+    'http://www.topografix.com/GPX#Track': GPXTrack, // coverage type, precedence over domain types
+    'http://www.topografix.com/GPX#Route': GPXRoute,
+    'http://coveragejson.org/def#Trajectory': Trajectory // domain type, fall-back for other trajectory coverages
   }
 })
 
@@ -81,14 +83,14 @@ the Coverage as first argument, and options as second:
 
 ```js
 // anything implementing ILayer
-class GPXTrackCoverage extends L.FeatureGroup {
+class GPXTrack extends L.FeatureGroup {
   constructor(cov, options) {
     this.params = options.parameters
   }
   // instead of palettes and legends we could use hovers and popups here
 }
 
-class GridCoverage extends L.TileLayer.Canvas {
+class Grid extends L.TileLayer.Canvas {
   constructor(cov, options) {
     this.param = options.parameters[0]
   }
