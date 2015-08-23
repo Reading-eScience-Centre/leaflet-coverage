@@ -48,7 +48,7 @@ class GridCoverage extends L.TileLayer.Canvas {
       .then([domain, range] => {
         this.domain = domain
         this.range = range
-        this._initSubsettedAxes()
+        this._subsetAxesByPreference()
         this._addControls()
         super.onAdd(map)
         map.fire('dataload')
