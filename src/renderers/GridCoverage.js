@@ -1,4 +1,5 @@
 import L from 'leaflet'
+import * as utils from 'renderers/utils'
 
 const DOMAIN_TYPE = 'http://coveragejson.org/def#Grid'
 
@@ -33,8 +34,11 @@ class GridCoverage extends L.TileLayer.Canvas {
     }
     this.cov = cov
     this.param = options.parameter
-    this._time = options.time
-    this._vertical = options.vertical
+    
+    this._axesSubset = { // x and y are not subsetted
+        t: {coordPref: options.time},
+        z: {coordPref: options.vertical}
+    }
   }
   
   onAdd (map) {
@@ -44,7 +48,7 @@ class GridCoverage extends L.TileLayer.Canvas {
       .then([domain, range] => {
         this.domain = domain
         this.range = range
-        this._initAxes()
+        this._initSubsettedAxes()
         this._addControls()
         super.onAdd(map)
         map.fire('dataload')
@@ -63,21 +67,52 @@ class GridCoverage extends L.TileLayer.Canvas {
   }
   
   /**
-   * Sets the temporal and vertical axes indices before adding the layer to the map.
+   * Subsets the temporal and vertical axes based on the _axesSubset.*.coordPref property,
+   * which is regarded as a preference and does not have to exactly match a coordinate.
    * 
-   * When
+   * After calling this method, _axesSubset.*.idx and _axesSubset.*.coord have
+   * values from the actual axes.
    */
-  _initAxes () {
-    if ('_time' in this) {
-      // TODO
-    } else {
-      
+  _subsetAxesByPreference () {
+    for (let axis of Object.keys(this._axesSubset)) {
+      let ax = this._axesSubset[axis]
+      if (ax.coordPref == undefined) { // == also handles null
+        ax.idx = 0
+      } else {
+        ax.idx = this._getClosestIndex(axis, ax.coordPref)
+      }
+      ax.coord = this.domain[axis] ? this.domain[axis][ax.idx] : null
     }
-    if ('_vertical' in this) {
-      
-    } else {
-      
+  }
+  
+  /**
+   * Subsets the temporal and vertical axes based on the _axesSubset.*.idx property
+   * which has been explicitly set.
+   * 
+   * After calling this method, the _axesSubset.*.coord properties have
+   * values from the actual axes.
+   */
+  _subsetAxesByIndex () {
+    for (let axis of Object.keys(this._axesSubset)) {
+      let ax = this._axesSubset[axis]
+      ax.coord = this.domain[axis] ? this.domain[axis][ax.idx] : null
+      delete ax.coordPref // in case it was set
     }
+  }
+  
+  /**
+   * Return the index of the coordinate value closest to the given value
+   * within the given axis. Supports ascending and descending axes.
+   * If the axis is empty, then 0 is returned, since we regard an empty axis
+   * as consisting of a single "unknown" coordinate value.
+   */
+  _getClosestIndex (axis, val) {
+    if (!(axis in this.domain)) {
+      return 0
+    }
+    let vals = this.domain[axis]
+    let idx = utils.indexOfNearest(vals, val)
+    return idx
   }
   
   /**
@@ -85,7 +120,8 @@ class GridCoverage extends L.TileLayer.Canvas {
    * This has no effect if the grid has no time axis.
    */
   set time (val) {
-    
+    this._axesSubset.t.coordPref = val
+    this._subsetAxesByPreference()
   }
   
   /**
@@ -93,7 +129,7 @@ class GridCoverage extends L.TileLayer.Canvas {
    * or null if the grid has no time axis.
    */
   get time () {
-    
+    return this._axesSubset.t.coord
   }
   
   /**
@@ -101,7 +137,8 @@ class GridCoverage extends L.TileLayer.Canvas {
    * This has no effect if the grid has no vertical axis.
    */
   set vertical (val) {
-    
+    this._axesSubset.z.coordPref = val
+    this._subsetAxesByPreference()
   }
   
   /**
@@ -109,7 +146,7 @@ class GridCoverage extends L.TileLayer.Canvas {
    * or null if the grid has no vertical axis.
    */
   get vertical () {
-    
+    return this._axesSubset.z.coord
   }
   
   _addControls () {
