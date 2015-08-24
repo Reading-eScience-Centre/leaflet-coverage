@@ -1,21 +1,27 @@
 {
   "name": "leaflet-coverage",
   "version": "0.1.0",
-  "main": "src/coverage",
+  "main": "CoverageLayerFactory",
   "registry": "jspm",
   "format": "esm",
   "scripts": {
-    "test": "standard"
+    "test": "standard",
+    "build": "jspm bundle-sfx src/CoverageLayerFactory bundle.js"
   },
   "standard": {
     "parser": "babel-eslint",
     "ignore": [
-      "src/config.js"
+      "config.js"
     ]
   },
   "jspm": {
     "directories": {
-      "baseURL": "src"
+      "lib": "src"
+    },
+    "dependencies": {
+      "cwise-compiler": "npm:cwise-compiler@^1.1.2",
+      "leaflet": "github:Leaflet/Leaflet@^0.7.3",
+      "ndarray": "npm:ndarray@^1.0.18"
     },
     "devDependencies": {
       "babel": "npm:babel-core@^5.8.22",
@@ -25,7 +31,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^4.0.10",
-    "jspm": "^0.16.0",
+    "jspm": "^0.16.1",
     "standard": "^5.1.0"
   }
 }

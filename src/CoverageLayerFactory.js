@@ -1,12 +1,12 @@
-import GridCoverage from 'GridCoverage'
-import TrajectoryCoverage from 'TrajectoryCoverage'
-import ProfileCoverage from 'ProfileCoverage'
+import GridCoverage from 'renderers/GridCoverage'
+import TrajectoryCoverage from 'renderers/TrajectoryCoverage'
+import ProfileCoverage from 'renderers/ProfileCoverage'
 
 const pre = 'http://coveragejson.org/def#'
 export const DEFAULT_RENDERERS = {
-    pre + 'Grid': GridCoverage,
-    pre + 'Profile': ProfileCoverage,
-    pre + 'Trajectory': TrajectoryCoverage
+    [pre + 'Grid']: GridCoverage,
+    [pre + 'Profile']: ProfileCoverage,
+    [pre + 'Trajectory']: TrajectoryCoverage
 }
 
 export default function LayerFactory (options) {
