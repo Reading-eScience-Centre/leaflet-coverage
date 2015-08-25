@@ -122,3 +122,7 @@ class ProfileCoverageCollection {
 }
 ```
 where the first constructor argument is an array of Coverage objects.
+
+## Acknowledgments
+
+This library is developed within the [MELODIES project](http://www.melodiesproject.eu).
