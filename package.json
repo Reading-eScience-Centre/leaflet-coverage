@@ -5,7 +5,8 @@
   "registry": "jspm",
   "format": "esm",
   "scripts": {
-    "test": "standard",
+    "style": "standard",
+    "test": "mocha test/",
     "build": "jspm bundle-sfx src/CoverageLayerFactory bundle.js"
   },
   "standard": {
@@ -32,6 +33,7 @@
   "devDependencies": {
     "babel-eslint": "^4.0.10",
     "jspm": "^0.16.1",
+    "mocha": "^2.2.5",
     "standard": "^5.1.0"
   }
 }

@@ -46,12 +46,14 @@ export function indicesOfNearest (a, x) {
 /**
  * Return the index in a of the value closest to x.
  * The array a must be sorted, either ascending or descending.
+ * If x happens to be exactly between two values, the one that
+ * appears first is returned.
  */
 export function indexOfNearest (a, x) {
   var i = indicesOfNearest(a, x)
   var lo = i[0]
   var hi = i[1]
-  if (Math.abs(x - a[lo]) < Math.abs(x - a[hi])) {
+  if (Math.abs(x - a[lo]) <= Math.abs(x - a[hi])) {
     return lo
   } else {
     return hi
