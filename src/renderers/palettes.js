@@ -40,12 +40,42 @@ export function linearPalette (colors, steps=256) {
   }
 
   return {
-    steps: steps,
     red: red,
     green: green,
     blue: blue
   }
 }
+
+/**
+ * Converts an array of CSS colors to a palette of the same size.
+ */
+function directPalette (colors) {
+  var canvas = document.createElement('canvas')
+  canvas.width = 1
+  canvas.height = 1
+  var ctx = canvas.getContext('2d')
+  
+  var steps = colors.length
+  
+  var red = new Uint8Array(steps)
+  var green = new Uint8Array(steps)
+  var blue = new Uint8Array(steps)
+  
+  for (var i=0; i < colors.length; i++) {
+    ctx.fillStyle = colors[i]
+    ctx.fillRect(0, 0, 1, 1)
+    var pix = ctx.getImageData(0, 0, 1, 1).data[0]
+    red[j] = pix[0]
+    green[j] = pix[1]
+    blue[j] = pix[2]
+  }
+  
+  return {
+    red: red,
+    green: green,
+    blue: blue
+  }
+}  
 
 /**
  * Manages palettes under common names.
@@ -59,7 +89,8 @@ export function linearPalette (colors, steps=256) {
  * var palettes = new PaletteManager({defaultSteps: 10})
  * palettes.addLinear('grayscale', ['#FFFFFF', '#000000']) // has 10 steps
  * palettes.addLinear('grayscalehd', ['#FFFFFF', '#000000'], {steps=1000}) // high-resolution palette
- * palettes.add('mycustom', {steps: 2, red: [0,255], green: [0,0], blue: [10,20]})
+ * palettes.add('breweroranges3', ['#fee6ce', '#fdae6b', '#e6550d']) // palette of exactly those 3 colors
+ * palettes.add('mycustom', {red: [0,255], green: [0,0], blue: [10,20]}) // different syntax
  * </code></pre>
  * 
  * Note that Uint8Array typed arrays should be used for custom palettes (added via add()) to avoid
@@ -79,20 +110,26 @@ export class PaletteManager {
    * Store a supplied generic palette under the given name.
    * 
    * @param name The unique name of the palette.
-   * @param palette An object with steps, red, green, and blue properties.
+   * @param palette An object with red, green, and blue properties (each an array of [0,255] values),
+   *                or an array of CSS color specifications.
    */
   add (name, palette) {
     if (this._palettes.has(name)) {
       console.warn('A palette with name "' + name + '" already exists! Overwriting...')
     }
-    if (![palette.red, palette.green, palette.blue].every(arr => arr.length === palette.steps)) {
-      throw new Error('The red, green, blue arrays of the palette do not all have steps elements')
+    if (Array.isArray(palette)) {
+      palette = directPalette(palette)
+    }
+    
+    if (![palette.red, palette.green, palette.blue].every(arr => arr.length === palette.red.length)) {
+      throw new Error('The red, green, blue arrays of the palette must be of equal lengths')
     }
     if (!(palette.red instanceof Uint8Array)) {
       palette.red = _asUint8Array(palette.red)
       palette.green = _asUint8Array(palette.green)
       palette.blue = _asUint8Array(palette.blue)
     }
+    palette.steps = palette.red.length // for convenience in clients
     this._palettes.set(name, palette)
   }
   
