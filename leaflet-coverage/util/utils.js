@@ -77,7 +77,7 @@ export function asSciJSndarray (arr) {
     // by existence of these properties we assume it is an ndarray
     return arr
   }
-  var ndarr = ndarray(new 1DWrapper(arr), arr.shape)
+  var ndarr = ndarray(new Wrapper1D(arr), arr.shape)
   return ndarr
 }
 
@@ -86,7 +86,7 @@ export function asSciJSndarray (arr) {
  * as a 1D array object with get(i) and .length properties.
  * Instances of this class can then be used as array storage for SciJS's ndarray. 
  */
-class 1DWrapper {
+class Wrapper1D {
   constructor (arr) {
     this._arr = arr
     this._shape = arr.shape

@@ -1,6 +1,6 @@
-import GridCoverage from 'renderers/GridCoverage'
-import TrajectoryCoverage from 'renderers/TrajectoryCoverage'
-import ProfileCoverage from 'renderers/ProfileCoverage'
+import GridCoverage from 'leaflet-coverage/renderers/GridCoverage'
+import TrajectoryCoverage from 'leaflet-coverage/renderers/TrajectoryCoverage'
+import ProfileCoverage from 'leaflet-coverage/renderers/ProfileCoverage'
 
 const pre = 'http://coveragejson.org/def#'
 export const DEFAULT_RENDERERS = {

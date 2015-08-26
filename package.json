@@ -6,8 +6,8 @@
   "format": "esm",
   "scripts": {
     "style": "standard",
-    "test": "mocha test/",
-    "build": "jspm bundle-sfx src/CoverageLayerFactory bundle.js"
+    "test": "./node_modules/.bin/karma start --single-run",
+    "build": "jspm bundle-sfx leaflet-coverage/CoverageLayerFactory bundle.js"
   },
   "standard": {
     "parser": "babel-eslint",
@@ -17,7 +17,7 @@
   },
   "jspm": {
     "directories": {
-      "lib": "src"
+      "lib": "leaflet-coverage"
     },
     "dependencies": {
       "cwise-compiler": "npm:cwise-compiler@^1.1.2",
@@ -25,6 +25,7 @@
       "ndarray": "npm:ndarray@^1.0.18"
     },
     "devDependencies": {
+      "assert": "npm:assert@^1.3.0",
       "babel": "npm:babel-core@^5.8.22",
       "babel-runtime": "npm:babel-runtime@^5.8.20",
       "core-js": "npm:core-js@^1.1.0"
