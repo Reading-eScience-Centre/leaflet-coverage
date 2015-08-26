@@ -14,7 +14,9 @@
   "standard": {
     "parser": "babel-eslint",
     "ignore": [
-      "config.js"
+      "config.js",
+      "karma.conf.js",
+      "karma.conf-ci.js"
     ]
   },
   "jspm": {
