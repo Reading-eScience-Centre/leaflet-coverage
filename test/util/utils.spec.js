@@ -47,10 +47,8 @@ describe("util/utils methods", () => {
                  [4,5,6]]
       // an object which has get(i,j,..) and .shape
       var ndobj = {
-          shape: [arr.length, arr[0].length],
-          get: function (i,j) {
-            return arr[i][j]
-          }
+        shape: [arr.length, arr[0].length],
+        get: (i,j) => arr[i][j]
       }
       var ndarr = utils.asSciJSndarray(ndobj)
       assert.deepEqual(ndarr.shape, ndobj.shape)

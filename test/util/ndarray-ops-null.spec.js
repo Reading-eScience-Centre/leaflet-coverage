@@ -11,7 +11,7 @@ describe("util/ndarray-ops-null methods", function() {
       assert.equal(idx, 2)
     })
     it("returns null if the array only contains nulls", function() {
-      var idx = opsnull.nullargmin()
+      var idx = opsnull.nullargmin(nullarr)
       assert.strictEqual(idx, null)
     })
   })
@@ -21,7 +21,7 @@ describe("util/ndarray-ops-null methods", function() {
       assert.equal(idx, 3)
     })
     it("returns null if the array only contains nulls", function() {
-      var idx = opsnull.nullargmax()
+      var idx = opsnull.nullargmax(nullarr)
       assert.strictEqual(idx, null)
     })
   })

@@ -92,13 +92,13 @@ class Wrapper1D {
     this._shape = arr.shape
     this._dims = arr.shape.length
     this._calculateStrides()
-    this.length = arr.shape.reduce((a, b) => a + b, 0)
+    this.length = arr.shape.reduce((a, b) => a * b, 1)
   }
   
   _calculateStrides () {
     var strides = new Uint16Array(this._dims)
     strides[this._dims-1] = 1
-    for (var i = this._dims-2; i > 0; i--) {
+    for (var i = this._dims-2; i >= 0; i--) {
       strides[i] = strides[i+1] * this._shape[i+1]
     }
     this._strides = strides
