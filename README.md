@@ -17,20 +17,22 @@ L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 
 // default renderers for common domain types
-var LayerFactory = L.CoverageLayerFactory()
+var LayerFactory = L.Coverage.LayerFactory()
 
 var cov = ... // load Coverage object with another library
-var options = {
-  keys: ['salinity'],
-  legend: {
+
+// TODO should be added like Legend
+//  parameterSync: L.Coverage.ParameterSync() // handles palette/legend merging of same-observedProperty/unit parameters
+//                                           // only useful for more than one coverage
+
+LayerFactory(cov, {keys: ['salinity']}).on('load', function(e) {
+  var covLayer = e.target
+  
+  new L.Coverage.Controls.Legend(covLayer, {
     id: 'horizontalLegend', // custom HTML template id
     position: 'bottom' // all other properties except 'id' are handed to the template
-  },
-  parameterSync: L.CoverageParameterSync() // handles palette/legend merging of same-observedProperty/unit parameters
-                                           // only useful for more than one coverage 
-}
-LayerFactory(cov, options).on('loaded', function(e) {
-  var covLayer = e.target
+  }).addTo(map)
+  
   map.fitBounds(covLayer.getBounds())
 }).addTo(map)
 
@@ -50,21 +52,21 @@ TODO need controls for axes (mostly for Grid and maybe profiles)
 ### Custom visualization
 
 ```js
-var LayerFactory = L.CoverageLayerFactory({
+var LayerFactory = L.Coverage.LayerFactory({
   renderer: GPXTrack
 })
 
 // alternatively, with more control for different coverage types:
-var LayerFactory = L.CoverageLayerFactory({
+var LayerFactory = L.Coverage.LayerFactory({
   renderers: {
     'http://www.topografix.com/GPX#Track': GPXTrack, // coverage type, precedence over domain types
     'http://www.topografix.com/GPX#Route': GPXRoute,
-    'http://coveragejson.org/def#Trajectory': Trajectory // domain type, fall-back for other trajectory coverages
+    'http://coveragejson.org/def#Trajectory': L.Coverage.Renderers.Trajectory // domain type, fall-back for other trajectory coverages
   }
 })
 
 
-LayerFactory(cov, {keys: ['distance', 'elevation', 'heartrate']}).on('loaded', function(e) {
+LayerFactory(cov, {keys: ['distance', 'elevation', 'heartrate']}).on('load', function(e) {
   var covLayer = e.target
   map.fitBounds(covLayer.getBounds())
 }).addTo(map)
@@ -105,9 +107,9 @@ as a single entity.
 TODO write down use cases when this is really needed (probably for profiles)
 
 ```js
-var LayerFactory = L.CoverageCollectionLayerFactory()
+var LayerFactory = L.Coverage.CollectionLayerFactory()
 var covs = ... // many Profiles
-LayerFactory(covs, {keys: ['salinity']}).on('loaded', function(e) {
+LayerFactory(covs, {keys: ['salinity']}).on('load', function(e) {
   var covLayer = e.target
   map.fitBounds(covLayer.getBounds())
 }).addTo(map)
@@ -115,7 +117,7 @@ LayerFactory(covs, {keys: ['salinity']}).on('loaded', function(e) {
 
 And similarly for custom renderers:
 ```js
-class ProfileCoverageCollection {
+class ProfileCollection {
   constructor(covs, options) {
     this.param = options.parameters[0]
   }

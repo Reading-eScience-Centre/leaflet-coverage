@@ -1,12 +1,12 @@
-import GridCoverage from 'leaflet-coverage/renderers/GridCoverage'
-import TrajectoryCoverage from 'leaflet-coverage/renderers/TrajectoryCoverage'
-import ProfileCoverage from 'leaflet-coverage/renderers/ProfileCoverage'
+import Grid from 'leaflet-coverage/renderers/Grid'
+import Trajectory from 'leaflet-coverage/renderers/Trajectory'
+import Profile from 'leaflet-coverage/renderers/Profile'
 
 const pre = 'http://coveragejson.org/def#'
 export const DEFAULT_RENDERERS = {
-    [pre + 'Grid']: GridCoverage,
-    [pre + 'Profile']: ProfileCoverage,
-    [pre + 'Trajectory']: TrajectoryCoverage
+    [pre + 'Grid']: Grid,
+    [pre + 'Profile']: Profile,
+    [pre + 'Trajectory']: Trajectory
 }
 
 export default function LayerFactory (options) {

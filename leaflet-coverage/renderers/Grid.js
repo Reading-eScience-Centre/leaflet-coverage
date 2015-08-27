@@ -12,9 +12,22 @@ const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
  * 
  * Provides time/vertical controls and a legend.
  * 
+ * Events fired onto the map:
+ * "dataloading" - Data loading has started
+ * "dataload" - Data loading has finished (also in case of errors)
+ * 
+ * Events fired on this layer:
+ * TODO check if "loading" and "load" get called repeatedly on redraw()! if yes, add note, can be handled with .once()
+ * "loading" - Rendering of tiles has started
+ * "load" - Rendering has finished
+ * "error" - Error when loading data
+ * "paletteChange" - Palette has been changed
+ * "paletteExtentChange" - Palette extent has been changed
  * 
  */
-class GridCoverage extends L.TileLayer.Canvas {
+export default class Grid extends L.TileLayer.Canvas {
+  
+  // TODO override getBounds()
   
   /**
    * The parameter to display must be given as the 'parameter' options property.
@@ -63,6 +76,8 @@ class GridCoverage extends L.TileLayer.Canvas {
   }
   
   onAdd (map) {
+    // "loading" and "load" events are provided by the underlying TileLayer class
+    
     this._map = map
     map.fire('dataloading') // for supporting loading spinners
     Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)])
@@ -77,7 +92,7 @@ class GridCoverage extends L.TileLayer.Canvas {
       })
       .catch(e => {
         console.error(e.message)
-        // TODO let user provide way to handle errors
+        this.fire('error', e)
         
         map.fire('dataload')
       })
@@ -176,6 +191,7 @@ class GridCoverage extends L.TileLayer.Canvas {
   set palette (p) {
     this._palette = p
     this._autoRedraw()
+    this.fire('paletteChange')
   }
   
   get palette () {
@@ -216,21 +232,13 @@ class GridCoverage extends L.TileLayer.Canvas {
   set paletteExtent (extent) {
     this._updatePaletteExtent(extent)
     this._autoRedraw()
+    this.fire('paletteExtentChange')
   }
   
   get paletteExtent () {
     return this._paletteExtent
   }
     
-  _addControls () {
-    // palette changer is external and sets the palette property!
-    // what about legend? axis subsetters?
-  }
-
-  _removeControls () {
-    
-  }
-  
   drawTile (canvas, tilePoint, zoom) {
     let map = this._map
     let ctx = canvas.getContext('2d')

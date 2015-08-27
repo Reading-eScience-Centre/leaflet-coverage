@@ -1,7 +1,7 @@
 {
   "name": "leaflet-coverage",
   "version": "0.1.0",
-  "main": "CoverageLayerFactory",
+  "main": "LayerFactory",
   "registry": "jspm",
   "format": "esm",
   "scripts": {
@@ -9,7 +9,7 @@
     "test": "./node_modules/.bin/karma start --single-run",
     "karma": "./node_modules/.bin/karma start",
     "saucelabs": "./node_modules/.bin/karma start karma.conf-ci.js",
-    "build": "jspm bundle-sfx leaflet-coverage/CoverageLayerFactory bundle.js"
+    "build": "jspm bundle-sfx leaflet-coverage/LayerFactory bundle.js"
   },
   "standard": {
     "parser": "babel-eslint",

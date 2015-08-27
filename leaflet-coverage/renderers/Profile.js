@@ -1,11 +1,12 @@
 import L from 'leaflet'
 
-const DOMAIN_TYPE = 'http://coveragejson.org/def#Trajectory'
+const DOMAIN_TYPE = 'http://coveragejson.org/def#Profile'
 
 /**
- * Renderer for Coverages with domain type Trajectory.
+ * Renderer for Coverages with domain type Profile.
+ * TODO maybe just wrap the ProfileCoverageCollection renderer
  */
-class TrajectoryCoverage {
+export default class Profile {
   
   constructor(cov, options) {
     if (cov.domainType !== DOMAIN_TYPE) {
