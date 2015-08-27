@@ -19,6 +19,7 @@ System.config({
     "core-js": "npm:core-js@1.1.1",
     "cwise-compiler": "npm:cwise-compiler@1.1.2",
     "leaflet": "github:Leaflet/Leaflet@0.7.3",
+    "minified": "github:timjansen/minified.js@2015.1.1",
     "ndarray": "npm:ndarray@1.0.18",
     "github:jspm/nodelibs-buffer@0.1.0": {
       "buffer": "npm:buffer@3.4.3"

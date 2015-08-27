@@ -1,4 +1,7 @@
 import L from 'leaflet'
+import MINI from 'minified' 
+let $ = MINI.$
+let HTML = MINI.HTML
 
 // TODO the default template should be moved outside this module so that it can be easily skipped
 const DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-legend'
@@ -34,7 +37,22 @@ const DEFAULT_TEMPLATE_CSS = `
   margin-right: 8px;
   opacity: 0.7;
 }
-`
+
+function injectDefaultTemplate () {
+  // inject default template and CSS into DOM
+  let span = document.createElement('span')
+  span.innerHTML = DEFAULT_TEMPLATE
+  document.body.appendChild(span.firstChild)
+  
+  let style = document.createElement('style')
+  style.type = 'text/css'
+  if (style.styleSheet){
+    style.styleSheet.cssText = css
+  } else {
+    style.appendChild(document.createTextNode(css))
+  }
+  document.head.appendChild(style)
+}
 
 export default class Legend extends L.Control {
   
@@ -44,48 +62,53 @@ export default class Legend extends L.Control {
     this.id = options.id || DEFAULT_TEMPLATE_ID
     
     if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) !== null) {
-      // inject default template and CSS into DOM
-      let span = document.createElement('span')
-      span.innerHTML = DEFAULT_TEMPLATE
-      document.body.appendChild(span.firstChild)
-      
-      let style = document.createElement('style')
-      style.type = 'text/css'
-      if (style.styleSheet){
-        style.styleSheet.cssText = css
-      } else {
-        style.appendChild(document.createTextNode(css))
-      }
-      document.head.appendChild(style)
+      injectDefaultTemplate()
     }
-    
-    // remove control from map when covLayer is removed
+
+    covLayer.on('paletteChange', this.updateLegend)
+    covLayer.on('paletteExtentChange', this.updateLegend)    
+
     covLayer.on('remove', () => {
       this.remove()
     })
   }
   
-  onAdd (map) {
+  updateLegend () {
+    let el = this._el
+    
     let palette = this.covLayer.palette
-    let el = document.importNode(document.getElementById(this.id), true).firstChild
-    el.getElementsByClassName('legend-title')[0].innerHTML = title
-    el.getElementsByClassName('legend-uom')[0].innerHTML = uom
-    el.getElementsByClassName('.legend-min')[0].innerHTML = low
-    el.getElementsByClassName('.legend-max')[0].innerHTML = high
+    let [low,high] = this.covLayer.paletteExtent
+    
+    $('.legend-min', el).fill(low.toFixed(2))
+    $('.legend-max', el).fill(high.toFixed(2))
 
-    var gradient = ''
-    for (var i = 0; i < palette.steps; i++) {
+    let gradient = ''
+    for (let i = 0; i < palette.steps; i++) {
       if (i > 0) gradient += ','
       gradient += 'rgb(' + palette.red[i] + ',' + palette.green[i] + ',' + palette.blue[i] + ')'
     }
-    // TODO adapt
-    $('.legend-palette', div).css('background',
+    
+    $('.legend-palette', el).set('$background',
          'transparent linear-gradient(to top, ' + gradient + ') repeat scroll 0% 0%')
-    return div
   }
   
   onRemove (map) {
-    // clear event listeners
+    covLayer.off('paletteChange', this.updateLegend)
+    covLayer.off('paletteExtentChange', this.updateLegend)   
+  }
+  
+  onAdd (map) {
+    let param = this.covLayer.parameter
+    let title = param.observedProperty.label
+    let unit = param.unit ? (param.unit.symbol ? param.unit.symbol : param.unit.label) : ''
+    
+    let el = document.importNode($('#' + this.id)[0], true).firstChild
+    this._el = el
+    $('.legend-title', el).fill(title)
+    $('.legend-uom', el).fill(unit)
+    this.updateLegend()
+    
+    return el
   }
   
 }
