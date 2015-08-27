@@ -33,6 +33,13 @@ LayerFactory(cov, {keys: ['salinity']}).on('load', function(e) {
     position: 'bottom' // all other properties except 'id' are handed to the template
   }).addTo(map)
   
+  if (covLayer.time !== null) {
+  	new L.Coverage.Controls.TimeAxis(covLayer).addTo(map)
+  }
+  if (covLayer.vertical !== null) {
+  	new L.Coverage.Controls.VerticalAxis(covLayer).addTo(map)
+  }
+  
   map.fitBounds(covLayer.getBounds())
 }).addTo(map)
 

@@ -152,6 +152,10 @@ export default class Grid extends L.TileLayer.Canvas {
     return idx
   }
   
+  get parameter () {
+    return this.param
+  }
+  
   /**
    * Sets the currently active time to the one closest to the given Date object.
    * This has no effect if the grid has no time axis.
