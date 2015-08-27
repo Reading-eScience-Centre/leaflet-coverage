@@ -12,7 +12,8 @@ function nullargminmax (op) {
   return compile({
     args:["index","array","shape"],
     pre:{
-    body:"{this_v=" + minus + "Infinity;this_i=_inline_0_arg2_.slice(0)}",
+    //body:"{this_v=" + minus + "Infinity;this_i=_inline_0_arg2_.slice(0)}",
+      body:"{this_v=" + minus + "Infinity;this_i=_inline_0_arg2_.slice(0);for(var _inline_1_k=0;_inline_1_k<this_i.length;_inline_1_k++){this_i[_inline_1_k]=null}}",
     args:[
       {name:"_inline_0_arg0_",lvalue:false,rvalue:false,count:0},
       {name:"_inline_0_arg1_",lvalue:false,rvalue:false,count:0},

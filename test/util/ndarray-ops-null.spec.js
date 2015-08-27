@@ -8,21 +8,21 @@ describe("util/ndarray-ops-null methods", function() {
   describe("#nullargmin", function() {
     it("returns the index of the minimum element ignoring nulls", function() {
       var idx = opsnull.nullargmin(arr)
-      assert.equal(idx, 2)
+      assert.deepEqual(idx, [2])
     })
     it("returns null if the array only contains nulls", function() {
       var idx = opsnull.nullargmin(nullarr)
-      assert.strictEqual(idx, null)
+      assert.deepEqual(idx, [null])
     })
   })
   describe("#nullargmax", function() {
     it("returns the index of the maximum element ignoring nulls", function() {
       var idx = opsnull.nullargmax(arr)
-      assert.equal(idx, 3)
+      assert.deepEqual(idx, [3])
     })
     it("returns null if the array only contains nulls", function() {
       var idx = opsnull.nullargmax(nullarr)
-      assert.strictEqual(idx, null)
+      assert.deepEqual(idx, [null])
     })
   })
 })
