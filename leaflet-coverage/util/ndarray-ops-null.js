@@ -12,7 +12,6 @@ function nullargminmax (op) {
   return compile({
     args:["index","array","shape"],
     pre:{
-    //body:"{this_v=" + minus + "Infinity;this_i=_inline_0_arg2_.slice(0)}",
       body:"{this_v=" + minus + "Infinity;this_i=_inline_0_arg2_.slice(0);for(var _inline_1_k=0;_inline_1_k<this_i.length;_inline_1_k++){this_i[_inline_1_k]=null}}",
     args:[
       {name:"_inline_0_arg0_",lvalue:false,rvalue:false,count:0},
@@ -29,7 +28,7 @@ function nullargminmax (op) {
     thisVars:["this_i","this_v"],
     localVars:["_inline_1_k"]},
     post:{
-    body:"{return this_i}",
+    body:"{return this_i[0] === null ? null : this_i}",
     args:[],
     thisVars:["this_i"],
     localVars:[]}
