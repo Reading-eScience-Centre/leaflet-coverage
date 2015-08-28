@@ -27,8 +27,6 @@ const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
  */
 export default class Grid extends L.TileLayer.Canvas {
   
-  // TODO override getBounds()
-  
   /**
    * The parameter to display must be given as the 'parameter' options property.
    * 
@@ -101,6 +99,13 @@ export default class Grid extends L.TileLayer.Canvas {
   onRemove (map) {
     this._removeControls()
     super.onRemove(map)
+  }
+  
+  getBounds () {
+    let southWest = L.latLng(this.cov.bbox[1], this.cov.bbox[0])
+    let northEast = L.latLng(this.cov.bbox[3], this.cov.bbox[2])
+    let bounds = new L.LatLngBounds(southWest, northEast)
+    return bounds
   }
   
   /**
