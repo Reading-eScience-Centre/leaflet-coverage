@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import {scale} from 'leaflet-coverage/renderers/palettes'
+import {scale} from './leaflet-coverage/renderers/palettes.js'
 
 const DOMAIN_TYPE = 'http://coveragejson.org/def#Trajectory'
 
