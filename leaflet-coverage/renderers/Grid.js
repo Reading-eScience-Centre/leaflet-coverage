@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import {linearPalette} from 'leaflet-coverage/renderers/palettes'
+import {linearPalette, scale} from 'leaflet-coverage/renderers/palettes'
 import * as utils from 'leaflet-coverage/util/utils'
 import * as opsnull from 'leaflet-coverage/util/ndarray-ops-null'
 
@@ -10,8 +10,6 @@ const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
 /**
  * Renderer for Coverages with domain type Grid.
  * 
- * Provides time/vertical controls and a legend.
- * 
  * Events fired onto the map:
  * "dataloading" - Data loading has started
  * "dataload" - Data loading has finished (also in case of errors)
@@ -21,8 +19,10 @@ const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
  * "loading" - Rendering of tiles has started
  * "load" - Rendering has finished
  * "error" - Error when loading data
- * "paletteChange" - Palette has been changed
- * "paletteExtentChange" - Palette extent has been changed
+ * "paletteChange" - Palette has changed
+ * "paletteExtentChange" - Palette extent has changed
+ * "axisChange" - Axis coordinate has changed (e.axis === 'time'|'vertical')
+ * "remove" - Layer is removed from the map
  * 
  */
 export default class Grid extends L.TileLayer.Canvas {
@@ -84,7 +84,6 @@ export default class Grid extends L.TileLayer.Canvas {
         this.range = range
         this._subsetAxesByCoordinatePreference()
         this._updatePaletteExtent()
-        this._addControls()
         super.onAdd(map)
         map.fire('dataload')
       })
@@ -95,12 +94,7 @@ export default class Grid extends L.TileLayer.Canvas {
         map.fire('dataload')
       })
   }
-  
-  onRemove (map) {
-    this._removeControls()
-    super.onRemove(map)
-  }
-  
+    
   getBounds () {
     let southWest = L.latLng(this.cov.bbox[1], this.cov.bbox[0])
     let northEast = L.latLng(this.cov.bbox[3], this.cov.bbox[2])
@@ -166,9 +160,13 @@ export default class Grid extends L.TileLayer.Canvas {
    * This has no effect if the grid has no time axis.
    */
   set time (val) {
+    let old = this.time
     this._axesSubset.t.coordPref = val
     this._subsetAxesByPreference()
     this._autoRedraw()
+    if (old !== this.time) {
+      this.fire('axisChange', {axis: 'time'})
+    }    
   }
   
   /**
@@ -184,9 +182,13 @@ export default class Grid extends L.TileLayer.Canvas {
    * This has no effect if the grid has no vertical axis.
    */
   set vertical (val) {
+    let old = this.vertical
     this._axesSubset.z.coordPref = val
     this._subsetAxesByPreference()
     this._autoRedraw()
+    if (old !== this.vertical) {
+      this.fire('axisChange', {axis: 'vertical'})
+    }   
   }
   
   /**
@@ -261,17 +263,17 @@ export default class Grid extends L.TileLayer.Canvas {
     let start = tilePoint.multiplyBy(tileSize)
     let startX = start.x
     let startY = start.y
-        
+    
+    let palette = this.palette
     let {paletteRed, paletteGreen, paletteBlue} = this.palette
-    let paletteSize = paletteRed.length
-    let [paletteMin, paletteMax] = this.paletteExtent
+    let paletteExtent = this.paletteExtent
+    
+    // TODO don't scale value if categorical parameter
     
     function setPixel (tileY, tileX, val) {
       if (val === null) return
       // map value to color using a palette
-      // scale val to [0,paletteSize-1] using the palette extent
-      // (IDL bytscl formula: http://www.exelisvis.com/docs/BYTSCL.html)
-      var valScaled = Math.trunc((paletteSize - 1 + 0.9999) * (val - paletteMin) / (paletteMax - paletteMin))
+      var valScaled = scale(val, palette, paletteExtent)
 
       rgba.set(tileY, tileX, 0, paletteRed[valScaled])
       rgba.set(tileY, tileX, 1, paletteGreen[valScaled])

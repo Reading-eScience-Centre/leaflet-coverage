@@ -1,7 +1,8 @@
 import L from 'leaflet'
 import MINI from 'minified' 
 let $ = MINI.$
-let HTML = MINI.HTML
+
+import {inject} from 'leaflet-coverage/controls/utils'
 
 // TODO the default template should be moved outside this module so that it can be easily skipped
 const DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-legend'
@@ -37,23 +38,12 @@ const DEFAULT_TEMPLATE_CSS = `
   margin-right: 8px;
   opacity: 0.7;
 }
+`
 
-function injectDefaultTemplate () {
-  // inject default template and CSS into DOM
-  let span = document.createElement('span')
-  span.innerHTML = DEFAULT_TEMPLATE
-  document.body.appendChild(span.firstChild)
-  
-  let style = document.createElement('style')
-  style.type = 'text/css'
-  if (style.styleSheet){
-    style.styleSheet.cssText = css
-  } else {
-    style.appendChild(document.createTextNode(css))
-  }
-  document.head.appendChild(style)
-}
-
+/**
+ * Displays a palette legend for the parameter displayed by the given
+ * Coverage layer.
+ */
 export default class Legend extends L.Control {
   
   constructor (covLayer, options) {
@@ -62,7 +52,7 @@ export default class Legend extends L.Control {
     this.id = options.id || DEFAULT_TEMPLATE_ID
     
     if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) !== null) {
-      injectDefaultTemplate()
+      inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS)
     }
 
     covLayer.on('paletteChange', this.updateLegend)

@@ -75,7 +75,14 @@ function directPalette (colors) {
     green: green,
     blue: blue
   }
-}  
+}
+
+function scale (val, palette, extent) {
+  // scale val to [0,paletteSize-1] using the palette extent
+  // (IDL bytscl formula: http://www.exelisvis.com/docs/BYTSCL.html)
+  let scaled = Math.trunc((palette.steps - 1 + 0.9999) * (val - extent[0]) / (extent[1] - extent[0]))
+  return scaled
+}
 
 /**
  * Manages palettes under common names.
