@@ -10,12 +10,14 @@ describe("renderers/palettes methods", () => {
       let b = [10,99,255]
       let colors = []
       for (let i=0; i < r.length; i++) {
-        colors.push('rgb(${r[i]}, ${g[i]}, ${b[i]})')
+        colors.push(`rgb(${r[i]}, ${g[i]}, ${b[i]})`)
       }
       let palette = palettes.directPalette(colors)
-      assert.deepEqual(palette.red, r)
-      assert.deepEqual(palette.green, g)
-      assert.deepEqual(palette.blue, b)      
+      for (let i=0; i < r.length; i++) {
+        assert.strictEqual(palette.red[i], r[i])
+        assert.strictEqual(palette.green[i], g[i])
+        assert.strictEqual(palette.blue[i], b[i])
+      }
     })
   })
 })

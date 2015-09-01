@@ -1,7 +1,7 @@
 import L from 'leaflet'
-import {linearPalette, scale} from './renderers/palettes.js'
-import * as utils from './util/utils.js'
-import * as opsnull from './util/ndarray-ops-null.js'
+import {linearPalette, scale} from './palettes.js'
+import * as utils from '../util/utils.js'
+import * as opsnull from '../util/ndarray-ops-null.js'
 
 const DOMAIN_TYPE = 'http://coveragejson.org/def#Grid'
   

@@ -64,10 +64,10 @@ export function directPalette (colors) {
   for (var i=0; i < colors.length; i++) {
     ctx.fillStyle = colors[i]
     ctx.fillRect(0, 0, 1, 1)
-    var pix = ctx.getImageData(0, 0, 1, 1).data[0]
-    red[j] = pix[0]
-    green[j] = pix[1]
-    blue[j] = pix[2]
+    var pix = ctx.getImageData(0, 0, 1, 1).data
+    red[i] = pix[0]
+    green[i] = pix[1]
+    blue[i] = pix[2]
   }
   
   return {
