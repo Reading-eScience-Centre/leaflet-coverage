@@ -2,7 +2,7 @@ import L from 'leaflet'
 import MINI from 'minified' 
 let $ = MINI.$
 
-import {inject} from './controls/utils.js'
+import {inject} from './utils.js'
 
 // TODO the default template should be moved outside this module so that it can be easily skipped
 const DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-legend'
