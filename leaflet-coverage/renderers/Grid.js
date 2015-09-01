@@ -46,6 +46,7 @@ export default class Grid extends L.TileLayer.Canvas {
    * </code></pre>
    */
   constructor (cov, options) {
+    super()
     if (cov.domainType !== DOMAIN_TYPE) {
       throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE)
     }
@@ -79,7 +80,7 @@ export default class Grid extends L.TileLayer.Canvas {
     this._map = map
     map.fire('dataloading') // for supporting loading spinners
     Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)])
-      .then([domain, range] => {
+      .then(([domain, range]) => {
         this.domain = domain
         this.range = range
         this._subsetAxesByCoordinatePreference()
@@ -317,7 +318,7 @@ export default class Grid extends L.TileLayer.Canvas {
    * Derives the bounding box of the x,y axes in CRS coordinates.
    * @returns {Array} [xmin,ymin,xmax,ymax]
    */
-  function _getDomainBbox () {
+  _getDomainBbox () {
     let {xmin,xmax} = [this.domain.x[0], this.domain.x[this.domain.x.length - 1]]
     let {ymin,ymax} = [this.domain.y[0], this.domain.y[this.domain.y.length - 1]]
     if (xmin > xmax) {
@@ -339,7 +340,7 @@ export default class Grid extends L.TileLayer.Canvas {
    * @param {Integer} startY
    * @param {ndarray} vals Range values.
    */
-  function _drawAnyMapProjection (setPixel, tileSize, startX, startY, vals) {
+  _drawAnyMapProjection (setPixel, tileSize, startX, startY, vals) {
     // usable for any map projection, but computationally more intensive
     // there are two hotspots in the loops: map.unproject and indexOfNearest
 
@@ -377,7 +378,7 @@ export default class Grid extends L.TileLayer.Canvas {
    * Draws a geodetic rectilinear domain grid on a map whose grid is, or can be directly
    * mapped to, a geodetic rectilinear grid.
    */
-  function _drawRectilinearGeodeticMapProjection (setPixel, tileSize, startX, startY, vals) {
+  _drawRectilinearGeodeticMapProjection (setPixel, tileSize, startX, startY, vals) {
     // optimized version for map projections that are equal to a rectilinear geodetic grid
     // this can be used when lat and lon can be computed independently for a given pixel
 

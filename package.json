@@ -9,7 +9,7 @@
     "test": "./node_modules/.bin/karma start --single-run",
     "karma": "./node_modules/.bin/karma start",
     "saucelabs": "./node_modules/.bin/karma start karma.conf-ci.js",
-    "build": "jspm bundle-sfx leaflet-coverage/LayerFactory bundle.js"
+    "build": "jspm bundle-sfx leaflet-coverage/LayerFactory.js bundle.js"
   },
   "standard": {
     "parser": "babel-eslint",
@@ -34,12 +34,11 @@
       "babel": "npm:babel-core@^5.8.22",
       "babel-runtime": "npm:babel-runtime@^5.8.20",
       "core-js": "npm:core-js@^1.1.0"
-    },
-    "overrides": {}
+    }
   },
   "devDependencies": {
     "babel-eslint": "^4.0.10",
-    "jspm": "^0.16.1",
+    "jspm": "^0.16.2",
     "karma": "^0.13.9",
     "karma-chrome-launcher": "^0.2.0",
     "karma-firefox-launcher": "^0.1.6",

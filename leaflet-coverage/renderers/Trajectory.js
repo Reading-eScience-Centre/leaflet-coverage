@@ -49,7 +49,7 @@ export default class Trajectory extends L.LayerGroup {
     this._map = map
     map.fire('dataloading') // for supporting loading spinners
     Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)])
-      .then([domain, range] => {
+      .then(([domain, range]) => {
         this.domain = domain
         this.range = range
         this._updatePaletteExtent()

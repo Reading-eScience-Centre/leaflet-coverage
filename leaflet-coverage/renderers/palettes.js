@@ -49,7 +49,7 @@ export function linearPalette (colors, steps=256) {
 /**
  * Converts an array of CSS colors to a palette of the same size.
  */
-function directPalette (colors) {
+export function directPalette (colors) {
   var canvas = document.createElement('canvas')
   canvas.width = 1
   canvas.height = 1
@@ -77,7 +77,7 @@ function directPalette (colors) {
   }
 }
 
-function scale (val, palette, extent) {
+export function scale (val, palette, extent) {
   // scale val to [0,paletteSize-1] using the palette extent
   // (IDL bytscl formula: http://www.exelisvis.com/docs/BYTSCL.html)
   let scaled = Math.trunc((palette.steps - 1 + 0.9999) * (val - extent[0]) / (extent[1] - extent[0]))
@@ -169,7 +169,7 @@ export class PaletteManager {
   }
 }
 
-_asUint8Array (arr) {
+function _asUint8Array (arr) {
   var ta = new Uint8Array(arr.length)
   for (var i=0; i < arr.length; i++) {
     let val = arr[i]
