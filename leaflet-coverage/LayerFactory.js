@@ -9,7 +9,7 @@ export const DEFAULT_RENDERERS = {
     [pre + 'Trajectory']: Trajectory
 }
 
-export default function LayerFactory (options) {
+export default function LayerFactory (options={}) {
   if (options.renderer) {
     return (cov, opts) => new options.renderer(cov, opts)
   }
