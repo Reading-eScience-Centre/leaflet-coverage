@@ -14,9 +14,22 @@ export default function LayerFactory (options={}) {
     return (cov, opts) => new options.renderer(cov, opts)
   }
   if (options.renderers) {
-    return (cov, opts) => options.renderers[cov.type]? 
-                          new options.renderers[cov.type](cov, opts) :
-                          new options.renderers[cov.domainType](cov, opts)
+    return (cov, opts) => {
+      if (options.renderers[cov.type]) {
+        return new options.renderers[cov.type](cov, opts)
+      }
+      if (options.renderers[cov.domainType]) {
+        return new options.renderers[cov.domainType](cov, opts)
+      }
+      throw new Error(`No renderer found for type=${cov.type} or domainType=${cov.domainType},
+                       available: ${Object.keys(options.renderers)}`)
+    }
   }
-  return (cov, opts) => new DEFAULT_RENDERERS[cov.domainType](cov, opts)
+  return (cov, opts) => {
+    if (!DEFAULT_RENDERERS[cov.domainType]) {
+      throw new Error(`No renderer found for domainType=${cov.domainType},
+          available: ${Object.keys(DEFAULT_RENDERERS)}`)
+    }
+    return new DEFAULT_RENDERERS[cov.domainType](cov, opts)
+  }
 }
