@@ -1,9 +1,10 @@
 # leaflet-coverage
 
-A Leaflet plugin for visualizing [coverages](https://en.wikipedia.org/wiki/Coverage_data) (numerical or categorical data varying in space and time) with the help of the [JavaScript Coverage API](https://github.com/neothemachine/coverage-jsapi). Currently, it supports the domain types defined within [CoverageJSON](https://github.com/neothemachine/coveragejson).
+A [Leaflet](http://leafletjs.com/) plugin for visualizing [coverages](https://en.wikipedia.org/wiki/Coverage_data) (numerical or categorical data varying in space and time) with the help of the [JavaScript Coverage API](https://github.com/Reading-eScience-Centre/coverage-jsapi). Currently, it supports the domain types defined within [CoverageJSON](https://github.com/Reading-eScience-Centre/coveragejson).
 
-Note that to *load* a coverage you have to use another library, depending on which formats you want to support. The only currently known coverage loader that can be used is the [covjson-reader](https://github.com/neothemachine/covjson-reader) for the [CoverageJSON](https://github.com/neothemachine/coveragejson) format.
+Note that to *load* a coverage you have to use another library, depending on which formats you want to support. The only currently known coverage loader that can be used is the [covjson-reader](https://github.com/Reading-eScience-Centre/covjson-reader) for the [CoverageJSON](https://github.com/Reading-eScience-Centre/coveragejson) format.
 
+NOTE: This plugin is in active development and does not support all CoverageJSON domain types yet.
 
 ## Example
 
