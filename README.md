@@ -31,7 +31,8 @@ LayerFactory(cov, {keys: ['salinity']}).on('load', function(e) {
   
   new L.Coverage.Controls.Legend(covLayer, {
     id: 'horizontalLegend', // custom HTML template id
-    position: 'bottom' // all other properties except 'id' are handed to the template
+    position: 'bottom',
+    language: 'de' // preferred language for labels
   }).addTo(map)
   
   if (covLayer.time !== null) {
