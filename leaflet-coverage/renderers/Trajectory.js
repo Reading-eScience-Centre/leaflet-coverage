@@ -63,7 +63,7 @@ class Trajectory extends L.LayerGroup {
         map.fire('dataload')
       })
       .catch(e => {
-        console.error(e.message)
+        console.error(e)
         this.fire('error', e)
         
         map.fire('dataload')
