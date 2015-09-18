@@ -24,7 +24,7 @@ const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
  * "remove" - Layer is removed from the map
  * 
  */
-export default class Trajectory extends L.LayerGroup {
+class Trajectory extends L.LayerGroup {
   
   constructor(cov, options) {
     super()
@@ -146,3 +146,6 @@ export default class Trajectory extends L.LayerGroup {
 }
 
 Trajectory.include(L.Mixin.Events)
+
+// work-around for Babel bug, otherwise Trajectory cannot be referenced here
+export { Trajectory as default }
