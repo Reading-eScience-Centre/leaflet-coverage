@@ -144,3 +144,5 @@ export default class Trajectory extends L.LayerGroup {
   }
   
 }
+
+Trajectory.include(L.Mixin.Events)
