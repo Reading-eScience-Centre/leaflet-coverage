@@ -37,7 +37,7 @@ export default class TimeAxis extends L.Control {
   
   onAdd (map) {
 
-    let el = document.importNode($('#' + this.id)[0], true).firstChild
+    let el = document.importNode($('#' + this.id)[0].content, true).children[0]
     this._el = el
     this.updateAxis()
     

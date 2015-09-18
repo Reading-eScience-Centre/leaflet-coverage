@@ -99,7 +99,7 @@ export default class Legend extends L.Control {
                (param.unit.symbol ? param.unit.symbol : getLanguageString(param.unit.label, language)) :
                ''
     
-    let el = document.importNode($('#' + this.id)[0], true).firstChild
+    let el = document.importNode($('#' + this.id)[0].content, true).children[0]
     this._el = el
     $('.legend-title', el).fill(title)
     $('.legend-uom', el).fill(unit)
