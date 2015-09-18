@@ -26,7 +26,7 @@ const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
  */
 class Trajectory extends L.LayerGroup {
   
-  constructor(cov, options) {
+  constructor (cov, options) {
     super()
     if (cov.domainType !== DOMAIN_TYPE) {
       throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE)
@@ -42,14 +42,17 @@ class Trajectory extends L.LayerGroup {
     } else {
       throw new Error('paletteExtent must either be a 2-element array, ' +
           'one of "full", "subset" (identical to "full" for trajectories) or "fov", or be omitted')
-    }    
+    }
+    console.log('Trajectory layer created')
   }
   
-  onAdd(map) {
+  onAdd (map) {
+    console.log('adding trajectory to map')
     this._map = map
     map.fire('dataloading') // for supporting loading spinners
     Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)])
       .then(([domain, range]) => {
+        console.log('domain and range loaded')
         this.domain = domain
         this.range = range
         this._updatePaletteExtent()
@@ -63,12 +66,12 @@ class Trajectory extends L.LayerGroup {
         this.fire('error', e)
         
         map.fire('dataload')
-      })
-      
+      })      
   }
   
   onRemove (map) {
-    
+    console.log('removing trajectory to map')
+    super.onRemove(map)
   }
   
   get parameter () {
@@ -132,7 +135,7 @@ class Trajectory extends L.LayerGroup {
       if (val !== null) {
         let valScaled = scale(val, palette, paletteExtent)
         let marker = new L.CircleMarker(coord, {
-            color: `rgb($(red[valScaled]), $(green[valScaled]), $(blue[valScaled]))`
+            color: `rgb(${red[valScaled]}, ${green[valScaled]}, ${blue[valScaled]})`
           })
         this.addLayer(marker)        
       }
