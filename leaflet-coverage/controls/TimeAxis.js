@@ -17,7 +17,7 @@ export default class TimeAxis extends L.Control {
     this.covLayer = covLayer
     this.id = options.id || DEFAULT_TEMPLATE_ID
     
-    if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) !== null) {
+    if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
       inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS)
     }
 

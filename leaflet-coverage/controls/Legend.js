@@ -54,7 +54,7 @@ export default class Legend extends L.Control {
     this.id = options.id || DEFAULT_TEMPLATE_ID
     this.language = options.language || DEFAULT_LANGUAGE
     
-    if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) !== null) {
+    if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
       inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS)
     }
 

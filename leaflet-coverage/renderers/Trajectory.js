@@ -148,7 +148,7 @@ class Trajectory extends L.LayerGroup {
     let coords = []
     let markers = []
     for (let i=0; i < x.length; i++) {
-      let val = vals[i]
+      let val = vals.get(i)
       // this always has to be lat/lon, no matter which map projection is used
       let coord = new L.LatLng(y[i], x[i])
       coords.push(coord)
