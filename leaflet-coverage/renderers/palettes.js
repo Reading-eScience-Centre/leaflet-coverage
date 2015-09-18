@@ -40,6 +40,7 @@ export function linearPalette (colors, steps=256) {
   }
 
   return {
+    steps: red.length,
     red: red,
     green: green,
     blue: blue
@@ -71,6 +72,7 @@ export function directPalette (colors) {
   }
   
   return {
+    steps: red.length,
     red: red,
     green: green,
     blue: blue
