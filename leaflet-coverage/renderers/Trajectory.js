@@ -158,13 +158,18 @@ class Trajectory extends L.FeatureGroup {
       if (val !== null) {
         let valScaled = scale(val, palette, paletteExtent)
         let marker = new L.CircleMarker(coord, {
-            color: `rgb(${red[valScaled]}, ${green[valScaled]}, ${blue[valScaled]})`
+            color: `rgb(${red[valScaled]}, ${green[valScaled]}, ${blue[valScaled]})`,
+            opacity: 1,
+            fillOpacity: 1
           })
         this.addLayer(marker)
       }
     }
     
-    let polyline = L.polyline(coords, {color: 'black'})
+    let polyline = L.polyline(coords, {
+        color: 'black',
+        weight: 3
+      })
     
     this.addLayer(polyline)
   }
