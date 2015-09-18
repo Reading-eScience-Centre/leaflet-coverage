@@ -40,7 +40,7 @@ const DEFAULT_TEMPLATE_CSS = `
 }
 `
 
-DEFAULT_LANGUAGE = 'en'
+const DEFAULT_LANGUAGE = 'en'
 
 /**
  * Displays a palette legend for the parameter displayed by the given
