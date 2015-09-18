@@ -10,3 +10,8 @@ install:
   - ./node_modules/.bin/jspm install
   
 script: npm run saucelabs
+
+notifications:
+  email:
+    on_failure: change
+    

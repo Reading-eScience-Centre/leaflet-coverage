@@ -89,7 +89,8 @@ class Trajectory extends L.LayerGroup {
     return this._palette
   }
   
-  _updatePaletteExtent (extent) {
+  _updatePaletteExtent () {
+    let extent = this._paletteExtent
     if (Array.isArray(extent) && extent.length === 2) {
       this._paletteExtent = extent
       return
