@@ -161,7 +161,7 @@ class Trajectory extends L.LayerGroup {
       }
     }
     
-    let polyline = L.polyline(points, {color: 'black'})
+    let polyline = L.polyline(coords, {color: 'black'})
     
     this.addLayer(polyline)
   }
