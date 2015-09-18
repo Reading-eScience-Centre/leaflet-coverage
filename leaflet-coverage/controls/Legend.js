@@ -115,7 +115,7 @@ function getLanguageTag (map, preferredLanguage) {
     return preferredLanguage
   } else {
     // could be more clever here for cases like 'de' vs 'de-DE'
-    return map.keys().next()
+    return map.keys().next().value
   }
 }
 
@@ -125,6 +125,6 @@ function getLanguageString (map, preferredLanguage) {
   } else {
     // random language
     // this case should not happen as all labels should have common languages
-    return map.values().next()
+    return map.values().next().value
   }
 }

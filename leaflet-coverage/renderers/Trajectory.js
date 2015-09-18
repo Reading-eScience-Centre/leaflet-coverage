@@ -26,7 +26,10 @@ const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
  * "remove" - Layer is removed from the map
  * 
  */
-class Trajectory extends L.LayerGroup {
+class Trajectory extends L.FeatureGroup {
+  
+  // TODO FeatureGroup is not ideal since click events etc should not be blindly propagated
+  //    (we use it for now to have getBounds() which LayerGroup misses)
   
   constructor (cov, options) {
     super()
