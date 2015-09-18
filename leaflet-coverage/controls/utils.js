@@ -8,7 +8,7 @@ export function inject (html, css) {
   // inject default template and CSS into DOM
   let span = document.createElement('span')
   span.innerHTML = html
-  document.body.appendChild(span.firstChild)
+  document.body.appendChild(span.children[0])
   
   let style = document.createElement('style')
   style.type = 'text/css'

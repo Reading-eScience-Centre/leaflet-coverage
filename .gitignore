@@ -3,3 +3,4 @@
 /jspm_packages/
 /sauce.json
 /bundle.js
+/*.log
