@@ -32,7 +32,7 @@ export default class Trajectory extends L.LayerGroup {
       throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE)
     }
     this.cov = cov
-    this.param = options.parameters[0]
+    this.param = cov.parameters.get(options.keys[0])
     
     this._palette = options.palette || DEFAULT_PALETTE
     if (options.paletteExtent === undefined || options.paletteExtent === 'subset') {

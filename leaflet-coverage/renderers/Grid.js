@@ -37,7 +37,7 @@ export default class Grid extends L.TileLayer.Canvas {
    * <pre><code>
    * var cov = ... // get Coverage data
    * var layer = new GridCoverage(cov, {
-   *   parameter: cov.parameters.get('salinity'),
+   *   keys: ['salinity'],
    *   time: new Date('2015-01-01T12:00:00Z'),
    *   vertical: 50,
    *   palette: palettes.get('blues'),
@@ -51,7 +51,7 @@ export default class Grid extends L.TileLayer.Canvas {
       throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE)
     }
     this.cov = cov
-    this.param = options.parameter
+    this.param = cov.parameters.get(options.keys[0])
     this._axesSubset = { // x and y are not subsetted
         t: {coordPref: options.time},
         z: {coordPref: options.vertical}

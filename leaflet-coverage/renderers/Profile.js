@@ -13,7 +13,7 @@ export default class Profile {
       throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE)
     }
     this.cov = cov
-    this.param = options.parameters[0]
+    this.param = cov.parameters.get(options.keys[0])
   }
   
   onAdd(map) {
