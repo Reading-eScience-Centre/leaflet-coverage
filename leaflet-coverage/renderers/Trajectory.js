@@ -1,5 +1,6 @@
 import L from 'leaflet'
 import {linearPalette, scale} from './palettes.js'
+import * as utils from '../util/utils.js'
 
 const DOMAIN_TYPE = 'http://coveragejson.org/def#Trajectory'
 
