@@ -45,6 +45,14 @@ class Trajectory extends L.LayerGroup {
       throw new Error('paletteExtent must either be a 2-element array, ' +
           'one of "full", "subset" (identical to "full" for trajectories) or "fov", or be omitted')
     }
+    // TODO remove code duplication
+    switch (options.redraw) {
+    case 'manual': this._autoRedraw = false; break
+    case undefined:
+    case 'onchange': this._autoRedraw = true; break
+    default: throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")')
+    }
+    
     console.log('Trajectory layer created')
   }
   
@@ -57,7 +65,7 @@ class Trajectory extends L.LayerGroup {
         console.log('domain and range loaded')
         this.domain = domain
         this.range = range
-        this._updatePaletteExtent()
+        this._updatePaletteExtent(this._paletteExtent)
         this._addTrajectoryLayers()
         super.onAdd(map)
         this.fire('load')
@@ -72,7 +80,7 @@ class Trajectory extends L.LayerGroup {
   }
   
   onRemove (map) {
-    console.log('removing trajectory to map')
+    console.log('removing trajectory from map')
     super.onRemove(map)
   }
   
@@ -82,7 +90,7 @@ class Trajectory extends L.LayerGroup {
   
   set palette (p) {
     this._palette = p
-    this._autoRedraw()
+    this._doAutoRedraw()
     this.fire('paletteChange')
   }
   
@@ -90,8 +98,17 @@ class Trajectory extends L.LayerGroup {
     return this._palette
   }
   
-  _updatePaletteExtent () {
-    let extent = this._paletteExtent
+  set paletteExtent (extent) {
+    this._updatePaletteExtent(extent)
+    this._autoRedraw()
+    this.fire('paletteExtentChange')
+  }
+  
+  get paletteExtent () {
+    return this._paletteExtent
+  }
+  
+  _updatePaletteExtent (extent) {
     if (Array.isArray(extent) && extent.length === 2) {
       this._paletteExtent = extent
       return
@@ -140,13 +157,24 @@ class Trajectory extends L.LayerGroup {
         let marker = new L.CircleMarker(coord, {
             color: `rgb(${red[valScaled]}, ${green[valScaled]}, ${blue[valScaled]})`
           })
-        this.addLayer(marker)        
+        this.addLayer(marker)
       }
     }
     
     let polyline = L.polyline(points, {color: 'black'})
     
     this.addLayer(polyline)
+  }
+  
+  _doAutoRedraw () {
+    if (this._autoRedraw) {
+      this.redraw()
+    }
+  }
+  
+  redraw () {
+    this.clearLayers()
+    this._addTrajectoryLayers()
   }
   
 }
