@@ -1,6 +1,7 @@
 import L from 'leaflet'
 import {linearPalette, scale} from './palettes.js'
 import * as utils from '../util/utils.js'
+import * as opsnull from '../util/ndarray-ops-null.js'
 
 const DOMAIN_TYPE = 'http://coveragejson.org/def#Trajectory'
 
