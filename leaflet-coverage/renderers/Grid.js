@@ -84,7 +84,7 @@ export default class Grid extends L.TileLayer.Canvas {
         this.domain = domain
         this.range = range
         this._subsetAxesByCoordinatePreference()
-        this._updatePaletteExtent()
+        this._updatePaletteExtent(this._paletteExtent)
         super.onAdd(map)
         map.fire('dataload')
       })
