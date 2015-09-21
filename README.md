@@ -18,28 +18,28 @@ L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 
 // default renderers for common domain types
-var LayerFactory = L.Coverage.LayerFactory()
+var LayerFactory = L.coverage.LayerFactory()
 
 var cov = ... // load Coverage object with another library
 
 // TODO should be added like Legend
-//  parameterSync: L.Coverage.ParameterSync() // handles palette/legend merging of same-observedProperty/unit parameters
+//  parameterSync: L.coverage.ParameterSync() // handles palette/legend merging of same-observedProperty/unit parameters
 //                                           // only useful for more than one coverage
 
 LayerFactory(cov, {keys: ['salinity']}).on('load', function(e) {
   var covLayer = e.target
   
-  new L.Coverage.Controls.Legend(covLayer, {
+  new L.coverage.control.Legend(covLayer, {
     id: 'horizontalLegend', // custom HTML template id
     position: 'bottom',
     language: 'de' // preferred language for labels
   }).addTo(map)
   
   if (covLayer.time !== null) {
-  	new L.Coverage.Controls.TimeAxis(covLayer).addTo(map)
+  	new L.coverage.control.TimeAxis(covLayer).addTo(map)
   }
   if (covLayer.vertical !== null) {
-  	new L.Coverage.Controls.VerticalAxis(covLayer).addTo(map)
+  	new L.coverage.control.VerticalAxis(covLayer).addTo(map)
   }
   
   map.fitBounds(covLayer.getBounds())
@@ -61,16 +61,16 @@ TODO need controls for axes (mostly for Grid and maybe profiles)
 ### Custom visualization
 
 ```js
-var LayerFactory = L.Coverage.LayerFactory({
+var LayerFactory = L.coverage.LayerFactory({
   renderer: GPXTrack
 })
 
 // alternatively, with more control for different coverage types:
-var LayerFactory = L.Coverage.LayerFactory({
+var LayerFactory = L.coverage.LayerFactory({
   renderers: {
     'http://www.topografix.com/GPX#Track': GPXTrack, // coverage type, precedence over domain types
     'http://www.topografix.com/GPX#Route': GPXRoute,
-    'http://coveragejson.org/def#Trajectory': L.Coverage.Renderers.Trajectory // domain type, fall-back for other trajectory coverages
+    'http://coveragejson.org/def#Trajectory': L.coverage.renderer.Trajectory // domain type, fall-back for other trajectory coverages
   }
 })
 
@@ -116,7 +116,7 @@ as a single entity.
 TODO write down use cases when this is really needed (probably for profiles)
 
 ```js
-var LayerFactory = L.Coverage.CollectionLayerFactory()
+var LayerFactory = L.coverage.CollectionLayerFactory()
 var covs = ... // many Profiles
 LayerFactory(covs, {keys: ['salinity']}).on('load', function(e) {
   var covLayer = e.target
