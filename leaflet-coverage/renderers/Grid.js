@@ -400,7 +400,7 @@ export default class Grid extends L.TileLayer.Canvas {
 
     for (let tileX = 0; tileX < tileSize; tileX++) {
       let lon = map.unproject(L.point(startX + tileX, startY)).lng
-      lon = utils.wrapLongitude(lon, lonRange)
+      lon = wrapLongitude(lon, lonRange)
       if (lon < bbox[0] || lon > bbox[2]) {
         continue
       }
