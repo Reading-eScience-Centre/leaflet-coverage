@@ -266,8 +266,7 @@ export default class Grid extends L.TileLayer.Canvas {
     let startX = start.x
     let startY = start.y
     
-    let palette = this.palette
-    let {paletteRed, paletteGreen, paletteBlue} = this.palette
+    let {red, green, blue} = this.palette
     let paletteExtent = this.paletteExtent
     
     // TODO don't scale value if categorical parameter
@@ -277,9 +276,9 @@ export default class Grid extends L.TileLayer.Canvas {
       // map value to color using a palette
       var valScaled = scale(val, palette, paletteExtent)
 
-      rgba.set(tileY, tileX, 0, paletteRed[valScaled])
-      rgba.set(tileY, tileX, 1, paletteGreen[valScaled])
-      rgba.set(tileY, tileX, 2, paletteBlue[valScaled])
+      rgba.set(tileY, tileX, 0, red[valScaled])
+      rgba.set(tileY, tileX, 1, green[valScaled])
+      rgba.set(tileY, tileX, 2, blue[valScaled])
       rgba.set(tileY, tileX, 3, 255)
     }
     
