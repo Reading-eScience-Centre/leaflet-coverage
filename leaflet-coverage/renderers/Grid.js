@@ -327,8 +327,8 @@ export default class Grid extends L.TileLayer.Canvas {
    * @returns {Array} [xmin,ymin,xmax,ymax]
    */
   _getDomainBbox () {
-    let {xmin,xmax} = [this.domain.x[0], this.domain.x[this.domain.x.length - 1]]
-    let {ymin,ymax} = [this.domain.y[0], this.domain.y[this.domain.y.length - 1]]
+    let [xmin,xmax] = [this.domain.x[0], this.domain.x[this.domain.x.length - 1]]
+    let [ymin,ymax] = [this.domain.y[0], this.domain.y[this.domain.y.length - 1]]
     if (xmin > xmax) {
       [xmin,xmax] = [xmax,xmin]
     }
