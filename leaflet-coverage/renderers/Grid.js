@@ -89,7 +89,7 @@ export default class Grid extends L.TileLayer.Canvas {
         map.fire('dataload')
       })
       .catch(e => {
-        console.error(e.message)
+        console.error(e)
         this.fire('error', e)
         
         map.fire('dataload')
