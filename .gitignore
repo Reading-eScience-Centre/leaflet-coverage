@@ -4,3 +4,5 @@
 /sauce.json
 /bundle.js
 /*.log
+/leaflet-coverage.src.js
+/leaflet-coverage.min.js

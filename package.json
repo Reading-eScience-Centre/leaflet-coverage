@@ -1,15 +1,33 @@
 {
   "name": "leaflet-coverage",
   "version": "0.1.0",
-  "main": "LayerFactory",
+  "description": "A Leaflet plugin for visualizing coverage data",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Reading-eScience-Centre/leaflet-coverage.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Reading-eScience-Centre/leaflet-coverage/issues"
+  },
+  "author": {
+    "name": "Maik Riechert"
+  },
+  "files": [
+    "leaflet-coverage.src.js",
+    "leaflet-coverage.min.js"
+  ],
   "registry": "jspm",
   "format": "esm",
   "scripts": {
+    "postinstall": "jspm install",
     "style": "standard",
-    "test": "./node_modules/.bin/karma start --single-run",
-    "karma": "./node_modules/.bin/karma start",
-    "saucelabs": "./node_modules/.bin/karma start karma.conf-ci.js",
-    "build": "jspm bundle-sfx leaflet-coverage/LayerFactory.js bundle.js"
+    "test": "karma start --single-run",
+    "karma": "karma start",
+    "saucelabs": "karma start karma.conf-ci.js",
+    "build": "npm run build-src && npm run build-min",
+    "build-src": "jspm bundle-sfx leaflet-coverage/classic - leaflet leaflet-coverage.src.js --globals \"{leaflet:'L'}\" --format global --skip-source-maps",
+    "build-min": "jspm bundle-sfx leaflet-coverage/classic - leaflet leaflet-coverage.min.js --globals \"{leaflet:'L'}\" --format global --minify --skip-source-maps",
+    "prepublish": "npm run build"
   },
   "standard": {
     "parser": "babel-eslint",
@@ -23,6 +41,7 @@
     "directories": {
       "lib": "leaflet-coverage"
     },
+    "main": "LayerFactory",
     "dependencies": {
       "cwise-compiler": "npm:cwise-compiler@^1.1.2",
       "leaflet": "github:Leaflet/Leaflet@^0.7.3",
