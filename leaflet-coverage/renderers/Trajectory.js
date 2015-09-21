@@ -18,12 +18,11 @@ const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
  * "dataload" - Data loading has finished (also in case of errors)
  * 
  * Events fired on this layer:
- * TODO check if "loading" and "load" get called repeatedly on redraw()! if yes, add note, can be handled with .once()
- * "load" - Rendering has finished
+ * "add" - Layer is initialized and is about to be added to the map
+ * "remove" - Layer is removed from the map
  * "error" - Error when loading data
  * "paletteChange" - Palette has changed
  * "paletteExtentChange" - Palette extent has changed
- * "remove" - Layer is removed from the map
  * 
  */
 class Trajectory extends L.FeatureGroup {
@@ -70,8 +69,8 @@ class Trajectory extends L.FeatureGroup {
         this.range = range
         this._updatePaletteExtent(this._paletteExtent)
         this._addTrajectoryLayers()
+        this.fire('add')
         super.onAdd(map)
-        this.fire('load')
         map.fire('dataload')
       })
       .catch(e => {
@@ -83,6 +82,8 @@ class Trajectory extends L.FeatureGroup {
   }
   
   onRemove (map) {
+    delete this._map
+    this.fire('remove')
     console.log('removing trajectory from map')
     super.onRemove(map)
   }

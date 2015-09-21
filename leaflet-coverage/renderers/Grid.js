@@ -16,9 +16,8 @@ const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
  * "dataload" - Data loading has finished (also in case of errors)
  * 
  * Events fired on this layer:
- * TODO check if "loading" and "load" get called repeatedly on redraw()! if yes, add note, can be handled with .once()
- * "loading" - Rendering of tiles has started
- * "load" - Rendering has finished
+ * "add" - Layer is initialized and is about to be added to the map
+ * "remove" - Layer is removed from the map
  * "error" - Error when loading data
  * "paletteChange" - Palette has changed
  * "paletteExtentChange" - Palette extent has changed
@@ -86,6 +85,7 @@ export default class Grid extends L.TileLayer.Canvas {
         this.range = range
         this._subsetAxesByCoordinatePreference()
         this._updatePaletteExtent(this._paletteExtent)
+        this.fire('add')
         super.onAdd(map)
         map.fire('dataload')
       })
@@ -95,6 +95,12 @@ export default class Grid extends L.TileLayer.Canvas {
         
         map.fire('dataload')
       })
+  }
+  
+  onRemove (map) {
+    delete this._map
+    this.fire('remove')
+    super.onRemove(map)
   }
     
   getBounds () {
