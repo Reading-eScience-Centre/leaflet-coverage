@@ -432,11 +432,12 @@ export default class Grid extends L.TileLayer.Canvas {
    * Returns false if this is not the case or unknown.
    */
   _isRectilinearGeodeticMap () {
-    let crs = this._map.crs
+    let crs = this._map.options.crs
     // these are the ones included in Leaflet
     let recti = [L.CRS.EPSG3857, L.CRS.EPSG4326, L.CRS.EPSG3395, L.CRS.Simple]
+    let isRecti = recti.indexOf(crs) !== -1
     // TODO for unknown ones, how do we test that?
-    return recti.some(r => crs instanceof r)
+    return isRecti
   }
   
   /**
