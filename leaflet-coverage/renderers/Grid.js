@@ -387,6 +387,7 @@ export default class Grid extends L.TileLayer.Canvas {
     let map = this._map
     let {x,y} = this.domain
     let bbox = this._getDomainBbox()
+    let lonRange = [bbox[0], bbox[0] + 360]
     
     var latCache = new Float64Array(tileSize)
     var iLatCache = new Uint32Array(tileSize)
