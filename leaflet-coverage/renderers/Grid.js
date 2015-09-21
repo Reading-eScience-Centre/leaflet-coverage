@@ -98,8 +98,15 @@ export default class Grid extends L.TileLayer.Canvas {
   }
     
   getBounds () {
-    let southWest = L.latLng(this.cov.bbox[1], this.cov.bbox[0])
-    let northEast = L.latLng(this.cov.bbox[3], this.cov.bbox[2])
+    if (this.cov.bbox) {
+      var bbox = this.cov.bbox
+    } else if (this._isRectilinearGeodeticDomainGrid()) {
+      var bbox = this._getDomainBbox()
+    } else {
+      return
+    }
+    let southWest = L.latLng(bbox[1], bbox[0])
+    let northEast = L.latLng(bbox[3], bbox[2])
     let bounds = new L.LatLngBounds(southWest, northEast)
     return bounds
   }
