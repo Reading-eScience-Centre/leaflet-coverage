@@ -345,6 +345,7 @@ export default class Grid extends L.TileLayer.Canvas {
     // usable for any map projection, but computationally more intensive
     // there are two hotspots in the loops: map.unproject and indexOfNearest
 
+    let map = this._map
     let {x,y} = this.domain
     let bbox = this._getDomainBbox()
     let lonRange = [bbox[0], bbox[0] + 360]
@@ -383,6 +384,7 @@ export default class Grid extends L.TileLayer.Canvas {
     // optimized version for map projections that are equal to a rectilinear geodetic grid
     // this can be used when lat and lon can be computed independently for a given pixel
 
+    let map = this._map
     let {x,y} = this.domain
     let bbox = this._getDomainBbox()
     
