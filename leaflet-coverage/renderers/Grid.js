@@ -266,6 +266,7 @@ export default class Grid extends L.TileLayer.Canvas {
     let startX = start.x
     let startY = start.y
     
+    let palette = this.palette
     let {red, green, blue} = this.palette
     let paletteExtent = this.paletteExtent
     
