@@ -57,6 +57,7 @@ export default class Legend extends L.Control {
       inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS)
     }   
 
+    this._remove = () => this.removeFrom(this._map)
     covLayer.on('remove', this._remove)
   }
   
@@ -77,10 +78,6 @@ export default class Legend extends L.Control {
     
     $('.legend-palette', el).set('$background',
          'transparent linear-gradient(to top, ' + gradient + ') repeat scroll 0% 0%')
-  }
-  
-  _remove () {
-    this.removeFrom(this._map)
   }
   
   onRemove (map) {
