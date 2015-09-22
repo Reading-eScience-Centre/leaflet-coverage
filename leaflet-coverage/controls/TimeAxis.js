@@ -24,7 +24,7 @@ export default class TimeAxis extends L.Control {
       if (e.axis === 'time') this.updateAxis()
     }
 
-    this._remove = () => this.removeFrom(this._map)
+    this._remove = () => { this.removeFrom(this._map) }
     covLayer.on('remove', this._remove)
   }
     

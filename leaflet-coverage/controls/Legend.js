@@ -57,7 +57,7 @@ export default class Legend extends L.Control {
       inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS)
     }   
 
-    this._remove = () => this.removeFrom(this._map)
+    this._remove = () => { this.removeFrom(this._map) }
     covLayer.on('remove', this._remove)
   }
   
