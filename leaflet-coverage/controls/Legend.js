@@ -55,10 +55,7 @@ export default class Legend extends L.Control {
     
     if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
       inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS)
-    }
-
-    covLayer.on('paletteChange', this.updateLegend)
-    covLayer.on('paletteExtentChange', this.updateLegend)    
+    }   
 
     covLayer.on('remove', () => {
       this.removeFrom(this._map)
@@ -92,6 +89,10 @@ export default class Legend extends L.Control {
   
   onAdd (map) {
     this._map = map
+    
+    this.covLayer.on('paletteChange', this.updateLegend)
+    this.covLayer.on('paletteExtentChange', this.updateLegend)
+    
     let param = this.covLayer.parameter
     // if requested language doesn't exist, use the returned one for all other labels
     let language = getLanguageTag(param.observedProperty.label, this.language) 
