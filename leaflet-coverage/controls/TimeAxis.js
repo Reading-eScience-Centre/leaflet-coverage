@@ -31,7 +31,7 @@ export default class TimeAxis extends L.Control {
   }
   
   onRemove (map) {
-    covLayer.off('axisChange', this._axisListener)
+    this.covLayer.off('axisChange', this._axisListener)
     delete this._map
   }
   

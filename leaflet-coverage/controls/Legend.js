@@ -85,8 +85,8 @@ export default class Legend extends L.Control {
   }
   
   onRemove (map) {
-    covLayer.off('paletteChange', this.updateLegend)
-    covLayer.off('paletteExtentChange', this.updateLegend)
+    this.covLayer.off('paletteChange', this.updateLegend)
+    this.covLayer.off('paletteExtentChange', this.updateLegend)
     delete this._map
   }
   
