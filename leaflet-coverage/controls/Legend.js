@@ -61,7 +61,7 @@ export default class Legend extends L.Control {
     covLayer.on('paletteExtentChange', this.updateLegend)    
 
     covLayer.on('remove', () => {
-      this.remove()
+      this.removeFrom(this._map)
     })
   }
   
@@ -86,10 +86,12 @@ export default class Legend extends L.Control {
   
   onRemove (map) {
     covLayer.off('paletteChange', this.updateLegend)
-    covLayer.off('paletteExtentChange', this.updateLegend)   
+    covLayer.off('paletteExtentChange', this.updateLegend)
+    delete this._map
   }
   
   onAdd (map) {
+    this._map = map
     let param = this.covLayer.parameter
     // if requested language doesn't exist, use the returned one for all other labels
     let language = getLanguageTag(param.observedProperty.label, this.language) 

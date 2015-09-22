@@ -26,16 +26,17 @@ export default class TimeAxis extends L.Control {
     covLayer.on('axisChange', this._axisListener)
 
     covLayer.on('remove', () => {
-      this.remove()
+      this.removeFrom(this._map)
     })
   }
   
   onRemove (map) {
     covLayer.off('axisChange', this._axisListener)
+    delete this._map
   }
   
   onAdd (map) {
-
+    this._map = map
     let el = document.importNode($('#' + this.id)[0].content, true).children[0]
     this._el = el
     this.updateAxis()
