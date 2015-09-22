@@ -24,7 +24,12 @@ export default class TimeAxis extends L.Control {
       if (e.axis === 'time') this.updateAxis()
     }
 
-    this._remove = () => { this.removeFrom(this._map) }
+    // arrow function is broken here with traceur, this is a workaround
+    // see https://github.com/google/traceur-compiler/issues/1987
+    let self = this
+    this._remove = function () {
+      self.removeFrom(self._map)
+    }
     covLayer.on('remove', this._remove)
   }
     
