@@ -10,12 +10,14 @@ export function inject (html, css) {
   span.innerHTML = html
   document.body.appendChild(span.children[0])
   
-  let style = document.createElement('style')
-  style.type = 'text/css'
-  if (style.styleSheet){
-    style.styleSheet.cssText = css
-  } else {
-    style.appendChild(document.createTextNode(css))
+  if (css) {
+    let style = document.createElement('style')
+    style.type = 'text/css'
+    if (style.styleSheet){
+      style.styleSheet.cssText = css
+    } else {
+      style.appendChild(document.createTextNode(css))
+    }
+    document.head.appendChild(style)
   }
-  document.head.appendChild(style)
 }
