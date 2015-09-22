@@ -57,9 +57,7 @@ export default class Legend extends L.Control {
       inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS)
     }   
 
-    covLayer.on('remove', () => {
-      this.removeFrom(this._map)
-    })
+    covLayer.on('remove', this._remove)
   }
   
   updateLegend () {
@@ -81,10 +79,14 @@ export default class Legend extends L.Control {
          'transparent linear-gradient(to top, ' + gradient + ') repeat scroll 0% 0%')
   }
   
+  _remove () {
+    this.removeFrom(this._map)
+  }
+  
   onRemove (map) {
+    this.covLayer.off('remove', this._remove)
     this.covLayer.off('paletteChange', this.updateLegend)
     this.covLayer.off('paletteExtentChange', this.updateLegend)
-    delete this._map
   }
   
   onAdd (map) {
