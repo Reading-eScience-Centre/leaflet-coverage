@@ -1,6 +1,5 @@
 import L from 'leaflet'
-import MINI from 'minified' 
-let $ = MINI.$
+import {$} from 'minified'
 
 /**
  * Displays a time axis selector for a given coverage layer.

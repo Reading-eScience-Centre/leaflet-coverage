@@ -1,6 +1,5 @@
 import L from 'leaflet'
-import MINI from 'minified' 
-let $ = MINI.$
+import {$} from 'minified' 
 
 import {inject} from './utils.js'
 
