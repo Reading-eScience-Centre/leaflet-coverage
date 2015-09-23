@@ -4,7 +4,9 @@ A [Leaflet](http://leafletjs.com/) plugin for visualizing [coverages](https://en
 
 Note that to *load* a coverage you have to use another library, depending on which formats you want to support. The only currently known coverage loader that can be used is the [covjson-reader](https://github.com/Reading-eScience-Centre/covjson-reader) for the [CoverageJSON](https://github.com/Reading-eScience-Centre/coveragejson) format.
 
-NOTE: This plugin is in active development and does not support all CoverageJSON domain types yet.
+NOTE: This plugin is in active development, does not support all CoverageJSON domain types, contains bugs, and will change.
+
+[API docs](https://doc.esdoc.org/github.com/reading-escience-centre/leaflet-coverage/)
 
 ## Example
 
