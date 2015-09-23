@@ -19,6 +19,7 @@
   "registry": "jspm",
   "format": "esm",
   "scripts": {
+    "docs": "esdoc -c esdoc.json",
     "postinstall": "jspm install",
     "style": "standard",
     "test": "karma start --single-run",
@@ -58,6 +59,8 @@
   },
   "devDependencies": {
     "babel-eslint": "^4.0.10",
+    "esdoc": "^0.3.0",
+    "esdoc-importpath-plugin": "0.0.1",
     "jspm": "^0.16.2",
     "karma": "^0.13.9",
     "karma-chrome-launcher": "^0.2.0",

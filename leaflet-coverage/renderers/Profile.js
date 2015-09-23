@@ -4,9 +4,13 @@ const DOMAIN_TYPE = 'http://coveragejson.org/def#Profile'
 
 /**
  * Renderer for Coverages with domain type Profile.
- * TODO maybe just wrap the ProfileCoverageCollection renderer
+ * 
+ * This will simply display a dot on the map and fire a click
+ * event when a user clicks on it.
+ * The dot either has a defined standard color, or it uses
+ * a palette together with a target depth.
  */
-export default class Profile {
+export default class Profile extends L.CircleMarker {
   
   constructor(cov, options) {
     if (cov.domainType !== DOMAIN_TYPE) {
