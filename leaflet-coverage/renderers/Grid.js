@@ -333,9 +333,20 @@ export default class Grid extends L.TileLayer.Canvas {
    * @returns {Array} [xmin,ymin,xmax,ymax]
    */
   _getDomainBbox () {
-    // TODO corner cells are cut off, the bbox should be enlarged by half a cell
-    let [xmin,xmax] = [this.domain.x[0], this.domain.x[this.domain.x.length - 1]]
-    let [ymin,ymax] = [this.domain.y[0], this.domain.y[this.domain.y.length - 1]]
+    // TODO use bounds if they are supplied
+    let xend = this.domain.x.length - 1
+    let yend = this.domain.y.length - 1
+    let [xmin,xmax] = [this.domain.x[0], this.domain.x[xend]]
+    let [ymin,ymax] = [this.domain.y[0], this.domain.y[yend]]
+    // TODO only enlarge when bounds haven't been used above
+    if (this.domain.x.length > 1) {
+      xmin -= Math.abs(this.domain.x[0] - this.domain.x[1]) / 2
+      xmax += Math.abs(this.domain.x[xend] - this.domain.x[xend - 1]) / 2
+    }
+    if (this.domain.y.length > 1) {
+      ymin -= Math.abs(this.domain.y[0] - this.domain.y[1]) / 2
+      ymax += Math.abs(this.domain.y[yend] - this.domain.y[yend - 1]) / 2
+    }
     if (xmin > xmax) {
       [xmin,xmax] = [xmax,xmin]
     }
