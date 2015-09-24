@@ -1,4 +1,4 @@
-# leaflet-coverage
+# leaflet-coverage [![Build Status](https://travis-ci.org/Reading-eScience-Centre/leaflet-coverage.svg?branch=master)](https://travis-ci.org/Reading-eScience-Centre/leaflet-coverage)
 
 A [Leaflet](http://leafletjs.com/) plugin for visualizing [coverages](https://en.wikipedia.org/wiki/Coverage_data) (numerical or categorical data varying in space and time) with the help of the [JavaScript Coverage API](https://github.com/Reading-eScience-Centre/coverage-jsapi). Currently, it supports the domain types defined within [CoverageJSON](https://github.com/Reading-eScience-Centre/coveragejson).
 
