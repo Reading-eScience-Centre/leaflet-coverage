@@ -13,6 +13,7 @@ const DOMAIN_TYPE = 'http://coveragejson.org/def#Profile'
 export default class Profile extends L.CircleMarker {
   
   constructor(cov, options) {
+    super()
     if (cov.domainType !== DOMAIN_TYPE) {
       throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE)
     }
