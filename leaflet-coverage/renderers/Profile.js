@@ -19,7 +19,6 @@ const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
 export class Profile {
   
   constructor (cov, options) {
-    super(L.latLng(0,0)) // we need to supply some initial value
     if (cov.domainType !== DOMAIN_TYPE) {
       throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE)
     }
@@ -60,7 +59,6 @@ export class Profile {
           this._updatePaletteExtent(this._paletteExtent)
           this._addMarker()
           this.fire('add')
-          super.onAdd(map)
           map.fire('dataload')
         })
     } else {
@@ -69,7 +67,6 @@ export class Profile {
         this.domain = domain
         this._addMarker()
         this.fire('add')
-        super.onAdd(map)
         map.fire('dataload')
       })
     }
