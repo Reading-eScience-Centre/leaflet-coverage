@@ -16,9 +16,10 @@ const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
  * The dot either has a defined standard color, or it uses
  * a palette together with a target depth if a parameter is chosen.
  */
-export class Profile {
+export class Profile extends L.Class {
   
   constructor (cov, options) {
+    super()
     if (cov.domainType !== DOMAIN_TYPE) {
       throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE)
     }
