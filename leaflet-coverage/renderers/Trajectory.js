@@ -82,7 +82,6 @@ class Trajectory extends L.FeatureGroup {
   }
   
   onRemove (map) {
-    delete this._map
     this.fire('remove')
     console.log('removing trajectory from map')
     super.onRemove(map)

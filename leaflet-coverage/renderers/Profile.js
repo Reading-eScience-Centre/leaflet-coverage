@@ -16,7 +16,7 @@ const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
  * The dot either has a defined standard color, or it uses
  * a palette together with a target depth if a parameter is chosen.
  */
-export default class Profile extends L.CircleMarker {
+export class Profile {
   
   constructor (cov, options) {
     super(L.latLng(0,0)) // we need to supply some initial value
@@ -58,7 +58,8 @@ export default class Profile extends L.CircleMarker {
           this.domain = domain
           this.range = range
           this._updatePaletteExtent(this._paletteExtent)
-          this._updateMarker()
+          this._addMarker()
+          this.fire('add')
           super.onAdd(map)
           map.fire('dataload')
         })
@@ -66,7 +67,8 @@ export default class Profile extends L.CircleMarker {
       promise = this.cov.loadDomain().then(domain => {
         console.log('domain loaded')
         this.domain = domain
-        this._updateMarker()
+        this._addMarker()
+        this.fire('add')
         super.onAdd(map)
         map.fire('dataload')
       })
@@ -78,6 +80,11 @@ export default class Profile extends L.CircleMarker {
       
       map.fire('dataload')
     })
+  }
+  
+  onRemove (map) {
+    this.fire('remove')
+    this._removeMarker()
   }
     
   get parameter () {
@@ -121,25 +128,42 @@ export default class Profile extends L.CircleMarker {
     this._paletteExtent = [arr.get(...opsnull.nullargmin(arr)), arr.get(...opsnull.nullargmax(arr))]
   }
   
-  _updateMarker () {
+  _addMarker () {
+    let {x,y} = this.domain
+    this.marker = L.circleMarker(L.latLng(y, x), {color: this._getColor()})
+    
+    this.marker.on('click', e => {
+      this.fire('click')
+    })
+    
+    this.marker.addTo(this._map)
+  }
+  
+  _removeMarker () {
+    this._map.removeLayer(this.marker)
+    delete this.marker
+  }
+  
+  _getColor () {
     let {x,y,z} = this.domain
     
     // TODO do coordinate transformation to lat/lon if necessary
-    this.setLatLng([y,x])
     
-    if (!this.param || this.targetZ === null) {
-      // use a default color since we don't use a palette here
-      this.options.color = this.defaultColor
-    } else {
+    if (this.param && this.targetZ !== null) {
       // use a palette
       // find the value with z nearest to targetZ
       let val = this.range.get(z[utils.indexOfNearest(z, this.targetZ)])
       if (val !== null) {
         let valScaled = scale(val, this.palette, this.paletteExtent)        
         let {red, green, blue} = this.palette
-        this.options.color = `rgb(${red[valScaled]}, ${green[valScaled]}, ${blue[valScaled]})`
+        return `rgb(${red[valScaled]}, ${green[valScaled]}, ${blue[valScaled]})`
       }
     }
+    return this.defaultColor
+  }
+  
+  _updateMarker () {
+    this.marker.options.color = this._getColor()
   }
   
   _doAutoRedraw () {
@@ -150,7 +174,12 @@ export default class Profile extends L.CircleMarker {
   
   redraw () {
     this._updateMarker()
-    super.redraw()
+    this.marker.redraw()
   }
   
 }
+
+Profile.include(L.Mixin.Events)
+
+// work-around for Babel bug, otherwise Profile cannot be referenced here
+export { Profile as default }
