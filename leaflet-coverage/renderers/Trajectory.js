@@ -103,7 +103,7 @@ class Trajectory extends L.FeatureGroup {
   
   set paletteExtent (extent) {
     this._updatePaletteExtent(extent)
-    this._autoRedraw()
+    this._doAutoRedraw()
     this.fire('paletteExtentChange')
   }
   

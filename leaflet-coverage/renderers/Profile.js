@@ -24,8 +24,8 @@ export class Profile extends L.Class {
       throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE)
     }
     this.cov = cov
-    this.targetZ = 'targetZ' in options ? options.targetZ : null
-    this.param = options.keys && this.targetZ !== null ? cov.parameters.get(options.keys[0]) : null    
+    this.param = options.keys ? cov.parameters.get(options.keys[0]) : null
+    this._targetZ = 'targetZ' in options ? options.targetZ : null
     this.defaultColor = options.color ? options.color : DEFAULT_COLOR
     
     this._palette = options.palette || DEFAULT_PALETTE
@@ -92,6 +92,16 @@ export class Profile extends L.Class {
     return this.param
   }
   
+  get targetZ () {
+    return this._targetZ
+  }
+  
+  set targetZ (z) {
+    this._targetZ = z
+    this._doAutoRedraw()
+    this.fire('targetZChange')
+  }
+  
   set palette (p) {
     this._palette = p
     this._doAutoRedraw()
@@ -99,12 +109,12 @@ export class Profile extends L.Class {
   }
   
   get palette () {
-    return this.param ? this._palette : null
+    return this.param && this.targetZ !== null ? this._palette : null
   }
   
   set paletteExtent (extent) {
     this._updatePaletteExtent(extent)
-    this._autoRedraw()
+    this._doAutoRedraw()
     this.fire('paletteExtentChange')
   }
   
