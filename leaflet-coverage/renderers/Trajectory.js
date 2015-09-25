@@ -126,7 +126,6 @@ class Trajectory extends L.FeatureGroup {
       
     } else if (extent === 'fov') {
       // scan the values that are currently in field of view on the map for min/max
-      // this implies using the current subset
       let bounds = this._map.getBounds()
 
       // TODO implement
