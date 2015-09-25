@@ -83,6 +83,7 @@ module.exports = function(config) {
     autoWatch: true,
 
     sauceLabs: {
+      testName: 'leaflet-coverage',
       recordScreenshots: false
     },
     captureTimeout: 120000,
