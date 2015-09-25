@@ -5,7 +5,7 @@ import * as opsnull from '../util/ndarray-ops-null.js'
 
 const DOMAIN_TYPE = 'http://coveragejson.org/def#Profile'
 
-const DEFAULT_COLOR = '#03f'
+const DEFAULT_COLOR = 'black'
 const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
   
 /**
@@ -24,11 +24,10 @@ export class Profile extends L.Class {
       throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE)
     }
     this.cov = cov
-    this.param = options.keys ? cov.parameters.get(options.keys[0]) : null
     this.targetZ = 'targetZ' in options ? options.targetZ : null
+    this.param = options.keys && this.targetZ !== null ? cov.parameters.get(options.keys[0]) : null    
     this.defaultColor = options.color ? options.color : DEFAULT_COLOR
-        
-        
+    
     this._palette = options.palette || DEFAULT_PALETTE
     if (Array.isArray(options.paletteExtent)) {
       this._paletteExtent = options.paletteExtent
@@ -100,7 +99,7 @@ export class Profile extends L.Class {
   }
   
   get palette () {
-    return this._palette
+    return this.param ? this._palette : null
   }
   
   set paletteExtent (extent) {
