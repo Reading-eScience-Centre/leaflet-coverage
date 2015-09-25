@@ -84,6 +84,10 @@ export class Profile extends L.Class {
     this.fire('remove')
     this._removeMarker()
   }
+  
+  getBounds () {
+    return this.marker.getBounds()
+  }
     
   get parameter () {
     return this.param
