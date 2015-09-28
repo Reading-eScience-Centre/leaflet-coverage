@@ -1,9 +1,9 @@
 import assert from 'assert'
 
-import * as utils from 'leaflet-coverage/util/utils.js'
+import * as utils from 'leaflet-coverage/util/arrays.js'
 import ndarray from 'ndarray'
 
-describe("util/utils methods", () => {
+describe("util/arrays methods", () => {
   describe("#indicesOfNearest", () => {
     var arr = [1,2,3]
     it("returns [0,0] if value below min", () => {
