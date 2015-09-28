@@ -8,7 +8,7 @@ let googleReady = new Promise((resolve, reject) => {
     packages: ['line'], 
     callback: resolve
   })
-}
+})
 
 export default class ProfilePlot extends L.Popup {
   constructor (cov) {
