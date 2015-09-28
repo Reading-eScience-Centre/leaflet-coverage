@@ -1,7 +1,7 @@
 import L from 'leaflet'
 import ndarray from 'ndarray'
 import {linearPalette, scale} from './palettes.js'
-import * as utils from '../util/utils.js'
+import * as arrays from '../util/arrays.js'
 import * as opsnull from '../util/ndarray-ops-null.js'
 
 const DOMAIN_TYPE = 'http://coveragejson.org/def#Grid'
@@ -162,7 +162,7 @@ export default class Grid extends L.TileLayer.Canvas {
       return 0
     }
     let vals = this.domain[axis]
-    let idx = utils.indexOfNearest(vals, val)
+    let idx = arrays.indexOfNearest(vals, val)
     return idx
   }
   
@@ -231,7 +231,7 @@ export default class Grid extends L.TileLayer.Canvas {
     } 
 
     // wrapping as SciJS's ndarray allows us to do easy subsetting and efficient min/max search
-    let arr = utils.asSciJSndarray(this.range.values)
+    let arr = arrays.asSciJSndarray(this.range.values)
     let sub = this._axesSubset
         
     if (extent === 'full') {
@@ -297,7 +297,7 @@ export default class Grid extends L.TileLayer.Canvas {
     }
     
     let sub = this._axesSubset
-    let vals = utils.asSciJSndarray(this.range.values).pick(sub.t.idx, sub.z.idx, null, null)
+    let vals = arrays.asSciJSndarray(this.range.values).pick(sub.t.idx, sub.z.idx, null, null)
     
     if (this._isRectilinearGeodeticDomainGrid()) {
       if (this._isProjectedCoverageCRS()) {
@@ -393,8 +393,8 @@ export default class Grid extends L.TileLayer.Canvas {
         // now we find the closest grid cell using simple binary search
         // for finding the closest latitude/longitude we use a simple binary search
         // (as there is no discontinuity)
-        let iLat = utils.indexOfNearest(y, lat)
-        let iLon = utils.indexOfNearest(x, lon)
+        let iLat = arrays.indexOfNearest(y, lat)
+        let iLon = arrays.indexOfNearest(x, lon)
 
         setPixel(tileY, tileX, vals.get(iLat, iLon))
       }
@@ -420,7 +420,7 @@ export default class Grid extends L.TileLayer.Canvas {
       var lat = map.unproject(L.point(startX, startY + tileY)).lat
       latCache[tileY] = lat
       // find the index of the closest latitude in the grid using simple binary search
-      iLatCache[tileY] = utils.indexOfNearest(y, lat)
+      iLatCache[tileY] = arrays.indexOfNearest(y, lat)
     }
 
     for (let tileX = 0; tileX < tileSize; tileX++) {
@@ -432,7 +432,7 @@ export default class Grid extends L.TileLayer.Canvas {
 
       // find the index of the closest longitude in the grid using simple binary search
       // (as there is no discontinuity)
-      let iLon = utils.indexOfNearest(x, lon)
+      let iLon = arrays.indexOfNearest(x, lon)
 
       for (let tileY = 0; tileY < tileSize; tileY++) {
         // get geographic coordinates of tile pixel

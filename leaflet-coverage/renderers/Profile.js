@@ -1,6 +1,6 @@
 import L from 'leaflet'
 import {linearPalette, scale} from './palettes.js'
-import * as utils from '../util/utils.js'
+import * as arrays from '../util/arrays.js'
 import * as opsnull from '../util/ndarray-ops-null.js'
 
 const DOMAIN_TYPE = 'http://coveragejson.org/def#Profile'
@@ -133,7 +133,7 @@ export class Profile extends L.Class {
     }
 
     // wrapping as SciJS's ndarray allows us to do easy subsetting and efficient min/max search
-    let arr = utils.asSciJSndarray(this.range.values)
+    let arr = arrays.asSciJSndarray(this.range.values)
         
     // scan the whole range for min/max values
     this._paletteExtent = [arr.get(...opsnull.nullargmin(arr)), arr.get(...opsnull.nullargmax(arr))]
@@ -163,7 +163,7 @@ export class Profile extends L.Class {
     if (this.param && this.targetZ !== null) {
       // use a palette
       // find the value with z nearest to targetZ
-      let val = this.range.get(z[utils.indexOfNearest(z, this.targetZ)])
+      let val = this.range.get(z[arrays.indexOfNearest(z, this.targetZ)])
       if (val !== null) {
         let valScaled = scale(val, this.palette, this.paletteExtent)        
         let {red, green, blue} = this.palette

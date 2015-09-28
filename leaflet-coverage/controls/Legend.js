@@ -2,6 +2,7 @@ import L from 'leaflet'
 import {$} from 'minified' 
 
 import {inject} from './utils.js'
+import * as i18n from '../util/i18n.js'
 
 // TODO the default template should be moved outside this module so that it can be easily skipped
 const DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-legend'
@@ -39,8 +40,6 @@ const DEFAULT_TEMPLATE_CSS = `
 }
 `
 
-const DEFAULT_LANGUAGE = 'en'
-
 /**
  * Displays a palette legend for the parameter displayed by the given
  * Coverage layer.
@@ -51,7 +50,7 @@ export default class Legend extends L.Control {
     super(options.position ? {position: options.position} : {})
     this.covLayer = covLayer
     this.id = options.id || DEFAULT_TEMPLATE_ID
-    this.language = options.language || DEFAULT_LANGUAGE
+    this.language = options.language || i18n.DEFAULT_LANGUAGE
     
     if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
       inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS)
@@ -99,10 +98,10 @@ export default class Legend extends L.Control {
     
     let param = this.covLayer.parameter
     // if requested language doesn't exist, use the returned one for all other labels
-    let language = getLanguageTag(param.observedProperty.label, this.language) 
-    let title = getLanguageString(param.observedProperty.label, language)
+    let language = i18n.getLanguageTag(param.observedProperty.label, this.language) 
+    let title = i18n.getLanguageString(param.observedProperty.label, language)
     let unit = param.unit ? 
-               (param.unit.symbol ? param.unit.symbol : getLanguageString(param.unit.label, language)) :
+               (param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, language)) :
                ''
     
     let el = document.importNode($('#' + this.id)[0].content, true).children[0]
@@ -114,23 +113,4 @@ export default class Legend extends L.Control {
     return el
   }
   
-}
-
-function getLanguageTag (map, preferredLanguage) {
-  if (map.has(preferredLanguage)) {
-    return preferredLanguage
-  } else {
-    // could be more clever here for cases like 'de' vs 'de-DE'
-    return map.keys().next().value
-  }
-}
-
-function getLanguageString (map, preferredLanguage) {
-  if (map.has(preferredLanguage)) {
-    return map.get(preferredLanguage)
-  } else {
-    // random language
-    // this case should not happen as all labels should have common languages
-    return map.values().next().value
-  }
 }

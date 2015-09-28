@@ -1,6 +1,6 @@
 import L from 'leaflet'
 import {linearPalette, scale} from './palettes.js'
-import * as utils from '../util/utils.js'
+import * as arrays from '../util/arrays.js'
 import * as opsnull from '../util/ndarray-ops-null.js'
 
 const DOMAIN_TYPE = 'http://coveragejson.org/def#Trajectory'
@@ -118,7 +118,7 @@ class Trajectory extends L.FeatureGroup {
     } 
 
     // wrapping as SciJS's ndarray allows us to do easy subsetting and efficient min/max search
-    let arr = utils.asSciJSndarray(this.range.values)
+    let arr = arrays.asSciJSndarray(this.range.values)
         
     if (extent === 'full') {
       // scan the whole range for min/max values, don't subset
