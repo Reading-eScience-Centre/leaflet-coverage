@@ -178,7 +178,7 @@ export default class Grid extends L.TileLayer.Canvas {
     let old = this.time
     this._axesSubset.t.coordPref = val
     this._subsetAxesByPreference()
-    this._autoRedraw()
+    this._doAutoRedraw()
     if (old !== this.time) {
       this.fire('axisChange', {axis: 'time'})
     }    
@@ -200,7 +200,7 @@ export default class Grid extends L.TileLayer.Canvas {
     let old = this.vertical
     this._axesSubset.z.coordPref = val
     this._subsetAxesByPreference()
-    this._autoRedraw()
+    this._doAutoRedraw()
     if (old !== this.vertical) {
       this.fire('axisChange', {axis: 'vertical'})
     }   
@@ -216,7 +216,7 @@ export default class Grid extends L.TileLayer.Canvas {
    
   set palette (p) {
     this._palette = p
-    this._autoRedraw()
+    this._doAutoRedraw()
     this.fire('paletteChange')
   }
   
@@ -257,7 +257,7 @@ export default class Grid extends L.TileLayer.Canvas {
   
   set paletteExtent (extent) {
     this._updatePaletteExtent(extent)
-    this._autoRedraw()
+    this._doAutoRedraw()
     this.fire('paletteExtentChange')
   }
   
@@ -494,7 +494,7 @@ export default class Grid extends L.TileLayer.Canvas {
     return !geographic.some(uri => this.domain.crs === uri)
   }
   
-  _autoRedraw () {
+  _doAutoRedraw () {
     if (this._autoRedraw) {
       this.redraw()
     }
