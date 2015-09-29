@@ -1,5 +1,7 @@
 import L from 'leaflet'
-import 'https://www.google.com/jsapi'
+
+// cannot import directly here as CORS headers are missing!
+//import 'https://www.google.com/jsapi'
 
 import * as i18n from '../util/i18n.js'
 
