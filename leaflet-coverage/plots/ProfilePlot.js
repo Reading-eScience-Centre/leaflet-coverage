@@ -13,10 +13,13 @@ let googleReady = new Promise((resolve, reject) => {
 })
 
 const DEFAULT_PLOT_OPTIONS = {
-  chart: {
-  },
   width: 500,
   height: 500,
+  axes: {
+    x: {
+      0: {format: '#,##'}
+    }
+  },
   orientation: 'vertical'
 }
 
@@ -61,8 +64,7 @@ export default class ProfilePlot extends L.Popup {
     let param = this.param
     let data = new google.visualization.DataTable()
     data.addColumn('number', 'Vertical')
-    // TODO add units
-    data.addColumn('number', i18n.getLanguageString(param.observedProperty.label))
+    data.addColumn('number', this._cov.id)
     
     let rows = []
     for (let i=0; i < this.domain.z.length; i++) {
@@ -74,6 +76,11 @@ export default class ProfilePlot extends L.Popup {
 
     var el = document.createElement('div')
     var chart = new google.charts.Line(el)
+    
+    let opts = this.plotOptions
+    // TODO add units
+    opts.axes.x[0].label = i18n.getLanguageString(param.observedProperty.label)
+    
     chart.draw(data, this.plotOptions)
     return el
   }
