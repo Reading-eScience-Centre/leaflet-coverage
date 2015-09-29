@@ -20,7 +20,7 @@ export default class ProfilePlot extends L.Popup {
   
   onAdd (map) {
     map.fire('dataloading')
-    Promise.all([this.cov.loadDomain(), this.cov.loadRanges(), googleReady])
+    Promise.all([this._cov.loadDomain(), this._cov.loadRanges(), googleReady])
       .then(([domain, ranges]) => {
         this.domain = domain
         this.ranges = ranges
