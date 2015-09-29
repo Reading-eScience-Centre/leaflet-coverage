@@ -21,10 +21,15 @@ const DEFAULT_PLOT_OPTIONS = {
 }
 
 export default class ProfilePlot extends L.Popup {
-  constructor (cov, options) {
+  constructor (cov, options, plotOptions) {
     super()
     this._cov = cov
-    this._options = options || DEFAULT_PLOT_OPTIONS
+    this.param = options.keys ? cov.parameters.get(options.keys[0]) : null
+    this.plotOptions = plotOptions || DEFAULT_PLOT_OPTIONS
+    
+    if (this.param === null) {
+      throw new Error('multiple params not supported yet')
+    }
   }
   
   onAdd (map) {
@@ -53,28 +58,23 @@ export default class ProfilePlot extends L.Popup {
   }
   
   _getPlotElement () {
-    var data = new google.visualization.DataTable()
+    let param = this.param
+    let data = new google.visualization.DataTable()
     data.addColumn('number', 'Vertical')
-    let paramKeys = Array.from(this._cov.parameters.keys())
-    for (let key of paramKeys) {
-      let param = this._cov.parameters.get(key)
-      // TODO add units
-      data.addColumn('number', i18n.getLanguageString(param.observedProperty.label))
-    }
+    // TODO add units
+    data.addColumn('number', i18n.getLanguageString(param.observedProperty.label))
     
     let rows = []
     for (let i=0; i < this.domain.z.length; i++) {
-      let row = [this.domain.z[i]]
-      for (let key of paramKeys) {
-        row.push(this.ranges.get(key).values.get(i))
-      }
+      let row = [this.domain.z[i],
+                 this.ranges.get(param.key).values.get(i)]
       rows.push(row)
     }
     data.addRows(rows)
 
     var el = document.createElement('div')
     var chart = new google.charts.Line(el)
-    chart.draw(data, this._options)
+    chart.draw(data, this.plotOptions)
     return el
   }
 }
