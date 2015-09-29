@@ -37,7 +37,7 @@ export default class ProfilePlot extends L.Popup {
   
   _addPlotToPopup () {
     // TODO transform if necessary
-    let {x,y} = cov.domain
+    let {x,y} = this._cov.domain
     this.setLatLng(L.latLng(y, x))
     let el = this._getPlotElement()
     this.setContent(el)
