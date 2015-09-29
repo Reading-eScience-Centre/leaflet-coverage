@@ -46,7 +46,7 @@ export default class ProfilePlot extends L.Popup {
   _getPlotElement () {
     var data = new google.visualization.DataTable()
     data.addColumn('number', 'Vertical')
-    let paramKeys = this._cov.parameters.keys()
+    let paramKeys = Array.from(this._cov.parameters.keys())
     for (let key of paramKeys) {
       let param = this._cov.parameters.get(key)
       // TODO add units
