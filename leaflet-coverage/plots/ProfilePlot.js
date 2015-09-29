@@ -12,10 +12,19 @@ let googleReady = new Promise((resolve, reject) => {
   })
 })
 
+const DEFAULT_PLOT_OPTIONS = {
+  chart: {
+  },
+  width: 500,
+  height: 500,
+  orientation: 'vertical'
+}
+
 export default class ProfilePlot extends L.Popup {
-  constructor (cov) {
+  constructor (cov, options) {
     super()
     this._cov = cov
+    this._options = options || DEFAULT_PLOT_OPTIONS
   }
   
   onAdd (map) {
@@ -63,17 +72,9 @@ export default class ProfilePlot extends L.Popup {
     }
     data.addRows(rows)
 
-    var options = {
-      chart: {
-      },
-      width: 500,
-      height: 700,
-      orientation: 'vertical'
-    }
-
     var el = document.createElement('div')
     var chart = new google.charts.Line(el)
-    chart.draw(data, options)
+    chart.draw(data, this._options)
     return el
   }
 }
