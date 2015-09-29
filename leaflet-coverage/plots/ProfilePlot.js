@@ -13,8 +13,8 @@ let googleReady = new Promise((resolve, reject) => {
 })
 
 const DEFAULT_PLOT_OPTIONS = {
-  width: 500,
-  height: 500,
+  width: 300,
+  height: 300,
   axes: {
     x: {
       0: {format: '#,##'}
