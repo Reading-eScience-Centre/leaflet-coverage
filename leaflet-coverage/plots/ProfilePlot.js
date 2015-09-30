@@ -1,16 +1,8 @@
 import L from 'leaflet'
-
-// cannot import directly here as CORS headers are missing!
-//import 'https://www.google.com/jsapi'
+import c3 from 'c3'
 
 import * as i18n from '../util/i18n.js'
 
-let googleReady = new Promise((resolve, reject) => {
-  google.load('visualization', '1.1', {
-    packages: ['line'], 
-    callback: resolve
-  })
-})
 
 const DEFAULT_PLOT_OPTIONS = {
   width: 300,
@@ -62,26 +54,58 @@ export default class ProfilePlot extends L.Popup {
   
   _getPlotElement () {
     let param = this.param
-    let data = new google.visualization.DataTable()
-    data.addColumn('number', 'Vertical')
-    data.addColumn('number', this._cov.id)
     
-    let rows = []
-    for (let i=0; i < this.domain.z.length; i++) {
-      let row = [this.domain.z[i],
-                 this.ranges.get(param.key).values.get(i)]
-      rows.push(row)
+    let xLabel = 'Vertical'
+    let x = [xLabel]
+    for (let z of this.domain.z) {
+      x.push(z)
     }
-    data.addRows(rows)
+    let y = [this._cov.id]
+    for (let i=0; i < this.domain.z.length; i++) {
+      y.push(this.ranges.get(param.key).values.get(i))
+    }
 
-    var el = document.createElement('div')
-    var chart = new google.charts.Line(el)
+    let el = document.createElement('div')
+    c3.generate({
+      bindto: el,
+      data: {
+        x: 'x',
+        columns: [x, y]
+      },
+      axis: {
+        rotated: true,
+        x: {
+          label: {
+            text: xLabel,
+            position: 'outer-center'
+          }
+        },
+        y: {
+          label: {
+            // TODO add units
+            text: i18n.getLanguageString(param.observedProperty.label),
+            position: 'outer-middle'
+          }
+        }
+      },
+      grid: {
+        x: {
+            show: true
+        },
+        y: {
+            show: true
+        }
+      },
+      // no need for a legend since there is only one source currently
+      legend: {
+        show: false
+      },
+      size: {
+        height: 300,
+        width: 300
+      },
+    })
     
-    let opts = this.plotOptions
-    // TODO add units
-    opts.axes.x[0].label = i18n.getLanguageString(param.observedProperty.label)
-    
-    chart.draw(data, this.plotOptions)
     return el
   }
 }
