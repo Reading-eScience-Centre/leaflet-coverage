@@ -3,18 +3,6 @@ import c3 from 'c3'
 
 import * as i18n from '../util/i18n.js'
 
-
-const DEFAULT_PLOT_OPTIONS = {
-  width: 300,
-  height: 300,
-  axes: {
-    x: {
-      0: {format: '#,##'}
-    }
-  },
-  orientation: 'vertical'
-}
-
 export default class ProfilePlot extends L.Popup {
   constructor (cov, options, plotOptions) {
     super()
