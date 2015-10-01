@@ -69,7 +69,7 @@ class ParameterSync extends L.Class {
     this._registerLayerListeners(layer, param)
     
     if (!match) {
-      this.fire('parameteradd', {syncLayer: this._getSyncLayer(param)})
+      this.fire('parameterAdd', {syncLayer: this._getSyncLayer(param)})
     }
   }
   
@@ -83,7 +83,7 @@ class ParameterSync extends L.Class {
       this._paramLayers.delete(param)
       // underscore since the 'parameterremove' event of the syncLayer should be used
       // from the outside
-      this.fire('_parameterremove', {param: param})
+      this.fire('_parameterRemove', {param: param})
     }
   }
   
