@@ -42,8 +42,8 @@ function defaultMatch (p1, p2) {
 }
 
 /**
- * Synchronizes visualization options of multiple layers with matching Parameter
- * and exposes a combined view of those options in form of a virtual layer.
+ * Synchronizes visualization options of multiple renderer layers with matching Parameter
+ * and exposes a combined view of those options in form of a virtual layer object.
  * 
  * A common use case for this is to have equal palettes and only a single legend
  * for multiple layers describing the same parameter.

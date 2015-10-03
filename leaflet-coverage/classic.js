@@ -11,6 +11,8 @@ import Grid from './renderers/Grid.js'
 import Profile from './renderers/Profile.js'
 import Trajectory from './renderers/Trajectory.js'
 import * as palettes from './renderers/palettes.js'
+import ParameterSync from './renderers/ParameterSync.js'
+import ProfilePlot from './popups/ProfilePlot.js'
 
 if (!('Coverage' in L)) {
   L.coverage = {} 
@@ -18,18 +20,20 @@ if (!('Coverage' in L)) {
 
 let c = L.coverage
 
-for (let ns of ['control', 'renderer', 'palette']) {
+for (let ns of ['control', 'renderer', 'popup', 'palette']) {
   if (!(ns in c)) {
     c[ns] = {}
   }
 }
 
 c.LayerFactory = LayerFactory
+c.ParameterSync = ParameterSync
 c.control.Legend = Legend
 c.control.TimeAxis = TimeAxis
 c.control.VerticalAxis = VerticalAxis
 c.renderer.Grid = Grid
 c.renderer.Profile = Profile
 c.renderer.Trajectory = Trajectory
+c.popup.ProfilePlot = ProfilePlot
 c.palette = palettes
 
