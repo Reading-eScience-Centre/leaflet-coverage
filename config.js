@@ -21,6 +21,7 @@ System.config({
     "leaflet": "github:Leaflet/Leaflet@0.7.3",
     "minified": "github:timjansen/minified.js@2015.1.1",
     "ndarray": "npm:ndarray@1.0.18",
+    "wu": "github:fitzgen/wu.js@2.0.0",
     "github:jspm/nodelibs-buffer@0.1.0": {
       "buffer": "npm:buffer@3.4.3"
     },

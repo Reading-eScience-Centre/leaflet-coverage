@@ -1,7 +1,7 @@
 {
   "name": "leaflet-coverage",
   "version": "0.1.0",
-  "license" : "BSD-3-Clause",
+  "license": "BSD-3-Clause",
   "description": "A Leaflet plugin for visualizing coverage data",
   "repository": {
     "type": "git",
@@ -49,7 +49,8 @@
       "cwise-compiler": "npm:cwise-compiler@^1.1.2",
       "leaflet": "github:Leaflet/Leaflet@^0.7.3",
       "minified": "github:timjansen/minified.js@^2015.1.1",
-      "ndarray": "npm:ndarray@^1.0.18"
+      "ndarray": "npm:ndarray@^1.0.18",
+      "wu": "github:fitzgen/wu.js@^2.0.0"
     },
     "devDependencies": {
       "assert": "npm:assert@^1.3.0",
