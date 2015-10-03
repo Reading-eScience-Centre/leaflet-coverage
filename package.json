@@ -46,6 +46,7 @@
       "lib": "leaflet-coverage"
     },
     "dependencies": {
+      "c3": "npm:c3@^0.4.11-rc4",
       "cwise-compiler": "npm:cwise-compiler@^1.1.2",
       "leaflet": "github:Leaflet/Leaflet@^0.7.3",
       "minified": "github:timjansen/minified.js@^2015.1.1",
