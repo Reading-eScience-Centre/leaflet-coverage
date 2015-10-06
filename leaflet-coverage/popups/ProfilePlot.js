@@ -3,6 +3,9 @@ import c3 from 'c3'
 
 import * as i18n from '../util/i18n.js'
 
+// not used currently
+const DEFAULT_PLOT_OPTIONS = {}
+
 export default class ProfilePlot extends L.Popup {
   constructor (cov, options, plotOptions) {
     super()
@@ -17,7 +20,7 @@ export default class ProfilePlot extends L.Popup {
   
   onAdd (map) {
     map.fire('dataloading')
-    Promise.all([this._cov.loadDomain(), this._cov.loadRanges(), googleReady])
+    Promise.all([this._cov.loadDomain(), this._cov.loadRanges()])
       .then(([domain, ranges]) => {
         this.domain = domain
         this.ranges = ranges
