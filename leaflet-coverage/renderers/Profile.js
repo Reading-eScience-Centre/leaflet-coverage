@@ -152,6 +152,8 @@ export class Profile extends L.Class {
   
   _removeMarker () {
     this._map.removeLayer(this.marker)
+    // not sure why this is necessary but without it we still get click events
+    this.marker.clearAllEventListeners()
     delete this.marker
   }
   
