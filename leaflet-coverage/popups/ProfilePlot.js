@@ -47,7 +47,7 @@ export default class ProfilePlot extends L.Popup {
     let param = this.param
     
     let xLabel = 'Vertical'
-    let x = [xLabel]
+    let x = ['x']
     for (let z of this.domain.z) {
       x.push(z)
     }
