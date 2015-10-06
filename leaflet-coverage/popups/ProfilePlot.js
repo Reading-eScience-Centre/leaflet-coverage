@@ -48,11 +48,12 @@ export default class ProfilePlot extends L.Popup {
     let param = this.param
     
     let xLabel = 'Vertical'
+    let yLabel = i18n.getLanguageString(param.observedProperty.label)
     let x = ['x']
     for (let z of this.domain.z) {
       x.push(z)
     }
-    let y = [this._cov.id]
+    let y = [yLabel]
     for (let i=0; i < this.domain.z.length; i++) {
       y.push(this.ranges.get(param.key).values.get(i))
     }
@@ -75,7 +76,7 @@ export default class ProfilePlot extends L.Popup {
         y: {
           label: {
             // TODO add units
-            text: i18n.getLanguageString(param.observedProperty.label),
+            text: yLabel,
             position: 'outer-middle'
           }
         }
