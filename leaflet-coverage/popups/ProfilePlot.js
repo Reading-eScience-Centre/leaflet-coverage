@@ -9,7 +9,7 @@ const DEFAULT_PLOT_OPTIONS = {}
 
 export default class ProfilePlot extends L.Popup {
   constructor (cov, options, plotOptions) {
-    super()
+    super({maxWidth: 350})
     this._cov = cov
     this.param = options.keys ? cov.parameters.get(options.keys[0]) : null
     this.language = options.language || i18n.DEFAULT_LANGUAGE
@@ -52,7 +52,7 @@ export default class ProfilePlot extends L.Popup {
     let unit = param.unit ? 
                (param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, this.language)) :
                ''
-    let yLabel = i18n.getLanguageString(param.observedProperty.label, this.language) + (unit ? ' (' + unit + ')' : '')
+    let obsPropLabel = i18n.getLanguageString(param.observedProperty.label, this.language) 
     let x = ['x']
     for (let z of this.domain.z) {
       x.push(z)
@@ -69,7 +69,7 @@ export default class ProfilePlot extends L.Popup {
         x: 'x',
         columns: [x, y],
         names: {
-          [param.key]: yLabel
+          [param.key]: obsPropLabel
         }
       },
       axis: {
@@ -82,8 +82,7 @@ export default class ProfilePlot extends L.Popup {
         },
         y: {
           label: {
-            // TODO add units
-            text: yLabel,
+            text: obsPropLabel + (unit ? ' (' + unit + ')' : ''),
             position: 'outer-middle'
           }
         }
