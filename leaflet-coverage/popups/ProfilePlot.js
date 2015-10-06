@@ -50,14 +50,14 @@ export default class ProfilePlot extends L.Popup {
     
     let xLabel = 'Vertical'
     let unit = param.unit ? 
-               ' (' + (param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, this.language)) + ')' :
+               (param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, this.language)) :
                ''
-    let yLabel = i18n.getLanguageString(param.observedProperty.label, this.language) + unit
+    let yLabel = i18n.getLanguageString(param.observedProperty.label, this.language) + (unit ? ' (' + unit + ')' : '')
     let x = ['x']
     for (let z of this.domain.z) {
       x.push(z)
     }
-    let y = [yLabel]
+    let y = [param.key]
     for (let i=0; i < this.domain.z.length; i++) {
       y.push(this.ranges.get(param.key).values.get(i))
     }
@@ -67,7 +67,10 @@ export default class ProfilePlot extends L.Popup {
       bindto: el,
       data: {
         x: 'x',
-        columns: [x, y]
+        columns: [x, y],
+        names: {
+          [param.key]: yLabel
+        }
       },
       axis: {
         rotated: true,
@@ -97,9 +100,19 @@ export default class ProfilePlot extends L.Popup {
       legend: {
         show: false
       },
+      tooltip: {
+        format: {
+          title: d => 'Vertical: ' + d,
+          value: (value, ratio, id) => value + unit
+        }
+      },
+      zoom: {
+        enabled: true,
+        rescale: true
+      },
       size: {
         height: 300,
-        width: 300
+        width: 350
       },
     })
     
