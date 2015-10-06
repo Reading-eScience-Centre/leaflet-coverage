@@ -495,7 +495,9 @@ export default class Grid extends L.TileLayer.Canvas {
   }
   
   _doAutoRedraw () {
-    if (this._autoRedraw) {
+    // we check getContainer() to prevent errors when trying to redraw when the layer has not
+    // fully initialized yet
+    if (this._autoRedraw && this.getContainer()) {
       this.redraw()
     }
   }
