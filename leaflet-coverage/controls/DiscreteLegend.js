@@ -49,6 +49,7 @@ export default class DiscreteLegend extends L.Control {
     this.covLayer = covLayer
     this.id = options.id || DEFAULT_TEMPLATE_ID
     this.language = options.language || i18n.DEFAULT_LANGUAGE
+    this.d3LegendFn = options.d3LegendFn
     
     if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
       inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS)
@@ -90,7 +91,11 @@ export default class DiscreteLegend extends L.Control {
       .attr('class', 'legendOrdinal')
       .attr('transform', 'translate(20,20)')
 
-    let legendOrdinal = d3.legend.color().scale(ordinal)
+    let legendOrdinal = d3.legend.color()
+    if (this.d3LegendFn) {
+      this.d3LegendFn(legendOrdinal)
+    }
+    legendOrdinal.scale(ordinal)
     svg.select('.legendOrdinal').call(legendOrdinal)
   }
   
