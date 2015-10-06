@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import {$} from 'minified'
+import {$,HTML} from 'minified'
 
 import {inject} from './utils.js'
 import * as i18n from '../util/i18n.js'
@@ -84,7 +84,7 @@ export default class DiscreteLegend extends L.Control {
         <br>`
     }
     
-    $('.legend-palette', el).fill(html)
+    $('.legend-palette', el).fill(HTML(html))
   }
   
   onRemove (map) {
