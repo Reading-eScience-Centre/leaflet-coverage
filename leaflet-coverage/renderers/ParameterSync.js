@@ -111,6 +111,7 @@ class ParameterSync extends L.Class {
    */
   addLayer (layer) {
     if (!layer.parameter) {
+      console.log('layer has no parameter, skipping parameter sync')
       return   
     }
     let params = Array.from(this._paramLayers.keys())
@@ -169,7 +170,7 @@ class ParameterSync extends L.Class {
     for (let [type, fn] of listeners) {
       layer.on(type, fn)
     }
-    this._layerListeners.set(param, listeners)
+    this._layerListeners.set(layer, listeners)
   }
   
   _syncProperties (param) {
