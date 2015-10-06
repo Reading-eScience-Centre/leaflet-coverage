@@ -8,7 +8,7 @@ import * as i18n from '../util/i18n.js'
 const DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-legend'
 const DEFAULT_TEMPLATE = `
 <template id="${DEFAULT_TEMPLATE_ID}">
-  <div class="info legend">
+  <div class="info legend continuous-legend">
     <div style="margin-bottom:3px">
       <strong class="legend-title"></strong>
     </div>
@@ -27,8 +27,6 @@ const DEFAULT_TEMPLATE = `
 `
 const DEFAULT_TEMPLATE_CSS = `
 .legend {
-  text-align: left;
-  line-height: 18px;
   color: #555;
 }
 `

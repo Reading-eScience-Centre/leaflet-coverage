@@ -8,19 +8,21 @@ import * as i18n from '../util/i18n.js'
 const DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-discrete-legend'
 const DEFAULT_TEMPLATE = `
 <template id="${DEFAULT_TEMPLATE_ID}">
-  <div class="info legend">
+  <div class="info legend discrete-legend">
     <strong class="legend-title"></strong><br>
-    <div class="info legend legend-palette"></div>
+    <div class="legend-palette discrete-legend-palette"></div>
   </div>
 </template>
 `
 const DEFAULT_TEMPLATE_CSS = `
 .legend {
-  text-align: left;
-  line-height: 18px;
   color: #555;
 }
-.legend i {
+.discrete-legend-palette {
+  padding: 2px 1px;
+  line-height: 18px;
+}
+.discrete-legend-palette i {
   float: left;
   height: 18px;
   margin-right: 8px;
