@@ -24,7 +24,7 @@ System.config({
     "leaflet": "github:Leaflet/Leaflet@0.7.3",
     "minified": "github:timjansen/minified.js@2015.1.1",
     "ndarray": "npm:ndarray@1.0.18",
-    "wu": "github:fitzgen/wu.js@2.0.0",
+    "wu": "npm:wu@2.1.0",
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.3.0"
     },
@@ -190,6 +190,11 @@ System.config({
     },
     "npm:util@0.10.3": {
       "inherits": "npm:inherits@2.0.1",
+      "process": "github:jspm/nodelibs-process@0.1.2"
+    },
+    "npm:wu@2.1.0": {
+      "fs": "github:jspm/nodelibs-fs@0.1.2",
+      "path": "github:jspm/nodelibs-path@0.1.0",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:xmlhttprequest@1.7.0": {
