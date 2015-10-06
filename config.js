@@ -20,7 +20,6 @@ System.config({
     "core-js": "npm:core-js@1.1.4",
     "cwise-compiler": "npm:cwise-compiler@1.1.2",
     "d3": "npm:d3@3.5.6",
-    "d3-legend": "npm:d3-svg-legend@1.3.0",
     "leaflet": "github:Leaflet/Leaflet@0.7.3",
     "minified": "github:timjansen/minified.js@2015.1.1",
     "ndarray": "npm:ndarray@1.0.18",
@@ -64,9 +63,6 @@ System.config({
     "npm:cwise-compiler@1.1.2": {
       "process": "github:jspm/nodelibs-process@0.1.2",
       "uniq": "npm:uniq@1.0.1"
-    },
-    "npm:d3-svg-legend@1.3.0": {
-      "d3": "npm:d3@3.5.6"
     },
     "npm:inherits@2.0.1": {
       "util": "github:jspm/nodelibs-util@0.1.0"

@@ -1,7 +1,5 @@
 import L from 'leaflet'
 import {$} from 'minified'
-import d3 from 'd3'
-import 'd3-legend'
 
 import {inject} from './utils.js'
 import * as i18n from '../util/i18n.js'
@@ -14,9 +12,7 @@ const DEFAULT_TEMPLATE = `
     <div style="margin-bottom:3px">
       <strong class="legend-title"></strong>
     </div>
-    <div>
-      <svg class="legend-palette"></svg>
-    </div>
+    <div class="legend-palette"></div>
   </div>
 </template>
 `
@@ -25,6 +21,13 @@ const DEFAULT_TEMPLATE_CSS = `
   text-align: left;
   line-height: 18px;
   color: #555;
+}
+.legend i {
+  float: left;
+  height: 18px;
+  margin-right: 8px;
+  opacity: 0.7;
+  width: 18px;
 }
 `
 
@@ -49,7 +52,6 @@ export default class DiscreteLegend extends L.Control {
     this.covLayer = covLayer
     this.id = options.id || DEFAULT_TEMPLATE_ID
     this.language = options.language || i18n.DEFAULT_LANGUAGE
-    this.d3LegendFn = options.d3LegendFn
     
     if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
       inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS)
@@ -71,32 +73,18 @@ export default class DiscreteLegend extends L.Control {
     
     let palette = this.covLayer.palette
     let param = this.covLayer.parameter
-        
-    let css = []
+    
+    let html = ''
+    
     for (let i=0; i < palette.steps; i++) {
-      css.push(`rgb(${palette.red[i]}, ${palette.green[i]}, ${palette.blue[i]})`)
+      let cat = i18n.getLanguageString(param.categories[i].label, this.language)
+      html += `
+        <i style="background:rgb(${palette.red[i]}, ${palette.green[i]}, ${palette.blue[i]})`)"></i>
+        ${cat}
+        <br>`      
     }
     
-    let categories = param.categories.map(c => i18n.getLanguageString(c.label, this.language))
-    
-    let ordinal = d3.scale.ordinal()
-      .domain(categories)
-      .range(css);
-
-    let svgEl = $('.legend-palette', el)[0]
-    svgEl.innerHTML = ''
-    let svg = d3.select(svgEl)
-
-    svg.append('g')
-      .attr('class', 'legendOrdinal')
-      .attr('transform', 'translate(20,20)')
-
-    let legendOrdinal = d3.legend.color()
-    if (this.d3LegendFn) {
-      this.d3LegendFn(legendOrdinal)
-    }
-    legendOrdinal.scale(ordinal)
-    svg.select('.legendOrdinal').call(legendOrdinal)
+    $('.legend-palette', el).fill(html)
   }
   
   onRemove (map) {

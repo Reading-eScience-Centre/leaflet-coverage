@@ -31,13 +31,6 @@ const DEFAULT_TEMPLATE_CSS = `
   line-height: 18px;
   color: #555;
 }
-.legend i {
-  width: 18px;
-  height: 18px;
-  float: left;
-  margin-right: 8px;
-  opacity: 0.7;
-}
 `
 
 /**
