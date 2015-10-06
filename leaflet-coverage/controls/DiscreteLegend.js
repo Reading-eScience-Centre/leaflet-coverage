@@ -9,10 +9,8 @@ const DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-discrete-legend'
 const DEFAULT_TEMPLATE = `
 <template id="${DEFAULT_TEMPLATE_ID}">
   <div class="info legend">
-    <div style="margin-bottom:3px">
-      <strong class="legend-title"></strong>
-    </div>
-    <div class="legend-palette"></div>
+    <strong class="legend-title"></strong><br>
+    <div class="info legend legend-palette"></div>
   </div>
 </template>
 `
