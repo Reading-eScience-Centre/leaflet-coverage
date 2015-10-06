@@ -12,6 +12,7 @@ export default class ProfilePlot extends L.Popup {
     super()
     this._cov = cov
     this.param = options.keys ? cov.parameters.get(options.keys[0]) : null
+    this.language = options.language || i18n.DEFAULT_LANGUAGE
     this.plotOptions = plotOptions || DEFAULT_PLOT_OPTIONS
     
     if (this.param === null) {
@@ -48,7 +49,10 @@ export default class ProfilePlot extends L.Popup {
     let param = this.param
     
     let xLabel = 'Vertical'
-    let yLabel = i18n.getLanguageString(param.observedProperty.label)
+    let unit = param.unit ? 
+               ' (' + (param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, this.language)) + ')' :
+               ''
+    let yLabel = i18n.getLanguageString(param.observedProperty.label, this.language) + unit
     let x = ['x']
     for (let z of this.domain.z) {
       x.push(z)
