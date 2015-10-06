@@ -191,6 +191,7 @@ class ParameterSync extends L.Class {
       layer_[prop] = unified
     }
     this._propSyncing.delete(prop)
+    this.fire('_syncPropChange', {param: param, prop: prop})
   }
 }
 
@@ -203,6 +204,11 @@ class SyncLayer extends L.Class {
     paramSync.on('_parameterRemove', e => {
       if (e.param === param) {
         this.fire('remove')
+      }
+    })
+    paramSync.on('_syncPropChange', e => {
+      if (e.param === param) {
+        this.fire(e.prop + 'Change')
       }
     })
     let layers = () => paramSync._paramLayers.get(param)
