@@ -6,7 +6,8 @@ import * as opsnull from '../util/ndarray-ops-null.js'
 
 const DOMAIN_TYPE = 'http://coveragejson.org/def#Grid'
   
-const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
+const DEFAULT_CONTINUOUS_PALETTE = () => linearPalette(['#deebf7', '#3182bd']) // blues
+const DEFAULT_CATEGORICAL_PALETTE = n => linearPalette(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3'], n)
 
 /**
  * Renderer for Coverages with domain type Grid.
@@ -57,14 +58,31 @@ export default class Grid extends L.TileLayer.Canvas {
         z: {coordPref: options.vertical}
     }
     
-    this._palette = options.palette || DEFAULT_PALETTE
-    if (options.paletteExtent === undefined) {
-      this._paletteExtent = 'full'
-    } else if (Array.isArray(options.paletteExtent) || ['full', 'subset', 'fov'].indexOf(options.paletteExtent) !== -1) {
-      this._paletteExtent = options.paletteExtent
+    if (options.palette) {
+      this._palette = options.palette
+    } else if (this.param.categories) {
+      this._palette = DEFAULT_CATEGORICAL_PALETTE(this.param.categories.length)
     } else {
-      throw new Error('paletteExtent must either be a 2-element array, one of "full", "subset", or "fov", or be omitted')
-    }    
+      this._palette = DEFAULT_CONTINUOUS_PALETTE()
+    }
+    
+    if (this.param.categories && this.param.categories.length !== this._palette.steps) {
+      throw new Error('Categorical palettes must match the number of categories of the parameter')
+    }
+    
+    if (this.param.categories) {
+      if (options.paletteExtent) {
+        throw new Error('paletteExtent cannot be given for categorical parameters')
+      }
+    } else {
+      if (options.paletteExtent === undefined) {
+        this._paletteExtent = 'full'
+      } else if (Array.isArray(options.paletteExtent) || ['full', 'subset', 'fov'].indexOf(options.paletteExtent) !== -1) {
+        this._paletteExtent = options.paletteExtent
+      } else {
+        throw new Error('paletteExtent must either be a 2-element array, one of "full", "subset", or "fov", or be omitted')
+      }
+    }
     
     switch (options.redraw) {
     case 'manual': this._autoRedraw = false; break
@@ -84,7 +102,9 @@ export default class Grid extends L.TileLayer.Canvas {
         this.domain = domain
         this.range = range
         this._subsetAxesByCoordinatePreference()
-        this._updatePaletteExtent(this._paletteExtent)
+        if (!this.param.categories) {
+          this._updatePaletteExtent(this._paletteExtent)
+        }
         this.fire('add')
         super.onAdd(map)
         map.fire('dataload')
@@ -181,7 +201,7 @@ export default class Grid extends L.TileLayer.Canvas {
     this._doAutoRedraw()
     if (old !== this.time) {
       this.fire('axisChange', {axis: 'time'})
-    }    
+    }
   }
   
   /**
@@ -256,6 +276,9 @@ export default class Grid extends L.TileLayer.Canvas {
   }
   
   set paletteExtent (extent) {
+    if (this.param.categories) {
+      throw new Error('Cannot set palette extent for categorical parameters')
+    }
     this._updatePaletteExtent(extent)
     this._doAutoRedraw()
     this.fire('paletteExtentChange')
@@ -283,17 +306,39 @@ export default class Grid extends L.TileLayer.Canvas {
     let {red, green, blue} = this.palette
     let paletteExtent = this.paletteExtent
     
-    // TODO don't scale value if categorical parameter
-    
-    function setPixel (tileY, tileX, val) {
-      if (val === null) return
-      // map value to color using a palette
-      var valScaled = scale(val, palette, paletteExtent)
-
-      rgba.set(tileY, tileX, 0, red[valScaled])
-      rgba.set(tileY, tileX, 1, green[valScaled])
-      rgba.set(tileY, tileX, 2, blue[valScaled])
+    let doSetPixel = (tileY, tileX, idx) => {
+      rgba.set(tileY, tileX, 0, red[idx])
+      rgba.set(tileY, tileX, 1, green[idx])
+      rgba.set(tileY, tileX, 2, blue[idx])
       rgba.set(tileY, tileX, 3, 255)
+    }
+    
+    let setPixel
+    if (this.param.categories) {
+      // categorical parameter
+      let valIdxMap = new Map()
+      for (let idx=0; idx < this.param.categories.length; idx++) {
+        let cat = this.param.categories[idx]
+        if (cat.value) {
+          valIdxMap.set(cat.value, idx)
+        } else {
+          for (let val of cat.values) {
+            valIdxMap.set(val, idx)
+          }
+        }
+      }
+      setPixel = (tileY, tileX, val) => {
+        if (val === null || !valIdxMap.has(val)) return
+        let idx = valIdxMap.get(val)
+        doSetPixel(tileY, tileX, idx)
+      }
+    } else {
+      // continuous parameter
+      setPixel = (tileY, tileX, val) => {
+        if (val === null) return
+        let idx = scale(val, palette, paletteExtent)
+        doSetPixel(tileY, tileX, idx)
+      }
     }
     
     let sub = this._axesSubset
