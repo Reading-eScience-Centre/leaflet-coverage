@@ -27,6 +27,10 @@ export class Profile extends L.Class {
     this.param = options.keys ? cov.parameters.get(options.keys[0]) : null
     this._targetZ = 'targetZ' in options ? options.targetZ : null
     this.defaultColor = options.color ? options.color : DEFAULT_COLOR
+        
+    if (this.param && this.param.categories) {
+      throw new Error('category parameters are currently not support for Profile')
+    }
     
     this._palette = options.palette || DEFAULT_PALETTE
     if (Array.isArray(options.paletteExtent)) {

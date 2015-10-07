@@ -38,6 +38,10 @@ class Trajectory extends L.FeatureGroup {
     this.cov = cov
     this.param = cov.parameters.get(options.keys[0])
     
+    if (this.param.categories) {
+      throw new Error('category parameters are currently not support for Trajectory')
+    }
+    
     this._palette = options.palette || DEFAULT_PALETTE
     if (options.paletteExtent === undefined || options.paletteExtent === 'subset') {
       this._paletteExtent = 'full'
