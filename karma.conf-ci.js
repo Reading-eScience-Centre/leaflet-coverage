@@ -87,6 +87,7 @@ module.exports = function(config) {
       recordScreenshots: false
     },
     captureTimeout: 120000,
+    browserNoActivityTimeout: 120000,
     customLaunchers: customLaunchers,
 
     // start these browsers
