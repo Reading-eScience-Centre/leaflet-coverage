@@ -19,8 +19,11 @@ export function withCategories (cov, key, categories) {
   return newcov
 }
 
+/**
+ * Shallow clone a given object.
+ */
 function shallowcopy (obj) {
-  let copy = {}
+  let copy = Object.create(Object.getPrototypeOf(obj))
   for (let prop in obj) {
     copy[prop] = obj[prop]
   }
