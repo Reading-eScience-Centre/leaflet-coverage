@@ -26,7 +26,6 @@ const DEFAULT_TEMPLATE_CSS = `
   float: left;
   height: 18px;
   margin-right: 8px;
-  opacity: 0.7;
   width: 18px;
 }
 `
