@@ -112,7 +112,7 @@ export default class ProfilePlot extends L.Popup {
       size: {
         height: 300,
         width: 350
-      },
+      }
     })
     
     return el

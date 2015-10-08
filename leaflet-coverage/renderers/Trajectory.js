@@ -142,7 +142,7 @@ class Trajectory extends L.FeatureGroup {
   
   _addTrajectoryLayers () {
     // add a Polyline in black, and coloured CircleMarker's for each domain point
-    let {x,y,z,t} = this.domain
+    let {x,y} = this.domain
     let vals = this.range.values
     
     // TODO do coordinate transformation to lat/lon if necessary
@@ -152,7 +152,6 @@ class Trajectory extends L.FeatureGroup {
     let paletteExtent = this.paletteExtent
     
     let coords = []
-    let markers = []
     for (let i=0; i < x.length; i++) {
       let val = vals.get(i)
       // this always has to be lat/lon, no matter which map projection is used

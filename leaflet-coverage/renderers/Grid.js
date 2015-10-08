@@ -124,10 +124,11 @@ export default class Grid extends L.TileLayer.Canvas {
   }
     
   getBounds () {
+    let bbox
     if (this.cov.bbox) {
-      var bbox = this.cov.bbox
+      bbox = this.cov.bbox
     } else if (this._isRectilinearGeodeticDomainGrid()) {
-      var bbox = this._getDomainBbox()
+      bbox = this._getDomainBbox()
     } else {
       return
     }
@@ -289,7 +290,6 @@ export default class Grid extends L.TileLayer.Canvas {
   }
     
   drawTile (canvas, tilePoint, zoom) {
-    let map = this._map
     let ctx = canvas.getContext('2d')
     let tileSize = this.options.tileSize
     

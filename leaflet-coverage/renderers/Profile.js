@@ -147,7 +147,7 @@ export class Profile extends L.Class {
     let {x,y} = this.domain
     this.marker = L.circleMarker(L.latLng(y, x), {color: this._getColor()})
     
-    this.marker.on('click', e => {
+    this.marker.on('click', () => {
       this.fire('click')
     })
     
@@ -160,7 +160,7 @@ export class Profile extends L.Class {
   }
   
   _getColor () {
-    let {x,y,z} = this.domain
+    let {z} = this.domain
     
     // TODO do coordinate transformation to lat/lon if necessary
     
