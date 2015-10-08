@@ -14,6 +14,7 @@ import Trajectory from './renderers/Trajectory.js'
 import * as palettes from './renderers/palettes.js'
 import ParameterSync from './renderers/ParameterSync.js'
 import ProfilePlot from './popups/ProfilePlot.js'
+import * as transform from './util/transform.js'
 
 if (!('Coverage' in L)) {
   L.coverage = {} 
@@ -38,4 +39,5 @@ c.renderer.Profile = Profile
 c.renderer.Trajectory = Trajectory
 c.popup.ProfilePlot = ProfilePlot
 c.palette = palettes
+c.transform = transform
 
