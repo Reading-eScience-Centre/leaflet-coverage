@@ -14,6 +14,10 @@
  *         the PaletteManager class.
  */
 export function linearPalette (colors, steps=256) {
+  if (steps === 1) {
+    // work-around, a gradient with 1 pixel becomes black otherwise
+    return directPalette([colors[0]])
+  }
   // draw the gradient in a canvas
   var canvas = document.createElement('canvas')
   canvas.width = steps
