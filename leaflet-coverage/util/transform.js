@@ -14,6 +14,8 @@ export function withParameters (cov, params) {
  */
 export function withCategories (cov, key, categories) {
   let newparams = shallowcopy(cov.parameters)
+  let newparam = shallowcopy(newparams.get(key))
+  newparams.set(key, newparam)
   newparams.get(key).categories = categories
   let newcov = withParameters(cov, newparams)
   return newcov
