@@ -19,6 +19,7 @@ System.config({
     "c3": "npm:c3@0.4.10",
     "clean-css": "npm:clean-css@3.4.5",
     "core-js": "npm:core-js@1.1.4",
+    "covjson-reader": "github:reading-escience-centre/covjson-reader@0.1.1",
     "css": "github:systemjs/plugin-css@0.1.18",
     "cwise-compiler": "npm:cwise-compiler@1.1.2",
     "d3": "npm:d3@3.5.6",
@@ -30,7 +31,7 @@ System.config({
       "assert": "npm:assert@1.3.0"
     },
     "github:jspm/nodelibs-buffer@0.1.0": {
-      "buffer": "npm:buffer@3.5.0"
+      "buffer": "npm:buffer@3.5.1"
     },
     "github:jspm/nodelibs-events@0.1.1": {
       "events": "npm:events@1.0.2"
@@ -64,6 +65,10 @@ System.config({
     "github:jspm/nodelibs-util@0.1.0": {
       "util": "npm:util@0.10.3"
     },
+    "github:reading-escience-centre/covjson-reader@0.1.1": {
+      "cbor": "github:paroga/cbor-js@0.1.0",
+      "ndarray": "npm:ndarray@1.0.18"
+    },
     "npm:amdefine@1.0.0": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",
       "module": "github:jspm/nodelibs-module@0.1.0",
@@ -76,7 +81,7 @@ System.config({
     "npm:babel-runtime@5.8.25": {
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:buffer@3.5.0": {
+    "npm:buffer@3.5.1": {
       "base64-js": "npm:base64-js@0.0.8",
       "ieee754": "npm:ieee754@1.1.6",
       "is-array": "npm:is-array@1.0.1"
@@ -128,12 +133,12 @@ System.config({
     "npm:inherits@2.0.1": {
       "util": "github:jspm/nodelibs-util@0.1.0"
     },
-    "npm:is-buffer@1.0.2": {
+    "npm:is-buffer@1.1.0": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0"
     },
     "npm:ndarray@1.0.18": {
       "iota-array": "npm:iota-array@1.0.0",
-      "is-buffer": "npm:is-buffer@1.0.2"
+      "is-buffer": "npm:is-buffer@1.1.0"
     },
     "npm:os-browserify@0.1.2": {
       "os": "github:jspm/nodelibs-os@0.1.0"
