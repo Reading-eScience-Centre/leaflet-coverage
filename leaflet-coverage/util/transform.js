@@ -1,6 +1,8 @@
 import wu from 'wu'
 import ndarray from 'ndarray'
 
+import {indicesOfNearest} from './arrays.js'
+
 /**
  * Returns a copy of the given Coverage object with the parameters
  * replaced by the supplied ones.
@@ -36,7 +38,7 @@ export function withCategories (cov, key, categories) {
  * @param {Object} polygon A GeoJSON Polygon object with 1 linear ring.
  * @returns {Coverage}
  */
-export function maskedByPolygon (cov, polygon) {
+export function maskByPolygon (cov, polygon) {
   if (!cov.domainType.endsWith('Grid')) {
     throw new Error('Sorry, only grids can be masked by polygon currently')
   }
@@ -84,6 +86,33 @@ export function maskedByPolygon (cov, polygon) {
 }
 
 /**
+ * Returns a copy of the coverage subsetted to the given bounding box.
+ * 
+ * Any grid cell is included which intersects with the bounding box. 
+ * 
+ * @param {Coverage} cov A Coverage object.
+ * @param {array} bbox [xmin,ymin,xmax,ymax] in native CRS coordinates.
+ * @returns {Promise} A promise with a Coverage object as result.
+ */
+export function subsetByBbox (cov, bbox) {
+  let [xmin,ymin,xmax,ymax] = bbox
+  
+  return cov.loadDomain().then(domain => {
+    let [ixmin,ixmax] = [indicesOfNearest(domain.x, xmin), indicesOfNearest(domain.x, xmax)]
+    let [iymin,iymax] = [indicesOfNearest(domain.y, ymin), indicesOfNearest(domain.y, ymax)]
+    let [xstart,xstop] = [ixmin[0], ixmax[1]]
+    let [ystart,ystop] = [iymin[0], iymax[1]]
+    if (xstart > xstop) {
+      [xstart,xstop] = [xstop,xstart]
+    }
+    if (ystart > ystop) {
+      [ystart,ystop] = [ystop,ystart]
+    }    
+    return cov.subsetByIndex({x: {start: xstart, stop: xstop}, y: {start: ystart, stop: ystop}})
+  })
+}
+
+/**
  * Returns whether a point is inside a polygon.
  * 
  * Based on Point Inclusion in Polygon Test (PNPOLY) by W. Randolph Franklin:
@@ -92,9 +121,9 @@ export function maskedByPolygon (cov, polygon) {
  * Note that this algorithm works both with closed (first point repeated at the end)
  * and unclosed polygons.
  *
- * @param x {number} x coordinate of point
- * @param y {number} y coordinate of point
- * @param polygon {Array} an array of 2-item arrays of coordinates.
+ * @param {number} x x coordinate of point
+ * @param {number} y y coordinate of point
+ * @param {Array} polygon an array of 2-item arrays of coordinates.
  * @returns {boolean} true if point is inside or false if not
  */
 export function pnpoly (x, y, polygon) {

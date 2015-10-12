@@ -91,7 +91,7 @@ describe("util/transform methods", () => {
     
     it('shall not modify the original coverage', () => {
       return CovJSON.read(JSON.parse(JSON.stringify(covjson))).then(cov => {
-        let newcov = transform.maskedByPolygon(cov, polygon)
+        let newcov = transform.maskByPolygon(cov, polygon)
         return cov.loadRange('ICEC').then(range => {
           assert.strictEqual(range.values.get(0, 0, 0, 0), 0.5)
           assert.strictEqual(range.values.get(0, 0, 0, 1), 0.6)
@@ -101,7 +101,7 @@ describe("util/transform methods", () => {
     
     it('shall mask the correct range values', () => {
       return CovJSON.read(JSON.parse(JSON.stringify(covjson))).then(cov => {
-        let newcov = transform.maskedByPolygon(cov, polygon)
+        let newcov = transform.maskByPolygon(cov, polygon)
         return newcov.loadRange('ICEC').then(range => {
           assert.strictEqual(range.values.get(0, 0, 0, 0), 0.5)
           assert.strictEqual(range.values.get(0, 0, 0, 1), null)
