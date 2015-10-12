@@ -45,6 +45,17 @@ describe("util/transform methods", () => {
     })
   })
   
+  describe("#pnpoly", () => {
+    it('should produce correct results', () => {
+      let poly = [[1, 10], [2, 10], [2, 20], [1, 20]]
+      assert(transform.pnpoly(1.5, 15, poly))
+      assert(!transform.pnpoly(0.5, 15, poly))
+      assert(!transform.pnpoly(2.5, 15, poly))
+      assert(!transform.pnpoly(1.5, 25, poly))
+      assert(!transform.pnpoly(1.5, 5, poly))
+    })
+  })
+  
   describe("#maskedByPolygon", () => {
     let covjson = {
       "type" : "GridCoverage",

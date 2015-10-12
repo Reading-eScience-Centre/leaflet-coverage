@@ -33,7 +33,7 @@ export function withCategories (cov, key, categories) {
  * domain types only.
  * 
  * @param {Coverage} cov A Coverage object.
- * @param {Object} polygon A GeoJSON polygon object.
+ * @param {Object} polygon A GeoJSON Polygon object with 1 linear ring.
  * @returns {Coverage}
  */
 export function maskedByPolygon (cov, polygon) {
@@ -41,13 +41,14 @@ export function maskedByPolygon (cov, polygon) {
     throw new Error('Sorry, only grids can be masked by polygon currently')
   }
   
-  let polycoords = polygon.coordinates
-    
+  let polycoords = polygon.coordinates[0]
+  
   let ndarrayWrapper = (domain, values) => {
     let pnpolyCache = ndarray(new Uint8Array(domain.x.length * domain.y.length), [domain.x.length, domain.y.length])
     for (let i=0; i < domain.x.length; i++) {
       for (let j=0; j < domain.y.length; j++) {
-        pnpolyCache.set(i, j, pnpoly(domain.x[i], domain.y[j], polycoords))
+        let inside = pnpoly(domain.x[i], domain.y[j], polycoords)
+        pnpolyCache.set(i, j, inside)
       }
     }
     return {
@@ -75,43 +76,37 @@ export function maskedByPolygon (cov, polygon) {
   let loadRanges = keys => Promise.all([cov.loadDomain(), cov.loadRanges(keys)])
     .then(([domain, ranges]) => new Map(wu(ranges).map(([key, range]) => [key, rangeWrapper(domain, range)])))
   
-  // FIXME this does not work, it overrides the original prototype!
   let newcov = shallowcopy(cov)
-  let proto = Object.getPrototypeOf(newcov)
-  proto.loadRange = loadRange
-  proto.loadRanges = loadRanges
+  newcov.loadRange = loadRange
+  newcov.loadRanges = loadRanges
   
   return newcov
 }
 
 /**
- * Point-in-polygon implementation from https://github.com/maxogden/geojson-js-utils.
+ * Returns whether a point is inside a polygon.
  * 
- * Note that the point and the polygon must have the same CRS.
- * Also, longitudes must already be wrapped to a common range.
+ * Based on Point Inclusion in Polygon Test (PNPOLY) by W. Randolph Franklin:
+ * http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
  * 
- * @param {number} x The x coordinate of the point.
- * @param {number} y The y coordinate of the point.
- * @param {array} coords The "coordinates" member of a GeoJSON polygon.
- * @returns {boolean} true, if the point is inside the polygon, otherwise false.
+ * Note that this algorithm works both with closed (first point repeated at the end)
+ * and unclosed polygons.
+ *
+ * @param x {number} x coordinate of point
+ * @param y {number} y coordinate of point
+ * @param polygon {Array} an array of 2-item arrays of coordinates.
+ * @returns {boolean} true if point is inside or false if not
  */
-function pnpoly (x, y, coords) {
-  var vert = [ [0,0] ]
+export function pnpoly (x, y, polygon) {
+  let inside = false
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    let [xi,yi] = polygon[i]
+    let [xj,yj] = polygon[j]
 
-  for (var i = 0; i < coords.length; i++) {
-    for (var j = 0; j < coords[i].length; j++) {
-      vert.push(coords[i][j])
-    }
-    vert.push(coords[i][0])
-    vert.push([0,0])
-  }
-
-  var inside = false
-  for (var i = 0, j = vert.length - 1; i < vert.length; j = i++) {
-    if (((vert[i][0] > y) != (vert[j][0] > y)) && (x < (vert[j][1] - vert[i][1]) * (y - vert[i][0]) / (vert[j][0] - vert[i][0]) + vert[i][1]))
+    if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
       inside = !inside
+    }
   }
-
   return inside
 }
 
