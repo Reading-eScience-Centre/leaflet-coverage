@@ -1,5 +1,4 @@
 import L from 'leaflet'
-import wu from 'wu'
 
 /**
  * Default function that checks if two Parameter objects describe
@@ -184,7 +183,7 @@ class ParameterSync extends L.Class {
       return
     }
     let propreduce = this._syncProps[prop]
-    let unified = wu(this._paramLayers.get(param)).map(l => l[prop]).reduce(propreduce)
+    let unified = [...this._paramLayers.get(param)].map(l => l[prop]).reduce(propreduce)
     // While we unify properties, stop listening for changes to prevent a cycle.
     this._propSyncing.add(prop)
     for (let layer_ of this._paramLayers.get(param)) {

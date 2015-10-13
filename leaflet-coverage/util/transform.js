@@ -1,4 +1,3 @@
-import wu from 'wu'
 import ndarray from 'ndarray'
 
 import {indicesOfNearest} from './arrays.js'
@@ -76,7 +75,7 @@ export function maskByPolygon (cov, polygon) {
     .then(([domain, range]) => rangeWrapper(domain, range))
   
   let loadRanges = keys => Promise.all([cov.loadDomain(), cov.loadRanges(keys)])
-    .then(([domain, ranges]) => new Map(wu(ranges).map(([key, range]) => [key, rangeWrapper(domain, range)])))
+    .then(([domain, ranges]) => new Map([...ranges].map(([key, range]) => [key, rangeWrapper(domain, range)])))
   
   let newcov = shallowcopy(cov)
   newcov.loadRange = loadRange
