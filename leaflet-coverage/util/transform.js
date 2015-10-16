@@ -85,16 +85,18 @@ export function maskByPolygon (cov, polygon) {
 }
 
 /**
- * Returns a copy of the coverage subsetted to the given bounding box.
+ * Returns a copy of the grid coverage subsetted to the given bounding box.
  * 
  * Any grid cell is included which intersects with the bounding box. 
  * 
- * @param {Coverage} cov A Coverage object.
+ * @param {Coverage} cov A Coverage object with domain Grid.
  * @param {array} bbox [xmin,ymin,xmax,ymax] in native CRS coordinates.
  * @returns {Promise} A promise with a Coverage object as result.
  */
 export function subsetByBbox (cov, bbox) {
   let [xmin,ymin,xmax,ymax] = bbox
+  
+  // TODO maybe implement for composite axes like trajectories as well
   
   return cov.loadDomain().then(domain => {
     let [ixmin,ixmax] = [indicesOfNearest(domain.x, xmin), indicesOfNearest(domain.x, xmax)]
