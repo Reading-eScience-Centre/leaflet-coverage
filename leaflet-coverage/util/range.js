@@ -3,7 +3,7 @@
  */
 export function reduce (range, fn, start) {
   function it (obj, shape, axisIdx, v1) {
-    if (shape.size === axisIdx) {
+    if (shape.length === axisIdx) {
       let v2 = range.get(obj)
       return fn(v1, v2)
     } else {
