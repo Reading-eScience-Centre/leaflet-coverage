@@ -58,19 +58,21 @@ export default class Grid extends L.TileLayer.Canvas {
         z: {coordPref: options.vertical}
     }
     
+    let categories = this.param.observedProperty.categories
+    
     if (options.palette) {
       this._palette = options.palette
-    } else if (this.param.categories) {
-      this._palette = DEFAULT_CATEGORICAL_PALETTE(this.param.categories.length)
+    } else if (categories) {
+      this._palette = DEFAULT_CATEGORICAL_PALETTE(categories.length)
     } else {
       this._palette = DEFAULT_CONTINUOUS_PALETTE()
     }
     
-    if (this.param.categories && this.param.categories.length !== this._palette.steps) {
+    if (categories && categories.length !== this._palette.steps) {
       throw new Error('Categorical palettes must match the number of categories of the parameter')
     }
     
-    if (this.param.categories) {
+    if (categories) {
       if (options.paletteExtent) {
         throw new Error('paletteExtent cannot be given for categorical parameters')
       }
@@ -105,7 +107,7 @@ export default class Grid extends L.TileLayer.Canvas {
       .then(() => this.subsetCov.loadRange(this.param.key))
       .then(subsetRange => {
         this.subsetRange = subsetRange
-        if (!this.param.categories) {
+        if (!this.param.observedProperty.categories) {
           this._updatePaletteExtent(this._paletteExtent)
         }
         this.fire('add')
@@ -278,7 +280,7 @@ export default class Grid extends L.TileLayer.Canvas {
   }
   
   set paletteExtent (extent) {
-    if (this.param.categories) {
+    if (this.param.observedProperty.categories) {
       throw new Error('Cannot set palette extent for categorical parameters')
     }
     this._updatePaletteExtent(extent)
@@ -316,11 +318,12 @@ export default class Grid extends L.TileLayer.Canvas {
     
     let setPixel
     if (this.param.categoryEncoding) {
-      // categorical parameter
+      // categorical parameter with integer encoding
       let valIdxMap = new Map()
-      for (let [categoryID, vals] of this.param.categoryEncoding) {
-        for (let val of vals) {
-          valIdxMap.set(val, categoryID)
+      for (let idx=0; idx < this.param.observedProperty.categories.length; idx++) {
+        let cat = this.param.observedProperty.categories[idx]
+        for (let val of this.param.categoryEncoding.get(cat.id)) {
+          valIdxMap.set(val, idx)
         }
       }
       setPixel = (tileY, tileX, val) => {
