@@ -49,16 +49,20 @@ export default class VerticalProfilePlot extends L.Popup {
   _getPlotElement () {
     let param = this.param
     
-    let xLabel = 'Vertical'
-    
+    let zUnit = ''
     if (this.domain.referencing) {
       let vertRef = this.domain.referencing.find(r => r.identifiers[0] === 'z')
       if (vertRef.srs) {
         let vertSrs = vertRef.srs
         if (vertSrs.cs && vertSrs.cs.axes) {
-          xLabel += ' (' + vertSrs.cs.axes[0].unit + ')'
+          zUnit = vertSrs.cs.axes[0].unit
         }
       }
+    }
+    
+    let xLabel = 'Vertical'
+    if (zUnit) {
+      xLabel += ' (' + zUnit + ')'
     }
     
     let unit = param.unit ? 
@@ -113,7 +117,7 @@ export default class VerticalProfilePlot extends L.Popup {
       },
       tooltip: {
         format: {
-          title: d => 'Vertical: ' + d,
+          title: d => 'Vertical: ' + d + zUnit,
           value: (value, ratio, id) => value + unit
         }
       },
