@@ -29,11 +29,11 @@ export function minMax (range) {
      // minimum ignoring null's
      if (v2 === null) return v1
      else return v1 < v2 ? v1 : v2
-     }, INFINITY),
+     }, Infinity),
    reduce(range, (v1,v2) => {
      // maximum ignoring null's
      if (v2 === null) return v1
      else return v1 > v2 ? v1 : v2
-     }, -INFINITY)
+     }, -Infinity)
    ]
 }
