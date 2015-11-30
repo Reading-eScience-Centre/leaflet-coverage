@@ -3,7 +3,7 @@ import {linearPalette, scale} from './palettes.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
 
-const DOMAIN_TYPE = 'http://coveragejson.org/def#Profile'
+const DOMAIN_TYPE = 'http://coveragejson.org/def#VerticalProfile'
 
 const DEFAULT_COLOR = 'black'
 const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
@@ -16,7 +16,7 @@ const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
  * The dot either has a defined standard color, or it uses
  * a palette together with a target depth if a parameter is chosen.
  */
-export class Profile extends L.Class {
+export class VerticalProfile extends L.Class {
   
   constructor (cov, options) {
     super()
@@ -191,7 +191,7 @@ export class Profile extends L.Class {
   
 }
 
-Profile.include(L.Mixin.Events)
+VerticalProfile.include(L.Mixin.Events)
 
 // work-around for Babel bug, otherwise Profile cannot be referenced here
-export { Profile as default }
+export { VerticalProfile as default }

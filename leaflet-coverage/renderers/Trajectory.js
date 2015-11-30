@@ -154,8 +154,8 @@ class Trajectory extends L.FeatureGroup {
     for (let i=0; i < composite.length; i++) {
       let val = range.get({composite: i})
       // this always has to be lat/lon, no matter which map projection is used
-      let x = composite[i][0]
-      let y = composite[i][1]
+      let x = composite[i][1]
+      let y = composite[i][2]
       let coord = new L.LatLng(y, x)
       coords.push(coord)
       if (val !== null) {

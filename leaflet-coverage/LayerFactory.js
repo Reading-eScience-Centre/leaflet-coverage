@@ -1,11 +1,11 @@
 import Grid from './renderers/Grid.js'
 import Trajectory from './renderers/Trajectory.js'
-import Profile from './renderers/Profile.js'
+import VerticalProfile from './renderers/VerticalProfile.js'
 
 const pre = 'http://coveragejson.org/def#'
 export const DEFAULT_RENDERERS = {
     [pre + 'Grid']: Grid,
-    [pre + 'Profile']: Profile,
+    [pre + 'VerticalProfile']: VerticalProfile,
     [pre + 'Trajectory']: Trajectory
 }
 
