@@ -60,7 +60,7 @@ export default class ProfilePlot extends L.Popup {
     }
     let y = [param.key]
     for (let i=0; i < this.domain.get('z').values.length; i++) {
-      y.push(this.ranges.get(param.key).get({z: i})
+      y.push(this.ranges.get(param.key).get({z: i}))
     }
 
     let el = document.createElement('div')
