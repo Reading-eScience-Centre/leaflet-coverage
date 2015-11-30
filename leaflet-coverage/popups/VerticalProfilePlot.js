@@ -117,8 +117,8 @@ export default class VerticalProfilePlot extends L.Popup {
       },
       tooltip: {
         format: {
-          title: d => 'Vertical: ' + d + zUnit,
-          value: (value, ratio, id) => value + unit
+          title: d => 'Vertical: ' + d + ' ' + zUnit,
+          value: (value, ratio, id) => value + ' ' + unit
         }
       },
       zoom: {
