@@ -9,11 +9,11 @@ import DiscreteLegend from './controls/DiscreteLegend.js'
 import TimeAxis from './controls/TimeAxis.js'
 import VerticalAxis from './controls/VerticalAxis.js'
 import Grid from './renderers/Grid.js'
-import Profile from './renderers/Profile.js'
+import VerticalProfile from './renderers/VerticalProfile.js'
 import Trajectory from './renderers/Trajectory.js'
 import * as palettes from './renderers/palettes.js'
 import ParameterSync from './renderers/ParameterSync.js'
-import ProfilePlot from './popups/ProfilePlot.js'
+import VerticalProfilePlot from './popups/VerticalProfilePlot.js'
 import * as transform from './util/transform.js'
 
 if (!('Coverage' in L)) {
@@ -35,9 +35,9 @@ c.control.DiscreteLegend = DiscreteLegend
 c.control.TimeAxis = TimeAxis
 c.control.VerticalAxis = VerticalAxis
 c.renderer.Grid = Grid
-c.renderer.Profile = Profile
+c.renderer.VerticalProfile = VerticalProfile
 c.renderer.Trajectory = Trajectory
-c.popup.ProfilePlot = ProfilePlot
+c.popup.VerticalProfilePlot = VerticalProfilePlot
 c.palette = palettes
 c.transform = transform
 

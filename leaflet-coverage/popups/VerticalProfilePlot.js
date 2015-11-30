@@ -7,7 +7,7 @@ import * as i18n from '../util/i18n.js'
 // not used currently
 const DEFAULT_PLOT_OPTIONS = {}
 
-export default class ProfilePlot extends L.Popup {
+export default class VerticalProfilePlot extends L.Popup {
   constructor (cov, options, plotOptions) {
     super({maxWidth: 350})
     this._cov = cov
@@ -50,6 +50,17 @@ export default class ProfilePlot extends L.Popup {
     let param = this.param
     
     let xLabel = 'Vertical'
+    
+    if (this.domain.referencing) {
+      let vertRef = this.domain.referencing.find(r => r.identifiers[0] === 'z')
+      if (vertRef.srs) {
+        let vertSrs = vertRef.srs
+        if (vertSrs.cs && vertSrs.cs.axes) {
+          xLabel += ' (' + vertSrs.cs.axes[0].unit + ')'
+        }
+      }
+    }
+    
     let unit = param.unit ? 
                (param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, this.language)) :
                ''
