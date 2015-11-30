@@ -2,7 +2,7 @@ import L from 'leaflet'
 import ndarray from 'ndarray'
 import {linearPalette, scale} from './palettes.js'
 import * as arrays from '../util/arrays.js'
-import * as opsnull from '../util/ndarray-ops-null.js'
+import * as rangeutil from '../util/range.js'
 
 const DOMAIN_TYPE = 'http://coveragejson.org/def#Grid'
   
@@ -76,11 +76,11 @@ export default class Grid extends L.TileLayer.Canvas {
       }
     } else {
       if (options.paletteExtent === undefined) {
-        this._paletteExtent = 'full'
-      } else if (Array.isArray(options.paletteExtent) || ['full', 'subset', 'fov'].indexOf(options.paletteExtent) !== -1) {
+        this._paletteExtent = 'subset'
+      } else if (Array.isArray(options.paletteExtent) || ['subset', 'fov'].indexOf(options.paletteExtent) !== -1) {
         this._paletteExtent = options.paletteExtent
       } else {
-        throw new Error('paletteExtent must either be a 2-element array, one of "full", "subset", or "fov", or be omitted')
+        throw new Error('paletteExtent must either be a 2-element array, one of "subset" or "fov", or be omitted')
       }
     }
     
@@ -97,11 +97,14 @@ export default class Grid extends L.TileLayer.Canvas {
     
     this._map = map
     map.fire('dataloading') // for supporting loading spinners
-    Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)])
-      .then(([domain, range]) => {
+    this.cov.loadDomain()
+      .then(domain => {
         this.domain = domain
-        this.range = range
-        this._subsetAxesByCoordinatePreference()
+      })
+      .then(this._subsetByCoordinatePreference)
+      .then(() => this.subsetCov.loadRange(this.param.key))
+      .then(subsetRange => {
+        this.subsetRange = subsetRange
         if (!this.param.categories) {
           this._updatePaletteExtent(this._paletteExtent)
         }
@@ -142,49 +145,44 @@ export default class Grid extends L.TileLayer.Canvas {
    * Subsets the temporal and vertical axes based on the _axesSubset.*.coordPref property,
    * which is regarded as a preference and does not have to exactly match a coordinate.
    * 
+   * The return value is a promise that succeeds with an empty result and
+   * sets this.subsetCov to the subsetted coverage.
+   * The subsetting always fixes a single time and vertical slice, choosing the first
+   * axis value if no preference was given.
+   * 
    * After calling this method, _axesSubset.*.idx and _axesSubset.*.coord have
    * values from the actual axes.
    */
-  _subsetAxesByCoordinatePreference () {
+  _subsetByCoordinatePreference () {
+    
+    /**
+     * Return the index of the coordinate value closest to the given value
+     * within the given axis. Supports ascending and descending axes.
+     * If the axis does not exist, then undefined is returned.
+     */
+    let getClosestIndex = (axis, val) => {
+      if (!this.domain.axes.has(axis)) {
+        return
+      }
+      let vals = this.domain.axes.get(axis).values
+      let idx = arrays.indexOfNearest(vals, val)
+      return idx
+    }
+    
     for (let axis of Object.keys(this._axesSubset)) {
       let ax = this._axesSubset[axis]
-      if (ax.coordPref == undefined) { // == also handles null
+      if (ax.coordPref == undefined && this.domain.axes.has(axis)) { // == also handles null
         ax.idx = 0
       } else {
-        ax.idx = this._getClosestIndex(axis, ax.coordPref)
+        ax.idx = getClosestIndex(axis, ax.coordPref)
       }
-      ax.coord = this.domain[axis] ? this.domain[axis][ax.idx] : null
+      ax.coord = this.domain.axes.has(axis) ? this.domain.axes.get(axis).values[ax.idx] : null
     }
-  }
-  
-  /**
-   * Subsets the temporal and vertical axes based on the _axesSubset.*.idx property
-   * which has been explicitly set.
-   * 
-   * After calling this method, the _axesSubset.*.coord properties have
-   * values from the actual axes.
-   */
-  _subsetAxesByIndex () {
-    for (let axis of Object.keys(this._axesSubset)) {
-      let ax = this._axesSubset[axis]
-      ax.coord = this.domain[axis] ? this.domain[axis][ax.idx] : null
-      delete ax.coordPref // in case it was set
-    }
-  }
-  
-  /**
-   * Return the index of the coordinate value closest to the given value
-   * within the given axis. Supports ascending and descending axes.
-   * If the axis is empty, then 0 is returned, since we regard an empty axis
-   * as consisting of a single "unknown" coordinate value.
-   */
-  _getClosestIndex (axis, val) {
-    if (!(axis in this.domain)) {
-      return 0
-    }
-    let vals = this.domain[axis]
-    let idx = arrays.indexOfNearest(vals, val)
-    return idx
+    
+    return this.cov.subsetByIndex({t: this._axesSubset.t.idx, z: this._axesSubset.z.idx})
+      .then(subsetCov => {
+        this.subsetCov = subsetCov
+      })
   }
   
   get parameter () {
@@ -196,13 +194,17 @@ export default class Grid extends L.TileLayer.Canvas {
    * This has no effect if the grid has no time axis.
    */
   set time (val) {
+    if (!this.domain.axes.has('t')) {
+      throw new Error('No time axis found')
+    }
     let old = this.time
     this._axesSubset.t.coordPref = val
-    this._subsetAxesByPreference()
-    this._doAutoRedraw()
-    if (old !== this.time) {
-      this.fire('axisChange', {axis: 'time'})
-    }
+    this._subsetByCoordinatePreference().then(() => {
+      this._doAutoRedraw()
+      if (old !== this.time) {
+        this.fire('axisChange', {axis: 'time'})
+      }
+    })
   }
   
   /**
@@ -218,13 +220,17 @@ export default class Grid extends L.TileLayer.Canvas {
    * This has no effect if the grid has no vertical axis.
    */
   set vertical (val) {
+    if (!this.domain.axes.has('z')) {
+      throw new Error('No vertical axis found')
+    }
     let old = this.vertical
     this._axesSubset.z.coordPref = val
-    this._subsetAxesByPreference()
-    this._doAutoRedraw()
-    if (old !== this.vertical) {
-      this.fire('axisChange', {axis: 'vertical'})
-    }   
+    this._subsetByCoordinatePreference().then(() => {
+      this._doAutoRedraw()
+      if (old !== this.vertical) {
+        this.fire('axisChange', {axis: 'vertical'})
+      } 
+    })  
   }
   
   /**
@@ -251,16 +257,11 @@ export default class Grid extends L.TileLayer.Canvas {
       return
     } 
 
-    // wrapping as SciJS's ndarray allows us to do easy subsetting and efficient min/max search
-    let arr = arrays.asSciJSndarray(this.range.values)
-    let sub = this._axesSubset
+    let range
         
-    if (extent === 'full') {
-      // scan the whole range for min/max values, don't subset
-      
-    } else if (extent === 'subset') {
-      // scan the current subset (per _axesSubset) for min/max values
-      arr = arr.pick(sub.t.idx, sub.z.idx, null, null)
+    if (extent === 'subset') {
+      // scan the current subset for min/max values
+      range = this.subsetRange
       
     } else if (extent === 'fov') {
       // scan the values that are currently in field of view on the map for min/max
@@ -272,8 +273,8 @@ export default class Grid extends L.TileLayer.Canvas {
     } else {
       throw new Error('Unknown extent specification: ' + extent)
     }
-
-    this._paletteExtent = [arr.get(...opsnull.nullargmin(arr)), arr.get(...opsnull.nullargmax(arr))]
+    
+    this._paletteExtent = rangeutil.minMax(range)
   }
   
   set paletteExtent (extent) {
@@ -341,8 +342,7 @@ export default class Grid extends L.TileLayer.Canvas {
       }
     }
     
-    let sub = this._axesSubset
-    let vals = arrays.asSciJSndarray(this.range.values).pick(sub.t.idx, sub.z.idx, null, null)
+    let vals = this.subsetRange.get
     
     if (this._isRectilinearGeodeticDomainGrid()) {
       if (this._isProjectedCoverageCRS()) {
@@ -378,19 +378,22 @@ export default class Grid extends L.TileLayer.Canvas {
    * @returns {Array} [xmin,ymin,xmax,ymax]
    */
   _getDomainBbox () {
+    let x = this.domain.axes.get('x').values
+    let y = this.domain.axes.get('y').values
+    
     // TODO use bounds if they are supplied
-    let xend = this.domain.x.length - 1
-    let yend = this.domain.y.length - 1
-    let [xmin,xmax] = [this.domain.x[0], this.domain.x[xend]]
-    let [ymin,ymax] = [this.domain.y[0], this.domain.y[yend]]
+    let xend = x.length - 1
+    let yend = y.length - 1
+    let [xmin,xmax] = [x[0], x[xend]]
+    let [ymin,ymax] = [y[0], y[yend]]
     // TODO only enlarge when bounds haven't been used above
-    if (this.domain.x.length > 1) {
-      xmin -= Math.abs(this.domain.x[0] - this.domain.x[1]) / 2
-      xmax += Math.abs(this.domain.x[xend] - this.domain.x[xend - 1]) / 2
+    if (x.length > 1) {
+      xmin -= Math.abs(x[0] - x[1]) / 2
+      xmax += Math.abs(x[xend] - x[xend - 1]) / 2
     }
-    if (this.domain.y.length > 1) {
-      ymin -= Math.abs(this.domain.y[0] - this.domain.y[1]) / 2
-      ymax += Math.abs(this.domain.y[yend] - this.domain.y[yend - 1]) / 2
+    if (y.length > 1) {
+      ymin -= Math.abs(y[0] - y[1]) / 2
+      ymax += Math.abs(y[yend] - y[yend - 1]) / 2
     }
     if (xmin > xmax) {
       [xmin,xmax] = [xmax,xmin]
@@ -416,7 +419,8 @@ export default class Grid extends L.TileLayer.Canvas {
     // there are two hotspots in the loops: map.unproject and indexOfNearest
 
     let map = this._map
-    let {x,y} = this.domain
+    let x = this.domain.axes.get('x').values
+    let y = this.domain.axes.get('y').values
     let bbox = this._getDomainBbox()
     let lonRange = [bbox[0], bbox[0] + 360]
     
@@ -441,7 +445,7 @@ export default class Grid extends L.TileLayer.Canvas {
         let iLat = arrays.indexOfNearest(y, lat)
         let iLon = arrays.indexOfNearest(x, lon)
 
-        setPixel(tileY, tileX, vals.get(iLat, iLon))
+        setPixel(tileY, tileX, vals({y: iLat, x: iLon}))
       }
     }
   }
@@ -455,7 +459,8 @@ export default class Grid extends L.TileLayer.Canvas {
     // this can be used when lat and lon can be computed independently for a given pixel
 
     let map = this._map
-    let {x,y} = this.domain
+    let x = this.domain.axes.get('x').values
+    let y = this.domain.axes.get('y').values
     let bbox = this._getDomainBbox()
     let lonRange = [bbox[0], bbox[0] + 360]
     
@@ -491,7 +496,7 @@ export default class Grid extends L.TileLayer.Canvas {
 
         let iLat = iLatCache[tileY]
 
-        setPixel(tileY, tileX, vals.get(iLat, iLon))
+        setPixel(tileY, tileX, vals({y: iLat, x: iLon}))
       }
     }
   }
@@ -517,6 +522,7 @@ export default class Grid extends L.TileLayer.Canvas {
    * Same as _isRectilinearGeodeticMap but for the coverage CRS.
    */
   _isRectilinearGeodeticDomainGrid () {
+    // FIXME 
     if (!this.domain.crs) {
       // defaults to CRS84 if not given
       return true
@@ -532,6 +538,7 @@ export default class Grid extends L.TileLayer.Canvas {
    * which have to be converted to geographic coordinates.
    */
   _isProjectedCoverageCRS () {
+    // FIXME 
     if (!this.domain.crs) {
       return false
     }

@@ -1,7 +1,7 @@
 import L from 'leaflet'
 import {linearPalette, scale} from './palettes.js'
 import * as arrays from '../util/arrays.js'
-import * as opsnull from '../util/ndarray-ops-null.js'
+import * as rangeutil from '../util/range.js'
 
 const DOMAIN_TYPE = 'http://coveragejson.org/def#Trajectory'
 
@@ -121,11 +121,10 @@ class Trajectory extends L.FeatureGroup {
       return
     } 
 
-    // wrapping as SciJS's ndarray allows us to do easy subsetting and efficient min/max search
-    let arr = arrays.asSciJSndarray(this.range.values)
+    let range = this.range
         
     if (extent === 'full') {
-      // scan the whole range for min/max values, don't subset
+      // scan the whole range for min/max values
       
     } else if (extent === 'fov') {
       // scan the values that are currently in field of view on the map for min/max
@@ -137,13 +136,13 @@ class Trajectory extends L.FeatureGroup {
       throw new Error('Unknown extent specification: ' + extent)
     }
 
-    this._paletteExtent = [arr.get(...opsnull.nullargmin(arr)), arr.get(...opsnull.nullargmax(arr))]
+    this._paletteExtent = rangeutil.minMax(range)
   }
   
   _addTrajectoryLayers () {
     // add a Polyline in black, and coloured CircleMarker's for each domain point
-    let {x,y} = this.domain
-    let vals = this.range.values
+    let composite = this.domain.axes.get('composite').values
+    let range = this.range
     
     // TODO do coordinate transformation to lat/lon if necessary
     
@@ -152,10 +151,12 @@ class Trajectory extends L.FeatureGroup {
     let paletteExtent = this.paletteExtent
     
     let coords = []
-    for (let i=0; i < x.length; i++) {
-      let val = vals.get(i)
+    for (let i=0; i < composite.length; i++) {
+      let val = range.get({composite: i})
       // this always has to be lat/lon, no matter which map projection is used
-      let coord = new L.LatLng(y[i], x[i])
+      let x = composite[i][0]
+      let y = composite[i][1]
+      let coord = new L.LatLng(y, x)
       coords.push(coord)
       if (val !== null) {
         let valScaled = scale(val, palette, paletteExtent)

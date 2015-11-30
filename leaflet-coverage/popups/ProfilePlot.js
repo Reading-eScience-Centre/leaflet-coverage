@@ -39,8 +39,9 @@ export default class ProfilePlot extends L.Popup {
   
   _addPlotToPopup () {
     // TODO transform if necessary
-    let {x,y} = this.domain
-    this.setLatLng(L.latLng(y, x))
+    let x = this.domain.axes.get('x')
+    let y = this.domain.axes.get('y')
+    this.setLatLng(L.latLng(y.values[0], x.values[0]))
     let el = this._getPlotElement()
     this.setContent(el)
   }
@@ -54,12 +55,12 @@ export default class ProfilePlot extends L.Popup {
                ''
     let obsPropLabel = i18n.getLanguageString(param.observedProperty.label, this.language) 
     let x = ['x']
-    for (let z of this.domain.z) {
+    for (let z of this.domain.axes.get('z').values) {
       x.push(z)
     }
     let y = [param.key]
-    for (let i=0; i < this.domain.z.length; i++) {
-      y.push(this.ranges.get(param.key).values.get(i))
+    for (let i=0; i < this.domain.get('z').values.length; i++) {
+      y.push(this.ranges.get(param.key).get({z: i})
     }
 
     let el = document.createElement('div')

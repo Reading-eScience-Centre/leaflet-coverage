@@ -38,38 +38,33 @@ export function withCategories (cov, key, categories) {
  * @returns {Coverage}
  */
 export function maskByPolygon (cov, polygon) {
+  // TODO improve domain type check
   if (!cov.domainType.endsWith('Grid')) {
     throw new Error('Sorry, only grids can be masked by polygon currently')
   }
   
   let polycoords = polygon.coordinates[0]
   
-  let ndarrayWrapper = (domain, values) => {
-    let pnpolyCache = ndarray(new Uint8Array(domain.x.length * domain.y.length), [domain.x.length, domain.y.length])
-    for (let i=0; i < domain.x.length; i++) {
-      for (let j=0; j < domain.y.length; j++) {
-        let inside = pnpoly(domain.x[i], domain.y[j], polycoords)
+  let rangeWrapper = (domain, range) => {
+    let x = domain.axes.get('x').values
+    let y = domain.axes.get('y').values
+    let pnpolyCache = ndarray(new Uint8Array(x.length * y.length), [x.length, y.length])
+    for (let i=0; i < x.length; i++) {
+      for (let j=0; j < y.length; j++) {
+        let inside = pnpoly(x[i], y[j], polycoords)
         pnpolyCache.set(i, j, inside)
       }
     }
-    return {
-      shape: domain.shape,
-      get: (...coords) => {
-        // grid has (t,z,y,x) axis order
-        if (pnpolyCache.get(coords[3], coords[2])) {
-          return values.get(...coords)
-        } else {
-          return null
-        }
+    let newrange = shallowcopy(range)
+    newrange.get = obj => {
+      if (pnpolyCache.get(obj.x || 0, obj.y || 0)) {
+        return range.get(obj)
+      } else {
+        return null
       }
     }
+    return newrange
   }
-  
-  let rangeWrapper = (domain, range) => ({
-    values: ndarrayWrapper(domain, range.values),
-    validMin: range.validMin,
-    validMax: range.validMax
-  })
   
   let loadRange = key => Promise.all([cov.loadDomain(), cov.loadRange(key)])
     .then(([domain, range]) => rangeWrapper(domain, range))
@@ -99,8 +94,10 @@ export function subsetByBbox (cov, bbox) {
   // TODO maybe implement for composite axes like trajectories as well
   
   return cov.loadDomain().then(domain => {
-    let [ixmin,ixmax] = [indicesOfNearest(domain.x, xmin), indicesOfNearest(domain.x, xmax)]
-    let [iymin,iymax] = [indicesOfNearest(domain.y, ymin), indicesOfNearest(domain.y, ymax)]
+    let x = domain.axes.get('x').values
+    let y = domain.axes.get('y').values
+    let [ixmin,ixmax] = [indicesOfNearest(x, xmin), indicesOfNearest(x, xmax)]
+    let [iymin,iymax] = [indicesOfNearest(y, ymin), indicesOfNearest(y, ymax)]
     let [xstart,xstop] = [ixmin[0], ixmax[1]]
     let [ystart,ystop] = [iymin[0], iymax[1]]
     if (xstart > xstop) {
