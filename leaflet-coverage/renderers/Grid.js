@@ -101,7 +101,7 @@ export default class Grid extends L.TileLayer.Canvas {
       .then(domain => {
         this.domain = domain
       })
-      .then(this._subsetByCoordinatePreference)
+      .then(() => this._subsetByCoordinatePreference())
       .then(() => this.subsetCov.loadRange(this.param.key))
       .then(subsetRange => {
         this.subsetRange = subsetRange
