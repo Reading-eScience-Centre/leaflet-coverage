@@ -57,7 +57,7 @@ export default class VerticalProfilePlot extends L.Popup {
         let vertSrs = vertRef.srs
         if (vertSrs.cs && vertSrs.cs.axes) {
           let ax = vertSrs.cs.axes[0]
-          zUnit = ax.unit
+          zUnit = ax.unit.symbol
           // TODO i18n
           if (ax.name && ax.name.en) {
             zName = ax.name.en
