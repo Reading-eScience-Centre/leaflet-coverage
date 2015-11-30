@@ -315,17 +315,12 @@ export default class Grid extends L.TileLayer.Canvas {
     }
     
     let setPixel
-    if (this.param.categories) {
+    if (this.param.categoryEncoding) {
       // categorical parameter
       let valIdxMap = new Map()
-      for (let idx=0; idx < this.param.categories.length; idx++) {
-        let cat = this.param.categories[idx]
-        if (cat.value) {
-          valIdxMap.set(cat.value, idx)
-        } else {
-          for (let val of cat.values) {
-            valIdxMap.set(val, idx)
-          }
+      for (let [categoryID, vals] of this.param.categoryEncoding) {
+        for (let val of vals) {
+          valIdxMap.set(val, categoryID)
         }
       }
       setPixel = (tileY, tileX, val) => {

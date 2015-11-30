@@ -76,7 +76,7 @@ export default class DiscreteLegend extends L.Control {
     let html = ''
     
     for (let i=0; i < palette.steps; i++) {
-      let cat = i18n.getLanguageString(param.categories[i].label, this.language)
+      let cat = i18n.getLanguageString(param.observedProperty.categories[i].label, this.language)
       html += `
         <i style="background:rgb(${palette.red[i]}, ${palette.green[i]}, ${palette.blue[i]})"></i>
         ${cat}
