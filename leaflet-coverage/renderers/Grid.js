@@ -484,6 +484,8 @@ export default class Grid extends L.TileLayer.Canvas {
       // find the index of the closest latitude in the grid using simple binary search
       iLatCache[tileY] = arrays.indexOfNearest(y, lat)
     }
+    
+    let t0 = new Date()
 
     for (let tileX = 0; tileX < tileSize; tileX++) {
       let lon = map.unproject(L.point(startX + tileX, startY)).lng
@@ -511,6 +513,8 @@ export default class Grid extends L.TileLayer.Canvas {
         setPixel(tileY, tileX, vals({y: iLat, x: iLon}))
       }
     }
+    
+    console.log(new Date()-t0)
   }
   
   /**
