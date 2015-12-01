@@ -18,11 +18,7 @@ export function isGeodeticWGS84CRS (rs) {
 }
 
 /**
- * Returns the referencing system and the associated domain identifiers
- * matching the given identifiers.
- * The array of returned identifiers has a length equal or greater
- * than the input identifiers and is in the correct order as necessary
- * for the referencing system.
+ * Returns the referencing system matching the given identifiers.
  * 
  * Note: If the input identifiers used for searching are associated
  * to multiple referencing systems, then this function returns `undefined`.
@@ -33,8 +29,5 @@ export function getRefSystem (domain, identifiers) {
     identifiers.every(id => ref.identifiers.indexOf(id) !== -1))
   if (!ref) return
   let rs = ref.srs || ref.trs || ref.rs
-  return {
-    identifiers: ref.identifiers,
-    rs: rs
-  }
+  return rs
 }
