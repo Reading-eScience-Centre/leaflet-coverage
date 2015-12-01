@@ -30,7 +30,7 @@ export function isGeodeticWGS84CRS (rs) {
 export function getRefSystem (domain, identifiers) {
   let refs = domain.referencing
   let ref = refs.find(ref => 
-    identifiers.all(id => ref.identifiers.indexOf(id) !== -1))
+    identifiers.every(id => ref.identifiers.indexOf(id) !== -1))
   if (!ref) return
   let rs = ref.srs || ref.trs || ref.rs
   return {
