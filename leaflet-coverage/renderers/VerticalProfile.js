@@ -2,6 +2,7 @@ import L from 'leaflet'
 import {linearPalette, scale} from './palettes.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
+import * as referencingutil from '../util/referencing.js'
 
 const DOMAIN_TYPE = 'http://coveragejson.org/def#VerticalProfile'
 
@@ -53,12 +54,20 @@ export class VerticalProfile extends L.Class {
     
     map.fire('dataloading') // for supporting loading spinners
     
+    function checkWGS84 (domain) {
+      let srs = referencingutil.getRefSystem(domain, ['x', 'y']).rs
+      if (!referencingutil.isGeodeticWGS84CRS(srs)) {
+        throw new Error('Unsupported CRS, must be WGS84')
+      }
+    }
+    
     let promise    
     if (this.param) {
       promise = Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)])
         .then(([domain, range]) => {
           console.log('domain and range loaded')
           this.domain = domain
+          checkWGS84(domain)
           this.range = range
           this._updatePaletteExtent(this._paletteExtent)
           this._addMarker()
@@ -69,6 +78,7 @@ export class VerticalProfile extends L.Class {
       promise = this.cov.loadDomain().then(domain => {
         console.log('domain loaded')
         this.domain = domain
+        checkWGS84(domain)
         this._addMarker()
         this.fire('add')
         map.fire('dataload')
@@ -140,6 +150,8 @@ export class VerticalProfile extends L.Class {
   }
   
   _addMarker () {
+    // TODO do coordinate transformation to lat/lon if necessary
+    
     let x = this.domain.axes.get('x').values[0]
     let y = this.domain.axes.get('y').values[0]
     this.marker = L.circleMarker(L.latLng(y, x), {color: this._getColor()})
@@ -158,9 +170,7 @@ export class VerticalProfile extends L.Class {
   
   _getColor () {
     let {z} = this.domain.axes.get('z').values
-    
-    // TODO do coordinate transformation to lat/lon if necessary
-    
+        
     if (this.param && this.targetZ !== null) {
       // use a palette
       // find the value with z nearest to targetZ

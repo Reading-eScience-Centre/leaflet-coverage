@@ -2,6 +2,7 @@ import L from 'leaflet'
 import {linearPalette, scale} from './palettes.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
+import * as referencingutil from '../util/referencing.js'
 
 const DOMAIN_TYPE = 'http://coveragejson.org/def#Trajectory'
 
@@ -70,6 +71,11 @@ class Trajectory extends L.FeatureGroup {
       .then(([domain, range]) => {
         console.log('domain and range loaded')
         this.domain = domain
+        let srs = referencingutil.getRefSystem(domain, ['x', 'y']).rs
+        if (!referencingutil.isGeodeticWGS84CRS(srs)) {
+          throw new Error('Unsupported CRS, must be WGS84')
+        }
+        
         this.range = range
         this._updatePaletteExtent(this._paletteExtent)
         this._addTrajectoryLayers()
