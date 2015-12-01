@@ -106,7 +106,7 @@ export default class Grid extends L.TileLayer.Canvas {
         
         let srs = referencingutil.getRefSystem(domain, ['x', 'y']).rs
         if (!referencingutil.isGeodeticWGS84CRS(srs)) {
-          throw new Error('Unsupported CRS, must be geodetic WGS84')
+          throw new Error('Unsupported CRS, must be WGS84')
         }
       })
       .then(() => this._subsetByCoordinatePreference())

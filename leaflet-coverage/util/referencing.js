@@ -18,19 +18,6 @@ export function isGeodeticWGS84CRS (rs) {
 }
 
 /**
- * Returns an array of the strings 'lat', 'lon', 'height' (if relevant)
- * in the order of the CRS axes.
- */
-export function getWGS84AxisOrder (rs) {
-  switch (rs.id) {
-  case EPSG4979: return ['lat', 'lon', 'height']
-  case EPSG4326: return ['lat', 'lon']
-  case CRS84: return ['lon', 'lat'] 
-  }
-  throw new Error('Not a geodetic WGS84 CRS!')
-}
-
-/**
  * Returns the referencing system and the associated domain identifiers
  * matching the given identifiers.
  * The array of returned identifiers has a length equal or greater
