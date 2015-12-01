@@ -3,6 +3,7 @@ import ndarray from 'ndarray'
 import {linearPalette, scale} from './palettes.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
+import * as referencingutil from '../util/referencing.js'
 
 const DOMAIN_TYPE = 'http://coveragejson.org/def#Grid'
   
@@ -102,6 +103,11 @@ export default class Grid extends L.TileLayer.Canvas {
     this.cov.loadDomain()
       .then(domain => {
         this.domain = domain
+        
+        let srs = referencingutil.getRefSystem(domain, ['x', 'y']).rs
+        if (!referencingutil.isGeodeticWGS84CRS(srs)) {
+          throw new Error('Unsupported CRS, must be geodetic WGS84')
+        }
       })
       .then(() => this._subsetByCoordinatePreference())
       .then(() => this.subsetCov.loadRange(this.param.key))
@@ -132,7 +138,7 @@ export default class Grid extends L.TileLayer.Canvas {
     let bbox
     if (this.cov.bbox) {
       bbox = this.cov.bbox
-    } else if (this._isRectilinearGeodeticDomainGrid()) {
+    } else if (this._isDomainUsingGeodeticWGS84CRS()) {
       bbox = this._getDomainBbox()
     } else {
       return
@@ -342,13 +348,12 @@ export default class Grid extends L.TileLayer.Canvas {
     
     let vals = this.subsetRange.get
     
-    if (this._isRectilinearGeodeticDomainGrid()) {
-      if (this._isProjectedCoverageCRS()) {
-        // unproject to lon/lat first
-        // TODO how can we do that? this means adding a dependency to proj4js!
-        // should probably be made optional since this is an edge case
-        throw new Error('NOT IMPLEMENTED YET')
-      }
+    // FIXME check if "Geodetic WGS84 CRS" as term is enough to describe WGS84 angular
+    //          what about cartesian??
+    
+    // TODO check if the domain and map CRS datum match
+    // -> if not, then at least a warning should be shown
+    if (this._isDomainUsingGeodeticWGS84CRS()) {
       if (this._isRectilinearGeodeticMap()) {
         // here we can apply heavy optimizations
         this._drawRectilinearGeodeticMapProjection(setPixel, tileSize, startX, startY, vals)
@@ -356,15 +361,24 @@ export default class Grid extends L.TileLayer.Canvas {
         // this is for any random map projection
         // here we have to unproject each map pixel individually and find the matching domain coordinates
         this._drawAnyMapProjection(setPixel, tileSize, startX, startY, vals)
-      }      
+      }
     } else {
-      if (true /*map CRS == domain CRS*/) { // TODO implement
+      // here we either have a projected CRS with base CRS = CRS84, or
+      // a projected CRS with non-CRS84 base CRS (like British National Grid), or
+      // a geodetic CRS not using a WGS84 datum
+       // FIXME check this, what does geodetic CRS really mean? = lat/lon? = ellipsoid?
+      
+      if (this._isGeodeticTransformAvailableForDomain()) {
         throw new Error('NOT IMPLEMENTED YET')
+        // TODO implement, use 2D coordinate arrays and/or proj4 transforms
       } else {
-        // here we would have to reproject the coverage
-        // since this is not feasible in browsers, we just throw an error
-        throw new Error('The map CRS must match the Coverage CRS ' +
-                        'if the latter cannot be mapped to a rectilinear geodetic grid')
+        // TODO if the map projection base CRS matches the CRS of the domain,
+        //      could we still draw the grid in projected coordinates?
+        // -> e.g. UK domain CRS (not projected! easting, northing) and 
+        //         UK basemap in that CRS
+        
+        throw new Error('Cannot draw grid, spatial CRS is not geodetic ' + 
+            'and no geodetic transform data is available')
       }
     }
     
@@ -517,31 +531,17 @@ export default class Grid extends L.TileLayer.Canvas {
   }
   
   /**
-   * Same as _isRectilinearGeodeticMap but for the coverage CRS.
+   * Return whether the coverage domain is using a geodetic CRS with WGS84 datum.
    */
-  _isRectilinearGeodeticDomainGrid () {
-    // FIXME 
-    if (!this.domain.crs) {
-      // defaults to CRS84 if not given
-      return true
-    }
-    // TODO add other common ones or somehow detect it automatically
-    let recti = ['http://www.opengis.net/def/crs/OGC/1.3/CRS84']
-    return recti.some(r => this.domain.crs === r)
+  _isDomainUsingGeodeticWGS84CRS () {
+    let srs = referencingutil.getRefSystem(this.domain, ['x','y'])
+    return referencingutil.isGeodeticWGS84CRS(srs)
   }
   
-  /**
-   * Whether the CRS of the coverage is a projected one, meaning
-   * that x and y are not geographic coordinates (lon/lat) but easting and northing
-   * which have to be converted to geographic coordinates.
-   */
-  _isProjectedCoverageCRS () {
-    // FIXME 
-    if (!this.domain.crs) {
-      return false
-    }
-    let geographic = ['http://www.opengis.net/def/crs/OGC/1.3/CRS84']
-    return !geographic.some(uri => this.domain.crs === uri)
+  _isGeodeticTransformAvailableForDomain () {
+    let srs = referencingutil.getRefSystem(this.domain, ['x','y'])
+    // TODO implement
+    return false
   }
   
   _doAutoRedraw () {

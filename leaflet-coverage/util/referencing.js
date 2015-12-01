@@ -29,3 +29,25 @@ export function getWGS84AxisOrder (rs) {
   }
   throw new Error('Not a geodetic WGS84 CRS!')
 }
+
+/**
+ * Returns the referencing system and the associated domain identifiers
+ * matching the given identifiers.
+ * The array of returned identifiers has a length equal or greater
+ * than the input identifiers and is in the correct order as necessary
+ * for the referencing system.
+ * 
+ * Note: If the input identifiers used for searching are associated
+ * to multiple referencing systems, then this function returns `undefined`.
+ */
+export function getRefSystem (domain, identifiers) {
+  let refs = domain.referencing
+  let ref = refs.find(ref => 
+    identifiers.all(id => ref.identifiers.indexOf(id) !== -1))
+  if (!ref) return
+  let rs = ref.srs || ref.trs || ref.rs
+  return {
+    identifiers: ref.identifiers,
+    rs: rs
+  }
+}
