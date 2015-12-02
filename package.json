@@ -48,7 +48,6 @@
     "dependencies": {
       "c3": "npm:c3@0.4.10",
       "css": "github:systemjs/plugin-css@^0.1.18",
-      "cwise-compiler": "npm:cwise-compiler@^1.1.2",
       "leaflet": "github:Leaflet/Leaflet@^0.7.3",
       "minified": "github:timjansen/minified.js@^2015.1.1",
       "ndarray": "npm:ndarray@^1.0.18"
