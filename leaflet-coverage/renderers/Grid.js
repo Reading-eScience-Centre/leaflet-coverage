@@ -98,6 +98,12 @@ export default class Grid extends L.TileLayer.Canvas {
   onAdd (map) {
     // "loading" and "load" events are provided by the underlying TileLayer class
     
+    // TODO change to subsetCov once that is used in _updatePaletteExtent
+    //  the goal is to avoid reloading data when approximating palette extent via subsetting
+    //  but: memory has to be freed when the layer is removed from the map
+    //      -> therefore cacheRanges should be on subsetCov whose reference is removed on onRemove
+    this.cov.cacheRanges = true
+    
     this._map = map
     map.fire('dataloading') // for supporting loading spinners
     this.cov.loadDomain()
@@ -114,8 +120,10 @@ export default class Grid extends L.TileLayer.Canvas {
       .then(subsetRange => {
         this.subsetRange = subsetRange
         if (!this.param.observedProperty.categories) {
-          this._updatePaletteExtent(this._paletteExtent)
+          return this._updatePaletteExtent(this._paletteExtent)
         }
+      })
+      .then(() => {
         this.fire('add')
         super.onAdd(map)
         map.fire('dataload')
@@ -130,6 +138,7 @@ export default class Grid extends L.TileLayer.Canvas {
   
   onRemove (map) {
     delete this._map
+    // TODO delete references to domain/range, caching logic should happen elsewhere
     this.fire('remove')
     super.onRemove(map)
   }
@@ -262,15 +271,36 @@ export default class Grid extends L.TileLayer.Canvas {
   _updatePaletteExtent (extent) {
     if (Array.isArray(extent) && extent.length === 2) {
       this._paletteExtent = extent
-      return
-    } 
-
-    let range
+      return Promise.resolve()
+    }
         
     if (extent === 'subset') {
       // scan the current subset for min/max values
-      range = this.subsetRange
-      
+
+      // check if subsetted size is manageable
+      if (this.subsetRange.shape.x * this.subsetRange.shape.y < 10000) {
+        this._paletteExtent = rangeutil.minMax(this.subsetRange)
+        return Promise.resolve()
+      } else {
+        // subset x and y to get a fast estimate of the palette extent
+        // since it is an estimate, the lower and upper bound needs a small buffer
+        // (to prevent out-of-bounds colours)
+        let xlen = this.subsetRange.shape.get('x')
+        let ylen = this.subsetRange.shape.get('y')
+        let xconstraint = {start: 0, stop: xlen, step: Math.max(Math.round(xlen/100), 1)}
+        let yconstraint = {start: 0, stop: ylen, step: Math.max(Math.round(ylen/100), 1)}
+        
+        // TODO bug in covjson-reader doesn't expose subsetByIndex for subsetted covs
+        //return this.subsetCov.subsetByIndex({x: xconstraint, y: yconstraint})
+        return this.cov.subsetByIndex({x: xconstraint, y: yconstraint, t: this._axesSubset.t.idx, z: this._axesSubset.z.idx})        
+          .then(subsetCov => {
+            return subsetCov.loadRange(this.param.key).then(subsetRange => {
+               let [min,max] = rangeutil.minMax(subsetRange)
+               let buffer = (max-min)*0.1 // 10% buffer on each side
+               this._paletteExtent = [min-buffer, max+buffer]
+            })
+          })
+      }
     } else if (extent === 'fov') {
       // scan the values that are currently in field of view on the map for min/max
       // this implies using the current subset
@@ -281,17 +311,16 @@ export default class Grid extends L.TileLayer.Canvas {
     } else {
       throw new Error('Unknown extent specification: ' + extent)
     }
-    
-    this._paletteExtent = rangeutil.minMax(range)
   }
   
   set paletteExtent (extent) {
     if (this.param.observedProperty.categories) {
       throw new Error('Cannot set palette extent for categorical parameters')
     }
-    this._updatePaletteExtent(extent)
-    this._doAutoRedraw()
-    this.fire('paletteExtentChange')
+    this._updatePaletteExtent(extent).then(() => {
+      this._doAutoRedraw()
+      this.fire('paletteExtentChange')
+    })
   }
   
   get paletteExtent () {
