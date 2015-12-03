@@ -26,22 +26,42 @@ describe("util/transform methods", () => {
   
   describe("#withCategories", () => {
     it('shall not modify the original coverage', () => {
+      let foo = 'foo'
+      let bar = 'bar'
       let cov = {
           parameters: new Map([['LC', 
             {
-              categories: [{
-                value: 1
-              }]
+              observedProperty: {
+                categories: [{
+                  id: foo
+                }, {
+                  id: bar
+                }] 
+              },
+              categoryEncoding: new Map([
+                [foo, [1,2]],
+                [bar, [3]]
+                ])
             }]])
       }
+      let foobar = 'foobar'
       let newcats = [{
-        value: 2
+        id: foobar
       }]
       
-      let newcov = transform.withCategories(cov, 'LC', newcats)
+      let mapping = new Map([
+        [foo, foobar],
+        [bar, foobar]
+      ])
       
-      assert.strictEqual(cov.parameters.get('LC').categories[0].value, 1)
-      assert.strictEqual(newcov.parameters.get('LC').categories[0].value, 2)
+      let newcov = transform.withCategories(cov, 'LC', newcats, mapping)
+      
+      assert.strictEqual(cov.parameters.get('LC').observedProperty.categories[0].id, foo)
+      assert.strictEqual(cov.parameters.get('LC').observedProperty.categories[1].id, bar)
+      assert.deepEqual(cov.parameters.get('LC').categoryEncoding.get(foo), [1,2])
+      assert.deepEqual(cov.parameters.get('LC').categoryEncoding.get(bar), [3])
+      assert.strictEqual(newcov.parameters.get('LC').observedProperty.categories[0].id, foobar)
+      assert.deepEqual(newcov.parameters.get('LC').categoryEncoding.get(foobar), [1,2,3])
     })
   })
   
@@ -58,11 +78,15 @@ describe("util/transform methods", () => {
   
   describe("#maskedByPolygon", () => {
     let covjson = {
-      "type" : "GridCoverage",
+      "type" : "Coverage",
       "domain" : {
-        "type" : "Grid",
-        "x" : [-10,5],
-        "y" : [40]
+        "type" : "Domain",
+        "profile": "Grid",
+        "axes": {
+          "x" : { "values": [-10,5] },
+          "y" : { "values": [40] }
+        },
+        "rangeAxisOrder": ["y", "x"]
       },
       "parameters" : {
         "ICEC": {
@@ -93,8 +117,8 @@ describe("util/transform methods", () => {
       return CovJSON.read(JSON.parse(JSON.stringify(covjson))).then(cov => {
         let newcov = transform.maskByPolygon(cov, polygon)
         return cov.loadRange('ICEC').then(range => {
-          assert.strictEqual(range.values.get(0, 0, 0, 0), 0.5)
-          assert.strictEqual(range.values.get(0, 0, 0, 1), 0.6)
+          assert.strictEqual(range.get({x: 0}), 0.5)
+          assert.strictEqual(range.get({x: 1}), 0.6)
         })
       })
     })
@@ -103,8 +127,8 @@ describe("util/transform methods", () => {
       return CovJSON.read(JSON.parse(JSON.stringify(covjson))).then(cov => {
         let newcov = transform.maskByPolygon(cov, polygon)
         return newcov.loadRange('ICEC').then(range => {
-          assert.strictEqual(range.values.get(0, 0, 0, 0), 0.5)
-          assert.strictEqual(range.values.get(0, 0, 0, 1), null)
+          assert.strictEqual(range.get({x: 0}), 0.5)
+          assert.strictEqual(range.get({x: 1}), null)
         })
       })
     })

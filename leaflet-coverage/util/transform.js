@@ -13,14 +13,43 @@ export function withParameters (cov, params) {
 }
 
 /**
- * Returns a copy of the given Coverage object with the categories
- * of a given parameter replaced by the supplied ones.
+ * Returns a copy of the given Coverage object with the categories 
+ * of a given parameter replaced by the supplied ones and the encoding
+ * adapted to the given mapping from old to new.
+ * 
+ * @param {Coverage} cov The Coverage object.
+ * @param {String} key The key of the parameter to work with.
+ * @param {Array} categoris The new array of category objects that will be part of the returned coverage.
+ * @param {Map} mapping A mapping from source category id to destination category id.
+ * @returns {Coverage}
  */
-export function withCategories (cov, key, categories) {
+export function withCategories (cov, key, categories, mapping) {
+  if (!(mapping instanceof Map)) {
+    throw new Error('mapping parameter must be a Map from/to category ID')
+  }
+  if (categories.some(c => !c.id)) {
+    throw new Error('At least one category object is missing the "id" property')
+  }
   let newparams = shallowcopy(cov.parameters)
   let newparam = shallowcopy(newparams.get(key))
   newparams.set(key, newparam)
-  newparams.get(key).categories = categories
+  let newobsprop = shallowcopy(newparams.get(key).observedProperty)
+  newparams.get(key).observedProperty = newobsprop
+  newparams.get(key).observedProperty.categories = categories
+  
+  let fromCatEnc = cov.parameters.get(key).categoryEncoding
+  let catEncoding = new Map()
+  for (let category of categories) {
+    let vals = []
+    for (let [fromCatId, toCatId] of mapping) {
+      if (toCatId === category.id) {
+        vals.push(...fromCatEnc.get(fromCatId))
+      }
+    }
+    catEncoding.set(category.id, vals)
+  }
+  newparams.get(key).categoryEncoding = catEncoding
+  
   let newcov = withParameters(cov, newparams)
   return newcov
 }
@@ -40,7 +69,7 @@ export function withCategories (cov, key, categories) {
 export function maskByPolygon (cov, polygon) {
   // TODO improve domain type check
   if (!cov.domainType.endsWith('Grid')) {
-    throw new Error('Sorry, only grids can be masked by polygon currently')
+    throw new Error('Sorry, only grids can be masked by polygon currently, domain type: ' + cov.domainType)
   }
   
   let polycoords = polygon.coordinates[0]
