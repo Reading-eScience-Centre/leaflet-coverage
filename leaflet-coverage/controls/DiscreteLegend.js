@@ -1,7 +1,7 @@
 import L from 'leaflet'
 import {$,HTML} from 'minified'
 
-import {inject} from './utils.js'
+import {inject, fromTemplate} from './utils.js'
 import * as i18n from '../util/i18n.js'
 
 // TODO the default template should be moved outside this module so that it can be easily skipped
@@ -105,7 +105,7 @@ export default class DiscreteLegend extends L.Control {
     this.language = i18n.getLanguageTag(param.observedProperty.label, this.language) 
     let title = i18n.getLanguageString(param.observedProperty.label, this.language)
     
-    let el = document.importNode($('#' + this.id)[0].content, true).children[0]
+    let el = fromTemplate(this.id)
     this._el = el
     $('.legend-title', el).fill(title)
     this.updateLegend()

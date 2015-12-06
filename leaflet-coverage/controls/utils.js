@@ -1,3 +1,5 @@
+import {$, HTML} from 'minified'
+
 /**
  * Inject HTML and CSS into the DOM.
  * 
@@ -7,9 +9,7 @@
 export function inject (html, css) {
   // inject default template and CSS into DOM
   if (html) {
-    let span = document.createElement('span')
-    span.innerHTML = html
-    document.body.appendChild(span.children[0])
+    $('body').add(HTML(html))
   }
   
   if (css) {
@@ -22,4 +22,13 @@ export function inject (html, css) {
     }
     document.head.appendChild(style)
   }
+}
+
+export function fromTemplate (id) {
+  let node = $('#' + id)[0]
+  // browsers without <template> support don't wrap everything in .content
+  if ('content' in node) {
+    node = node.content
+  }
+  return document.importNode(node, true).children[0]
 }
