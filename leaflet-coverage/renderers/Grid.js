@@ -13,13 +13,11 @@ const DEFAULT_CATEGORICAL_PALETTE = n => linearPalette(['#e41a1c', '#377eb8', '#
 /**
  * Renderer for Coverages with domain type Grid.
  * 
- * Events fired onto the map:
- * "dataloading" - Data loading has started
- * "dataload" - Data loading has finished (also in case of errors)
- * 
- * Events fired on this layer:
+ * Events:
  * "add" - Layer is initialized and is about to be added to the map
  * "remove" - Layer is removed from the map
+ * "dataLoading" - Data loading has started
+ * "dataLoad" - Data loading has finished (also in case of errors)
  * "error" - Error when loading data
  * "paletteChange" - Palette has changed
  * "paletteExtentChange" - Palette extent has changed
@@ -105,7 +103,7 @@ export default class Grid extends L.TileLayer.Canvas {
     this.cov.cacheRanges = true
     
     this._map = map
-    map.fire('dataloading') // for supporting loading spinners
+    this.fire('dataLoading') // for supporting loading spinners
     this.cov.loadDomain()
       .then(domain => {
         this.domain = domain
@@ -126,13 +124,13 @@ export default class Grid extends L.TileLayer.Canvas {
       .then(() => {
         this.fire('add')
         super.onAdd(map)
-        map.fire('dataload')
+        this.fire('dataLoad')
       })
       .catch(e => {
         console.error(e)
         this.fire('error', e)
         
-        map.fire('dataload')
+        this.fire('dataLoad')
       })
   }
   

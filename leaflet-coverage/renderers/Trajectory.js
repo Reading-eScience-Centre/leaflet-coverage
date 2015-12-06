@@ -14,13 +14,11 @@ const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
  * Displays the trajectory as a path with coloured points using
  * a given palette for a given parameter.
  * 
- * Events fired onto the map:
- * "dataloading" - Data loading has started
- * "dataload" - Data loading has finished (also in case of errors)
- * 
- * Events fired on this layer:
+ * Events:
  * "add" - Layer is initialized and is about to be added to the map
  * "remove" - Layer is removed from the map
+ * "dataLoading" - Data loading has started
+ * "dataLoad" - Data loading has finished (also in case of errors)
  * "error" - Error when loading data
  * "paletteChange" - Palette has changed
  * "paletteExtentChange" - Palette extent has changed
@@ -66,7 +64,7 @@ class Trajectory extends L.FeatureGroup {
   onAdd (map) {
     console.log('adding trajectory to map')
     this._map = map
-    map.fire('dataloading') // for supporting loading spinners
+    this.fire('dataLoading') // for supporting loading spinners
     Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)])
       .then(([domain, range]) => {
         console.log('domain and range loaded')
@@ -81,13 +79,13 @@ class Trajectory extends L.FeatureGroup {
         this._addTrajectoryLayers()
         this.fire('add')
         super.onAdd(map)
-        map.fire('dataload')
+        this.fire('dataLoad')
       })
       .catch(e => {
         console.error(e)
         this.fire('error', e)
         
-        map.fire('dataload')
+        this.fire('dataLoad')
       })      
   }
   

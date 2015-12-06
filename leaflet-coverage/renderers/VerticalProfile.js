@@ -52,7 +52,7 @@ export class VerticalProfile extends L.Class {
   onAdd (map) {
     this._map = map
     
-    map.fire('dataloading') // for supporting loading spinners
+    this.fire('dataLoading') // for supporting loading spinners
     
     function checkWGS84 (domain) {
       let srs = referencingutil.getRefSystem(domain, ['x', 'y'])
@@ -72,7 +72,7 @@ export class VerticalProfile extends L.Class {
           this._updatePaletteExtent(this._paletteExtent)
           this._addMarker()
           this.fire('add')
-          map.fire('dataload')
+          this.fire('dataLoad')
         })
     } else {
       promise = this.cov.loadDomain().then(domain => {
@@ -81,7 +81,7 @@ export class VerticalProfile extends L.Class {
         checkWGS84(domain)
         this._addMarker()
         this.fire('add')
-        map.fire('dataload')
+        this.fire('dataLoad')
       })
     }
           
@@ -89,7 +89,7 @@ export class VerticalProfile extends L.Class {
       console.error(e)
       this.fire('error', e)
       
-      map.fire('dataload')
+      this.fire('dataLoad')
     })
   }
   
