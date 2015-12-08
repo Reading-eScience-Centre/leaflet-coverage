@@ -1,6 +1,6 @@
 import L from 'leaflet'
 import ndarray from 'ndarray'
-import {linearPalette, scale} from './palettes.js'
+import {linearPalette, directPalette, scale} from './palettes.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
@@ -62,7 +62,11 @@ export default class Grid extends L.TileLayer.Canvas {
     if (options.palette) {
       this._palette = options.palette
     } else if (categories) {
-      this._palette = DEFAULT_CATEGORICAL_PALETTE(categories.length)
+      if (categories.every(cat => cat.preferredColor)) {
+        this._palette = directPalette(categories.map(cat => cat.preferredColor))
+      } else {
+        this._palette = DEFAULT_CATEGORICAL_PALETTE(categories.length)
+      }
     } else {
       this._palette = DEFAULT_CONTINUOUS_PALETTE()
     }
