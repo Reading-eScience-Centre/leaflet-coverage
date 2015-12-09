@@ -24,9 +24,11 @@ export function withParameters (cov, params) {
  * @returns {Coverage}
  */
 export function withCategories (cov, key, categories, mapping) {
+  /* check breaks with Babel, see https://github.com/jspm/jspm-cli/issues/1348
   if (!(mapping instanceof Map)) {
     throw new Error('mapping parameter must be a Map from/to category ID')
   }
+  */
   if (categories.some(c => !c.id)) {
     throw new Error('At least one category object is missing the "id" property')
   }
