@@ -70,7 +70,7 @@ export function withCategories (cov, key, categories, mapping) {
  */
 export function maskByPolygon (cov, polygon) {
   // TODO improve domain type check
-  if (!cov.domainType.endsWith('Grid')) {
+  if (cov.domainType.substring(cov.domainType.length-4) !== 'Grid') {
     throw new Error('Sorry, only grids can be masked by polygon currently, domain type: ' + cov.domainType)
   }
   
