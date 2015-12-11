@@ -19,28 +19,28 @@ export function withParameters (cov, params) {
  * 
  * @param {Coverage} cov The Coverage object.
  * @param {String} key The key of the parameter to work with.
- * @param {Array} categoris The new array of category objects that will be part of the returned coverage.
+ * @param {object} observedProperty The new observed property including the new array of category objects
+ *                           that will be part of the returned coverage.
  * @param {Map} mapping A mapping from source category id to destination category id.
  * @returns {Coverage}
  */
-export function withCategories (cov, key, categories, mapping) {
+export function withCategories (cov, key, observedProperty, mapping) {
   /* check breaks with Babel, see https://github.com/jspm/jspm-cli/issues/1348
   if (!(mapping instanceof Map)) {
     throw new Error('mapping parameter must be a Map from/to category ID')
   }
   */
-  if (categories.some(c => !c.id)) {
+  if (observedProperty.categories.some(c => !c.id)) {
     throw new Error('At least one category object is missing the "id" property')
   }
   let newparams = shallowcopy(cov.parameters)
   let newparam = shallowcopy(newparams.get(key))
   newparams.set(key, newparam)
-  let newobsprop = shallowcopy(newparams.get(key).observedProperty)
-  newparams.get(key).observedProperty = newobsprop
-  newparams.get(key).observedProperty.categories = categories
+  newparams.get(key).observedProperty = observedProperty
   
   let fromCatEnc = cov.parameters.get(key).categoryEncoding
   let catEncoding = new Map()
+  let categories = observedProperty.categories
   for (let category of categories) {
     let vals = []
     for (let [fromCatId, toCatId] of mapping) {
