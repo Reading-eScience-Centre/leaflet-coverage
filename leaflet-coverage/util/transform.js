@@ -44,11 +44,13 @@ export function withCategories (cov, key, categories, mapping) {
   for (let category of categories) {
     let vals = []
     for (let [fromCatId, toCatId] of mapping) {
-      if (toCatId === category.id) {
+      if (toCatId === category.id && fromCatEnc.has(fromCatId)) {
         vals.push(...fromCatEnc.get(fromCatId))
       }
     }
-    catEncoding.set(category.id, vals)
+    if (vals.length > 0) {
+      catEncoding.set(category.id, vals)
+    }
   }
   newparams.get(key).categoryEncoding = catEncoding
   
