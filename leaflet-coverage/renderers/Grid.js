@@ -109,10 +109,13 @@ export default class Grid extends L.TileLayer.Canvas {
     let max = -Infinity
     let min = Infinity
     let categories = this.param.observedProperty.categories
+    let encoding = this.param.categoryEncoding
     for (let category of categories) {
-      for (let val of this.param.categoryEncoding.get(category.id)) {
-        max = Math.max(max, val)
-        min = Math.min(min, val)
+      if (encoding.has(category.id)) {
+        for (let val of encoding.get(category.id)) {
+          max = Math.max(max, val)
+          min = Math.min(min, val)
+        }
       }
     }
     let valIdxMap
@@ -128,9 +131,11 @@ export default class Grid extends L.TileLayer.Canvas {
       }
       
       for (let idx=0; idx < categories.length; idx++) {
-        let cat = categories[idx]
-        for (let val of this.param.categoryEncoding.get(cat.id)) {
-          valIdxMap[val] = idx
+        let category = categories[idx]
+        if (encoding.has(category.id)) {
+          for (let val of this.param.categoryEncoding.get(category.id)) {
+            valIdxMap[val] = idx
+          }
         }
       }
     } else {
