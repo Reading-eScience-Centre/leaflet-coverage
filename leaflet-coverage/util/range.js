@@ -55,7 +55,7 @@ export function iterate (range, fn) {
     fn(get(obj))
   `
   
-  let iterateLoop = new Function('get', 'fn', begin + end)
+  let iterateLoop = new Function(`return function iterateRange (get, fn) { ${begin} ${end} }`)()
   iterateLoop(range.get, fn)
 }
 
