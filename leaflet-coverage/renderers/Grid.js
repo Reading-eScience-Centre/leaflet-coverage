@@ -56,6 +56,7 @@ export default class Grid extends L.TileLayer.Canvas {
         t: {coordPref: options.time},
         z: {coordPref: options.vertical}
     }
+    this._initCategoryIdxMap()
     
     let categories = this.param.observedProperty.categories
     
@@ -95,6 +96,47 @@ export default class Grid extends L.TileLayer.Canvas {
     case 'onchange': this._autoRedraw = true; break
     default: throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")')
     }
+  }
+  
+  /**
+   * Sets up a lookup table from categorical range value to palette index.
+   */
+  _initCategoryIdxMap () {
+    if (!this.param.categoryEncoding) return
+    
+    // categorical parameter with integer encoding
+    // Note: The palette order is equal to the categories array order.
+    let max = -Infinity
+    let min = Infinity
+    let categories = this.param.observedProperty.categories
+    for (let category of categories) {
+      for (let val of this.param.categoryEncoding.get(category.id)) {
+        max = Math.max(max, val)
+        min = Math.min(min, val)
+      }
+    }
+    let valIdxMap
+    if (categories.length < 256) {
+      if (max > 10000 || min < 0) {
+        // TODO implement fallback to Map implementation
+        throw new Error('category values too high (>10000) or low (<0)')
+      }
+      valIdxMap = new Uint8Array(max+1)
+      for (let i=0; i <= max; i++) {
+        // the above length < 256 check ensures that no palette index is ever 255
+        valIdxMap[i] = 255
+      }
+      
+      for (let idx=0; idx < categories.length; idx++) {
+        let cat = categories[idx]
+        for (let val of this.param.categoryEncoding.get(cat.id)) {
+          valIdxMap[val] = idx
+        }
+      }
+    } else {
+      throw new Error('Too many categories: ' + categories.length)
+    }
+    this._categoryIdxMap = valIdxMap
   }
   
   onAdd (map) {
@@ -356,18 +398,12 @@ export default class Grid extends L.TileLayer.Canvas {
     let setPixel
     if (this.param.categoryEncoding) {
       // categorical parameter with integer encoding
-      let valIdxMap = new Map()
-      for (let idx=0; idx < this.param.observedProperty.categories.length; idx++) {
-        let cat = this.param.observedProperty.categories[idx]
-        if (this.param.categoryEncoding.has(cat.id)) {
-          for (let val of this.param.categoryEncoding.get(cat.id)) {
-            valIdxMap.set(val, idx)
-          }
-        }
-      }
+      let valIdxMap = this._categoryIdxMap
+      let max = valIdxMap.length - 1
       setPixel = (tileY, tileX, val) => {
-        if (val === null || !valIdxMap.has(val)) return
-        let idx = valIdxMap.get(val)
+        if (val === null || val < 0 || val > max) return
+        let idx = valIdxMap[val]
+        if (idx === 255) return
         doSetPixel(tileY, tileX, idx)
       }
     } else {
