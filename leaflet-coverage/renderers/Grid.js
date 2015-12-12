@@ -168,14 +168,16 @@ export default class Grid extends L.TileLayer.Canvas {
         }
       })
       .then(() => {
+        this.errored = false
         this.fire('add')
         super.onAdd(map)
         this.fire('dataLoad')
       })
       .catch(e => {
+        this.errored = true
         console.error(e)
         this.fire('error', e)
-        
+        super.onAdd(map)
         this.fire('dataLoad')
       })
   }
@@ -372,6 +374,8 @@ export default class Grid extends L.TileLayer.Canvas {
   }
     
   drawTile (canvas, tilePoint, zoom) {
+    if (this.errored) return
+    
     let ctx = canvas.getContext('2d')
     let tileSize = this.options.tileSize
     
