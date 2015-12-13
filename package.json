@@ -27,8 +27,8 @@
     "karma": "karma start",
     "saucelabs": "karma start karma.conf-ci.js",
     "build": "npm run build-src && npm run build-min",
-    "build-src": "jspm bundle-sfx leaflet-coverage/classic - leaflet - d3 - c3 leaflet-coverage.src.js --globals \"{leaflet:'L', d3:'d3', c3:'c3'}\" --format global --skip-source-maps",
-    "build-min": "jspm bundle-sfx leaflet-coverage/classic - leaflet - d3 - c3 leaflet-coverage.min.js --globals \"{leaflet:'L', d3:'d3', c3:'c3'}\" --format global --minify --skip-source-maps",
+    "build-src": "jspm bundle-sfx leaflet-coverage/classic - leaflet - c3 leaflet-coverage.src.js --globals \"{leaflet:'L', c3:'c3'}\" --format global --skip-source-maps",
+    "build-min": "jspm bundle-sfx leaflet-coverage/classic - leaflet - c3 leaflet-coverage.min.js --globals \"{leaflet:'L', c3:'c3'}\" --format global --minify --skip-source-maps",
     "prepublish": "npm run build"
   },
   "standard": {
