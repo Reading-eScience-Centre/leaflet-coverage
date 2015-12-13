@@ -21,7 +21,7 @@
   "format": "esm",
   "scripts": {
     "docs": "esdoc -c esdoc.json",
-    "postinstall": "jspm install",
+    "postinstall": "jspm install --yes",
     "style": "standard",
     "test": "karma start --single-run",
     "karma": "karma start",
@@ -34,7 +34,6 @@
   "standard": {
     "parser": "babel-eslint",
     "ignore": [
-      "config.js",
       "karma.conf.js",
       "karma.conf-ci.js"
     ]
