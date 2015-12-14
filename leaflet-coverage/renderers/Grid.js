@@ -147,12 +147,6 @@ export default class Grid extends L.TileLayer.Canvas {
   onAdd (map) {
     // "loading" and "load" events are provided by the underlying TileLayer class
     
-    // TODO change to subsetCov once that is used in _updatePaletteExtent
-    //  the goal is to avoid reloading data when approximating palette extent via subsetting
-    //  but: memory has to be freed when the layer is removed from the map
-    //      -> therefore cacheRanges should be on subsetCov whose reference is removed on onRemove
-    this.cov.cacheRanges = true
-    
     this._map = map
     this.fire('dataLoading') // for supporting loading spinners
     this.cov.loadDomain()
@@ -165,6 +159,12 @@ export default class Grid extends L.TileLayer.Canvas {
         }
       })
       .then(() => this._subsetByCoordinatePreference())
+      .then(() => {
+        //  the goal is to avoid reloading data when approximating palette extent via subsetting
+        //  but: memory has to be freed when the layer is removed from the map
+        //      -> therefore cacheRanges is set on subsetCov whose reference is removed on onRemove
+        this.subsetCov.cacheRanges = true
+      })
       .then(() => this.subsetCov.loadRange(this.param.key))
       .then(subsetRange => {
         this.subsetRange = subsetRange
