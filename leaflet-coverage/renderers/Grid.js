@@ -341,9 +341,7 @@ export default class Grid extends L.TileLayer.Canvas {
         let xconstraint = {start: 0, stop: xlen, step: Math.max(Math.round(xlen/100), 1)}
         let yconstraint = {start: 0, stop: ylen, step: Math.max(Math.round(ylen/100), 1)}
         
-        // TODO bug in covjson-reader doesn't expose subsetByIndex for subsetted covs
-        //return this.subsetCov.subsetByIndex({x: xconstraint, y: yconstraint})
-        return this.cov.subsetByIndex({x: xconstraint, y: yconstraint, t: this._axesSubset.t.idx, z: this._axesSubset.z.idx})        
+        return this.subsetCov.subsetByIndex({x: xconstraint, y: yconstraint})        
           .then(subsetCov => {
             return subsetCov.loadRange(this.param.key).then(subsetRange => {
                let [min,max] = rangeutil.minMax(subsetRange)
