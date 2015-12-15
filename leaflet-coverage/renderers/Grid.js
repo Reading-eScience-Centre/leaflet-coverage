@@ -283,6 +283,13 @@ export default class Grid extends L.TileLayer.Canvas {
     return this._axesSubset.t.coord
   }
   
+  get timeSlices () {
+    if (!this.domain.axes.has('t')) {
+      throw new Error('No time axis found')
+    }
+    return this.domain.axes.get('t').values.map(t => new Date(t))
+  }
+  
   /**
    * Sets the currently active vertical coordinate to the one closest to the given value.
    * This has no effect if the grid has no vertical axis.
@@ -307,6 +314,13 @@ export default class Grid extends L.TileLayer.Canvas {
    */
   get vertical () {
     return this._axesSubset.z.coord
+  }
+  
+  get verticalSlices () {
+    if (!this.domain.axes.has('z')) {
+      throw new Error('No vertical axis found')
+    }
+    return this.domain.axes.get('z').values
   }
    
   set palette (p) {
