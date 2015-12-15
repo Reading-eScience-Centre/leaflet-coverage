@@ -208,8 +208,7 @@ export default class Grid extends L.TileLayer.Canvas {
    * After calling this method, _axesSubset.*.idx and _axesSubset.*.coord have
    * values from the actual axes.
    */
-  _subsetByCoordinatePreference () {
-    
+  _subsetByCoordinatePreference () {    
     /**
      * Return the index of the coordinate value closest to the given value
      * within the given axis. Supports ascending and descending axes.
@@ -239,6 +238,7 @@ export default class Grid extends L.TileLayer.Canvas {
       ax.coord = this.domain.axes.has(axis) ? this.domain.axes.get(axis).values[ax.idx] : null
     }
     
+    this.fire('dataLoading') // for supporting loading spinners
     return this.cov.subsetByIndex({t: this._axesSubset.t.idx, z: this._axesSubset.z.idx})
       .then(subsetCov => {
         this.subsetCov = subsetCov
@@ -253,6 +253,13 @@ export default class Grid extends L.TileLayer.Canvas {
         if (!this.param.observedProperty.categories) {
           return this._updatePaletteExtent(this._paletteExtent)
         }
+      })
+      .then(() => {
+        this.fire('dataLoad')
+      })
+      .catch(e => {
+        this.fire('dataLoad')
+        throw e
       })
   }
   
