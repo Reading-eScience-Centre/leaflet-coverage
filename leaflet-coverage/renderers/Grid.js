@@ -160,19 +160,6 @@ export default class Grid extends L.TileLayer.Canvas {
       })
       .then(() => this._subsetByCoordinatePreference())
       .then(() => {
-        //  the goal is to avoid reloading data when approximating palette extent via subsetting
-        //  but: memory has to be freed when the layer is removed from the map
-        //      -> therefore cacheRanges is set on subsetCov whose reference is removed on onRemove
-        this.subsetCov.cacheRanges = true
-      })
-      .then(() => this.subsetCov.loadRange(this.param.key))
-      .then(subsetRange => {
-        this.subsetRange = subsetRange
-        if (!this.param.observedProperty.categories) {
-          return this._updatePaletteExtent(this._paletteExtent)
-        }
-      })
-      .then(() => {
         this.errored = false
         this.fire('add')
         super.onAdd(map)
@@ -233,6 +220,11 @@ export default class Grid extends L.TileLayer.Canvas {
         return
       }
       let vals = this.domain.axes.get(axis).values
+      if (axis === 't') {
+        // convert to unix timestamps as we need numbers
+        val = val.getTime()
+        vals = vals.map(t => new Date(t).getTime())
+      }
       let idx = arrays.indexOfNearest(vals, val)
       return idx
     }
@@ -250,6 +242,17 @@ export default class Grid extends L.TileLayer.Canvas {
     return this.cov.subsetByIndex({t: this._axesSubset.t.idx, z: this._axesSubset.z.idx})
       .then(subsetCov => {
         this.subsetCov = subsetCov
+        //  the goal is to avoid reloading data when approximating palette extent via subsetting
+        //  but: memory has to be freed when the layer is removed from the map
+        //      -> therefore cacheRanges is set on subsetCov whose reference is removed on onRemove
+        this.subsetCov.cacheRanges = true
+        return this.subsetCov.loadRange(this.param.key)
+      })
+      .then(subsetRange => {
+        this.subsetRange = subsetRange
+        if (!this.param.observedProperty.categories) {
+          return this._updatePaletteExtent(this._paletteExtent)
+        }
       })
   }
   
@@ -280,7 +283,7 @@ export default class Grid extends L.TileLayer.Canvas {
    * or null if the grid has no time axis.
    */
   get time () {
-    return this._axesSubset.t.coord
+    return new Date(this._axesSubset.t.coord)
   }
   
   get timeSlices () {
