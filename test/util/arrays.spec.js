@@ -36,27 +36,4 @@ describe("util/arrays methods", () => {
       assert.equal(ind, 1)
     })
   })
-  describe("#asSciJSndarray", () => {
-    it("returns the same object if already a SciJS ndarray", () => {
-      var ndarr = ndarray([1,2,3,4], [2,2])
-      var ndarr2 = utils.asSciJSndarray(ndarr)
-      assert.strictEqual(ndarr2, ndarr)
-    })
-    it("correctly wraps our ndarray-like object as a SciJS ndarray", () => {
-      var arr = [[1,2,3],
-                 [4,5,6]]
-      // an object which has get(i,j,..) and .shape
-      var ndobj = {
-        shape: [arr.length, arr[0].length],
-        get: (i,j) => arr[i][j]
-      }
-      var ndarr = utils.asSciJSndarray(ndobj)
-      assert.deepEqual(ndarr.shape, ndobj.shape)
-      for (var i=0; i < ndobj.shape[0]; i++) {
-        for (var j=0; j < ndobj.shape[1]; j++) {
-          assert.strictEqual(ndarr.get(i,j), ndobj.get(i,j))
-        }
-      }
-    })
-  })
 })
