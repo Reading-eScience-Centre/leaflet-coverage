@@ -278,10 +278,9 @@ export default class Grid extends L.TileLayer.Canvas {
     let old = this.time
     this._axesSubset.t.coordPref = val
     this._subsetByCoordinatePreference().then(() => {
+      if (old === this.time) return
       this._doAutoRedraw()
-      if (old !== this.time) {
-        this.fire('axisChange', {axis: 'time'})
-      }
+      this.fire('axisChange', {axis: 'time'})
     })
   }
   
@@ -311,10 +310,9 @@ export default class Grid extends L.TileLayer.Canvas {
     let old = this.vertical
     this._axesSubset.z.coordPref = val
     this._subsetByCoordinatePreference().then(() => {
+      if (old === this.vertical) return
       this._doAutoRedraw()
-      if (old !== this.vertical) {
-        this.fire('axisChange', {axis: 'vertical'})
-      } 
+      this.fire('axisChange', {axis: 'vertical'}) 
     })  
   }
   
@@ -344,9 +342,17 @@ export default class Grid extends L.TileLayer.Canvas {
   }
   
   _updatePaletteExtent (extent) {
+    let hasChanged = newExtent => {
+      let oldExtent = this._paletteExtent
+      if (!Array.isArray(oldExtent)) return true
+      if (oldExtent[0] !== newExtent[0] || oldExtent[1] !== newExtent[1]) return true
+      return false
+    }
+    
     if (Array.isArray(extent) && extent.length === 2) {
+      let changed = hasChanged(extent)
       this._paletteExtent = extent
-      return Promise.resolve()
+      return Promise.resolve(changed)
     }
         
     if (extent === 'subset') {
@@ -354,8 +360,10 @@ export default class Grid extends L.TileLayer.Canvas {
 
       // check if subsetted size is manageable
       if (this.subsetRange.shape.x * this.subsetRange.shape.y < 10000) {
-        this._paletteExtent = rangeutil.minMax(this.subsetRange)
-        return Promise.resolve()
+        extent = rangeutil.minMax(this.subsetRange)
+        let changed = hasChanged(extent)
+        this._paletteExtent = extent
+        return Promise.resolve(changed)
       } else {
         // subset x and y to get a fast estimate of the palette extent
         // since it is an estimate, the lower and upper bound needs a small buffer
@@ -370,7 +378,10 @@ export default class Grid extends L.TileLayer.Canvas {
             return subsetCov.loadRange(this.param.key).then(subsetRange => {
                let [min,max] = rangeutil.minMax(subsetRange)
                let buffer = (max-min)*0.1 // 10% buffer on each side
-               this._paletteExtent = [min-buffer, max+buffer]
+               extent = [min-buffer, max+buffer]
+               let changed = hasChanged(extent)
+               this._paletteExtent = extent
+               return changed
             })
           })
       }
@@ -390,7 +401,8 @@ export default class Grid extends L.TileLayer.Canvas {
     if (this.param.observedProperty.categories) {
       throw new Error('Cannot set palette extent for categorical parameters')
     }
-    this._updatePaletteExtent(extent).then(() => {
+    this._updatePaletteExtent(extent).then(changed => {
+      if (!changed) return
       this._doAutoRedraw()
       this.fire('paletteExtentChange')
     })
@@ -405,7 +417,7 @@ export default class Grid extends L.TileLayer.Canvas {
     
     let ctx = canvas.getContext('2d')
     let tileSize = this.options.tileSize
-    
+    console.log(tileSize)
     let imgData = ctx.getImageData(0, 0, tileSize, tileSize)
     // Uint8ClampedArray, 1-dimensional, in order R,G,B,A,R,G,B,A,... row-major
     let rgba = ndarray(imgData.data, [tileSize, tileSize, 4])
