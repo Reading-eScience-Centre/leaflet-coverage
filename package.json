@@ -57,7 +57,7 @@
       "babel-runtime": "npm:babel-runtime@^5.8.24",
       "clean-css": "npm:clean-css@^3.4.5",
       "core-js": "npm:core-js@^1.1.4",
-      "covjson-reader": "github:reading-escience-centre/covjson-reader@master"
+      "covjson-reader": "npm:covjson-reader@^0.3.0"
     }
   },
   "devDependencies": {
