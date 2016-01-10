@@ -417,7 +417,7 @@ export default class Grid extends L.TileLayer.Canvas {
     
     let ctx = canvas.getContext('2d')
     let tileSize = this.options.tileSize
-    console.log(tileSize)
+    
     let imgData = ctx.getImageData(0, 0, tileSize, tileSize)
     // Uint8ClampedArray, 1-dimensional, in order R,G,B,A,R,G,B,A,... row-major
     let rgba = ndarray(imgData.data, [tileSize, tileSize, 4])
