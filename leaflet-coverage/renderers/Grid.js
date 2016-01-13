@@ -289,7 +289,7 @@ export default class Grid extends L.TileLayer.Canvas {
    * or null if the grid has no time axis.
    */
   get time () {
-    return new Date(this._axesSubset.t.coord)
+    return this._axesSubset.t.coord ? new Date(this._axesSubset.t.coord) : null
   }
   
   get timeSlices () {
