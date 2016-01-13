@@ -289,12 +289,12 @@ export default class Grid extends L.TileLayer.Canvas {
    * or null if the grid has no time axis.
    */
   get time () {
-    return new Date(this._axesSubset.t.coord)
+    return this.domain.axes.has('t') ? new Date(this._axesSubset.t.coord) : null
   }
   
   get timeSlices () {
     if (!this.domain.axes.has('t')) {
-      throw new Error('No time axis found')
+      return null
     }
     return this.domain.axes.get('t').values.map(t => new Date(t))
   }
