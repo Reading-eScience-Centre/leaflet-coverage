@@ -54,6 +54,7 @@ export default class TimeAxis extends L.Control {
       let dateStr = getUTCDateString(dateTimestamp)
       $('.date', el).add(HTML(`<option value="${dateStr}">${dateStr}</option>`))
     }
+    $('.date', el)[0].disabled = this._dateMap.size === 1
     
     $('.date', el).on('change', event => {
       let dateTimestamp = getUTCTimestampDateOnly(event.target.value)
