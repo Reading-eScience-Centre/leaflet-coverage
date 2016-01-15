@@ -48,16 +48,18 @@ describe("util/transform methods", () => {
             }]])
       }
       let foobar = 'foobar'
-      let newcats = [{
-        id: foobar
-      }]
+      let newobsprop = {
+        categories: [{
+          id: foobar
+        }]
+      }
       
       let mapping = new Map([
         [foo, foobar],
         [bar, foobar]
       ])
       
-      let newcov = transform.withCategories(cov, 'LC', newcats, mapping)
+      let newcov = transform.withCategories(cov, 'LC', newobsprop, mapping)
       
       assert.strictEqual(cov.parameters.get('LC').observedProperty.categories[0].id, foo)
       assert.strictEqual(cov.parameters.get('LC').observedProperty.categories[1].id, bar)
