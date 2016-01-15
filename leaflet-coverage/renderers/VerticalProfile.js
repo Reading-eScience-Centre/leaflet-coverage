@@ -17,7 +17,7 @@ const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
  * The dot either has a defined standard color, or it uses
  * a palette together with a target depth if a parameter is chosen.
  */
-export class VerticalProfile extends L.Class {
+class VerticalProfile extends L.Class {
   
   constructor (cov, options) {
     super()

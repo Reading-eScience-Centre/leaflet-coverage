@@ -1,12 +1,14 @@
 import Grid from './renderers/Grid.js'
 import Trajectory from './renderers/Trajectory.js'
 import VerticalProfile from './renderers/VerticalProfile.js'
+import MultiPolygon from './renderers/MultiPolygon.js'
 
 const pre = 'http://coveragejson.org/def#'
 export const DEFAULT_RENDERERS = {
     [pre + 'Grid']: Grid,
     [pre + 'VerticalProfile']: VerticalProfile,
-    [pre + 'Trajectory']: Trajectory
+    [pre + 'Trajectory']: Trajectory,
+    [pre + 'MultiPolygon']: MultiPolygon
 }
 
 export default function LayerFactory (options={}) {
