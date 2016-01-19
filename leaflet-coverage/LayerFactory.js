@@ -12,26 +12,31 @@ export const DEFAULT_RENDERERS = {
 }
 
 export default function LayerFactory (options={}) {
-  if (options.renderer) {
-    return (cov, opts) => new options.renderer(cov, opts)
-  }
-  if (options.renderers) {
-    return (cov, opts) => {
-      if (options.renderers[cov.type]) {
-        return new options.renderers[cov.type](cov, opts)
-      }
-      if (options.renderers[cov.domainType]) {
-        return new options.renderers[cov.domainType](cov, opts)
-      }
-      throw new Error(`No renderer found for type=${cov.type} or domainType=${cov.domainType},
-                       available: ${Object.keys(options.renderers)}`)
-    }
-  }
   return (cov, opts) => {
-    if (!DEFAULT_RENDERERS[cov.domainType]) {
-      throw new Error(`No renderer found for domainType=${cov.domainType},
-          available: ${Object.keys(DEFAULT_RENDERERS)}`)
+    let rendererClass = getRendererClass(cov, options)
+    if (!rendererClass) {
+      throw new Error(`No renderer found for type=${cov.type} or domainType=${cov.domainType},
+            available: ${Object.keys(DEFAULT_RENDERERS)}, ${Object.keys(options.renderers)}`)
     }
-    return new DEFAULT_RENDERERS[cov.domainType](cov, opts)
+    return new rendererClass(cov, opts)
   }
+}
+
+/**
+ * Return a renderer class for the given coverage,
+ * or null if none was found.
+ */
+export function getRendererClass (cov, options={}) {
+  if (options.renderers) {
+    if (options.renderers[cov.type]) {
+      return options.renderers[cov.type]
+    }
+    if (options.renderers[cov.domainType]) {
+      return options.renderers[cov.domainType]
+    }
+  }
+  if (DEFAULT_RENDERERS[cov.domainType]) {
+    return DEFAULT_RENDERERS[cov.domainType]
+  }
+  return null
 }
