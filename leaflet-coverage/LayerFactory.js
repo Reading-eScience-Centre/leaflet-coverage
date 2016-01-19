@@ -13,7 +13,7 @@ export const DEFAULT_RENDERERS = {
 
 export default function LayerFactory (options={}) {
   return (cov, opts) => {
-    let rendererClass = getRendererClass(cov, options)
+    let rendererClass = getLayerClass(cov, options)
     if (!rendererClass) {
       throw new Error(`No renderer found for type=${cov.type} or domainType=${cov.domainType},
             available: ${Object.keys(DEFAULT_RENDERERS)}, ${Object.keys(options.renderers)}`)
@@ -23,10 +23,10 @@ export default function LayerFactory (options={}) {
 }
 
 /**
- * Return a renderer class for the given coverage,
+ * Return a layer class usable for the given coverage,
  * or null if none was found.
  */
-export function getRendererClass (cov, options={}) {
+export function getLayerClass (cov, options={}) {
   if (options.renderers) {
     if (options.renderers[cov.type]) {
       return options.renderers[cov.type]
