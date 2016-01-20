@@ -103,7 +103,6 @@ describe("util/transform methods", () => {
         }
       },
       "ranges" : {
-        "type" : "RangeSet",
         "ICEC" : {
           "type" : "Range",
           "values" : [ 0.5, 0.6 ]

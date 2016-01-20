@@ -67,7 +67,7 @@ export function withCategories (cov, key, observedProperty, mapping) {
  * domain types only.
  * 
  * @param {Coverage} cov A Coverage object.
- * @param {Object} polygon A GeoJSON Polygon object with 1 linear ring.
+ * @param {Object} polygon A GeoJSON Polygon or MultiPolygon object without holes.
  * @returns {Coverage}
  */
 export function maskByPolygon (cov, polygon) {
@@ -76,7 +76,18 @@ export function maskByPolygon (cov, polygon) {
     throw new Error('Sorry, only grids can be masked by polygon currently, domain type: ' + cov.domainType)
   }
   
-  let polycoords = polygon.coordinates[0]
+  if (polygon.type === 'Polygon') {
+    polygon = {
+      type: 'MultiPolygon',
+      coordinates: [polygon.coordinates]
+    }
+  }
+  
+  if (polygon.coordinates.some(poly => poly.length > 1)) {
+    throw new Error('Polygons cannot have holes currently')
+  }
+  let polycoords = polygon.coordinates
+  let polycount = polycoords.length
   
   let rangeWrapper = (domain, range) => {
     let x = domain.axes.get('x').values
@@ -84,7 +95,13 @@ export function maskByPolygon (cov, polygon) {
     let pnpolyCache = ndarray(new Uint8Array(x.length * y.length), [x.length, y.length])
     for (let i=0; i < x.length; i++) {
       for (let j=0; j < y.length; j++) {
-        let inside = pnpoly(x[i], y[j], polycoords)
+        let inside
+        for (let p=0; p < polycount; p++) {
+          inside = pnpoly(x[i], y[j], polycoords[p][0])
+          if (inside) {
+            break
+          }
+        }
         pnpolyCache.set(i, j, inside)
       }
     }
@@ -108,6 +125,8 @@ export function maskByPolygon (cov, polygon) {
   let newcov = shallowcopy(cov)
   newcov.loadRange = loadRange
   newcov.loadRanges = loadRanges
+  // FIXME other methods like subsetByIndex are affected as well
+  //  -> it's time for doing this properly without shallowcopy hacks
   
   return newcov
 }
