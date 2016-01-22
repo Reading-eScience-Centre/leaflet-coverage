@@ -119,20 +119,23 @@ describe("util/transform methods", () => {
     
     it('shall not modify the original coverage', () => {
       return CovJSON.read(JSON.parse(JSON.stringify(covjson))).then(cov => {
-        let newcov = transform.maskByPolygon(cov, polygon)
-        return cov.loadRange('ICEC').then(range => {
-          assert.strictEqual(range.get({x: 0}), 0.5)
-          assert.strictEqual(range.get({x: 1}), 0.6)
+        return transform.maskByPolygon(cov, polygon).then(newcov => {
+          return cov.loadRange('ICEC').then(range => {
+            assert.strictEqual(range.get({x: 0}), 0.5)
+            assert.strictEqual(range.get({x: 1}), 0.6)
+          })
         })
       })
     })
     
     it('shall mask the correct range values', () => {
       return CovJSON.read(JSON.parse(JSON.stringify(covjson))).then(cov => {
-        let newcov = transform.maskByPolygon(cov, polygon)
-        return newcov.loadRange('ICEC').then(range => {
-          assert.strictEqual(range.get({x: 0}), 0.5)
-          assert.strictEqual(range.get({x: 1}), null)
+        return transform.maskByPolygon(cov, polygon).then(newcov => {
+          console.log(newcov)
+          return newcov.loadRange('ICEC').then(range => {
+            assert.strictEqual(range.get({x: 0}), 0.5)
+            assert.strictEqual(range.get({x: 1}), null)
+          })
         })
       })
     })

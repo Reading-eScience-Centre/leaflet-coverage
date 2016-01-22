@@ -59,6 +59,46 @@ export function withCategories (cov, key, observedProperty, mapping) {
 }
 
 /**
+ * @param {Coverage} cov The coverage.
+ * @param {String} key The key of the parameter for which the mapping should be applied.
+ * @param {Function} fn A function getting called as fn(obj, range) where obj is the axis indices object
+ *   and range is the original range object.
+ * @param {String} [dataType] The new data type to use for the range. If omitted, the original type is used.
+ * @returns {Coverage}
+ */
+export function mapRange (cov, key, fn, dataType) {
+  let rangeWrapper = range => {
+    let newrange = {
+      shape: range.shape,
+      dataType: dataType || range.dataType,
+      get: obj => fn(obj, range)
+    }
+    return newrange
+  }
+  
+  let loadRange = paramKey => key === paramKey ? cov.loadRange(paramKey).then(rangeWrapper) : cov.loadRange(paramKey)
+  
+  let loadRanges = paramKeys => cov.loadRanges(paramKeys)
+    .then(ranges => new Map([...ranges].map(([paramKey, range]) => [paramKey, key === paramKey ? rangeWrapper(range) : range])))
+  
+  let newcov = {
+    id: cov.id,
+    type: cov.type,
+    domainType: cov.domainType,
+    bbox: cov.bbox,
+    timeExtent: cov.timeExtent,
+    parameters: cov.parameters,
+    loadDomain: cov.loadDomain,
+    loadRange,
+    loadRanges,
+    subsetByIndex: constraints => cov.subsetByIndex(constraints).then(sub => mapRange(sub, key, fn, dataType)),
+    subsetByValue: constraints => cov.subsetByValue(constraints).then(sub => mapRange(sub, key, fn, dataType))
+  }
+  
+  return newcov
+}
+
+/**
  * Returns a copy of the given Coverage object where the 
  * range values which belong to domain areas outside the
  * given polygon are returned as null (no data).
@@ -68,7 +108,7 @@ export function withCategories (cov, key, observedProperty, mapping) {
  * 
  * @param {Coverage} cov A Coverage object.
  * @param {Object} polygon A GeoJSON Polygon or MultiPolygon object without holes.
- * @returns {Coverage}
+ * @returns {Promise<Coverage>}
  */
 export function maskByPolygon (cov, polygon) {
   // TODO improve domain type check
@@ -89,7 +129,7 @@ export function maskByPolygon (cov, polygon) {
   let polycoords = polygon.coordinates
   let polycount = polycoords.length
   
-  let rangeWrapper = (domain, range) => {
+  return cov.loadDomain().then(domain => {
     let x = domain.axes.get('x').values
     let y = domain.axes.get('y').values
     let pnpolyCache = ndarray(new Uint8Array(x.length * y.length), [x.length, y.length])
@@ -105,30 +145,21 @@ export function maskByPolygon (cov, polygon) {
         pnpolyCache.set(i, j, inside)
       }
     }
-    let newrange = shallowcopy(range)
-    newrange.get = obj => {
+    
+    let fn = (obj, range) => {
       if (pnpolyCache.get(obj.x || 0, obj.y || 0)) {
         return range.get(obj)
       } else {
         return null
       }
     }
-    return newrange
-  }
-  
-  let loadRange = key => Promise.all([cov.loadDomain(), cov.loadRange(key)])
-    .then(([domain, range]) => rangeWrapper(domain, range))
-  
-  let loadRanges = keys => Promise.all([cov.loadDomain(), cov.loadRanges(keys)])
-    .then(([domain, ranges]) => new Map([...ranges].map(([key, range]) => [key, rangeWrapper(domain, range)])))
-  
-  let newcov = shallowcopy(cov)
-  newcov.loadRange = loadRange
-  newcov.loadRanges = loadRanges
-  // FIXME other methods like subsetByIndex are affected as well
-  //  -> it's time for doing this properly without shallowcopy hacks
-  
-  return newcov
+
+    let newcov = cov
+    for (let key of cov.parameters.keys()) {
+      newcov = mapRange(newcov, key, fn)
+    }
+    return newcov
+  })
 }
 
 /**
@@ -138,7 +169,7 @@ export function maskByPolygon (cov, polygon) {
  * 
  * @param {Coverage} cov A Coverage object with domain Grid.
  * @param {array} bbox [xmin,ymin,xmax,ymax] in native CRS coordinates.
- * @returns {Promise} A promise with a Coverage object as result.
+ * @returns {Promise<Coverage>} A promise with a Coverage object as result.
  */
 export function subsetByBbox (cov, bbox) {
   let [xmin,ymin,xmax,ymax] = bbox
