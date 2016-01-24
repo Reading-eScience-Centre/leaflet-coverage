@@ -3,6 +3,7 @@ import c3 from 'c3'
 import 'c3/c3.css!'
 
 import * as i18n from '../util/i18n.js'
+import * as referencingUtil from '../util/referencing.js'
 
 // not used currently
 const DEFAULT_PLOT_OPTIONS = {}
@@ -51,17 +52,15 @@ export default class VerticalProfilePlot extends L.Popup {
     
     let zName = 'Vertical'
     let zUnit = ''
-    if (this.domain.referencing) {
-      let vertRef = this.domain.referencing.find(r => r.identifiers[0] === 'z')
-      if (vertRef.srs) {
-        let vertSrs = vertRef.srs
-        if (vertSrs.cs && vertSrs.cs.axes) {
-          let ax = vertSrs.cs.axes[0]
-          zUnit = ax.unit.symbol
-          // TODO i18n
-          if (ax.name && ax.name.en) {
-            zName = ax.name.en
-          }
+      
+    let vertSrs = referencingUtil.getRefSystem(this.domain, ['z'])
+    if (vertSrs) {
+      if (vertSrs.cs && vertSrs.cs.axes) {
+        let ax = vertSrs.cs.axes[0]
+        zUnit = ax.unit.symbol
+        // TODO i18n
+        if (ax.name && ax.name.en) {
+          zName = ax.name.en
         }
       }
     }
