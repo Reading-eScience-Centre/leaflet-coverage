@@ -88,7 +88,7 @@ export function mapRange (cov, key, fn, dataType) {
     bbox: cov.bbox,
     timeExtent: cov.timeExtent,
     parameters: cov.parameters,
-    loadDomain: cov.loadDomain,
+    loadDomain: () => cov.loadDomain(),
     loadRange,
     loadRanges,
     subsetByIndex: constraints => cov.subsetByIndex(constraints).then(sub => mapRange(sub, key, fn, dataType)),
