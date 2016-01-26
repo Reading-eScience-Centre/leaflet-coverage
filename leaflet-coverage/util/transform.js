@@ -173,24 +173,7 @@ export function maskByPolygon (cov, polygon) {
  */
 export function subsetByBbox (cov, bbox) {
   let [xmin,ymin,xmax,ymax] = bbox
-  
-  // TODO maybe implement for composite axes like trajectories as well
-  
-  return cov.loadDomain().then(domain => {
-    let x = domain.axes.get('x').values
-    let y = domain.axes.get('y').values
-    let [ixmin,ixmax] = [indicesOfNearest(x, xmin), indicesOfNearest(x, xmax)]
-    let [iymin,iymax] = [indicesOfNearest(y, ymin), indicesOfNearest(y, ymax)]
-    let [xstart,xstop] = [ixmin[0], ixmax[1]]
-    let [ystart,ystop] = [iymin[0], iymax[1]]
-    if (xstart > xstop) {
-      [xstart,xstop] = [xstop,xstart]
-    }
-    if (ystart > ystop) {
-      [ystart,ystop] = [ystop,ystart]
-    }    
-    return cov.subsetByIndex({x: {start: xstart, stop: xstop}, y: {start: ystart, stop: ystop}})
-  })
+  return cov.subsetByValue({x: {start: xmin, stop: xmax}, y: {start: ymin, stop: ymax}})
 }
 
 /**
