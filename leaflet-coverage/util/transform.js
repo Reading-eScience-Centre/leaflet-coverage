@@ -1,7 +1,5 @@
 import ndarray from 'ndarray'
 
-import {indicesOfNearest} from './arrays.js'
-
 /**
  * Returns a copy of the given Coverage object with the parameters
  * replaced by the supplied ones.
