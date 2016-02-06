@@ -1,5 +1,7 @@
 import ndarray from 'ndarray'
 
+import {COVJSON_GRID} from './constants.js'
+
 /**
  * Returns a copy of the given Coverage object with the parameters
  * replaced by the supplied ones.
@@ -8,8 +10,8 @@ import ndarray from 'ndarray'
  */
 export function withParameters (cov, params) {
   let newcov = {
-    type: cov.type,
-    domainType: cov.domainType,
+    profiles: cov.profiles,
+    domainProfiles: cov.domainProfiles,
     bbox: cov.bbox,
     timeExtent: cov.timeExtent,
     parameters: params,
@@ -92,8 +94,8 @@ export function mapRange (cov, key, fn, dataType) {
     .then(ranges => new Map([...ranges].map(([paramKey, range]) => [paramKey, key === paramKey ? rangeWrapper(range) : range])))
   
   let newcov = {
-    type: cov.type,
-    domainType: cov.domainType,
+    profiles: cov.profiles,
+    domainProfiles: cov.domainProfiles,
     bbox: cov.bbox,
     timeExtent: cov.timeExtent,
     parameters: cov.parameters,
@@ -120,9 +122,8 @@ export function mapRange (cov, key, fn, dataType) {
  * @returns {Promise<Coverage>}
  */
 export function maskByPolygon (cov, polygon) {
-  // TODO improve domain type check
-  if (cov.domainType.substring(cov.domainType.length-4) !== 'Grid') {
-    throw new Error('Sorry, only grids can be masked by polygon currently, domain type: ' + cov.domainType)
+  if (cov.domainProfiles.indexOf(COVJSON_GRID) === -1) {
+    throw new Error('Only grids can be masked by polygon currently, domain profiles: ' + cov.domainProfiles)
   }
   
   if (polygon.type === 'Polygon') {
