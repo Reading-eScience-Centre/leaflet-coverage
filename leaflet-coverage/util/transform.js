@@ -3,10 +3,22 @@ import ndarray from 'ndarray'
 /**
  * Returns a copy of the given Coverage object with the parameters
  * replaced by the supplied ones.
+ * 
+ * Note that this is a low-level function and no checks are done on the supplied parameters.
  */
 export function withParameters (cov, params) {
-  let newcov = shallowcopy(cov)
-  newcov.parameters = params  
+  let newcov = {
+    type: cov.type,
+    domainType: cov.domainType,
+    bbox: cov.bbox,
+    timeExtent: cov.timeExtent,
+    parameters: params,
+    loadDomain: () => cov.loadDomain(),
+    loadRange: key => cov.loadRange(key),
+    loadRanges: keys => cov.loadRanges(keys),
+    subsetByIndex: constraints => cov.subsetByIndex(constraints).then(sub => withParameters(sub, params)),
+    subsetByValue: constraints => cov.subsetByValue(constraints).then(sub => withParameters(sub, params))
+  }
   return newcov
 }
 
@@ -80,7 +92,6 @@ export function mapRange (cov, key, fn, dataType) {
     .then(ranges => new Map([...ranges].map(([paramKey, range]) => [paramKey, key === paramKey ? rangeWrapper(range) : range])))
   
   let newcov = {
-    id: cov.id,
     type: cov.type,
     domainType: cov.domainType,
     bbox: cov.bbox,
