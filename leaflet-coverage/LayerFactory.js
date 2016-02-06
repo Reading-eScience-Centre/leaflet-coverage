@@ -2,13 +2,14 @@ import Grid from './renderers/Grid.js'
 import Trajectory from './renderers/Trajectory.js'
 import VerticalProfile from './renderers/VerticalProfile.js'
 import MultiPolygon from './renderers/MultiPolygon.js'
+import {COVJSON_VERTICALPROFILE, COVJSON_GRID, COVJSON_TRAJECTORY, COVJSON_MULTIPOLYGON}
+  from './util/constants.js'
 
-const pre = 'http://coveragejson.org/def#'
 export const DEFAULT_RENDERERS = {
-    [pre + 'Grid']: Grid,
-    [pre + 'VerticalProfile']: VerticalProfile,
-    [pre + 'Trajectory']: Trajectory,
-    [pre + 'MultiPolygon']: MultiPolygon
+    [COVJSON_GRID]: Grid,
+    [COVJSON_VERTICALPROFILE]: VerticalProfile,
+    [COVJSON_TRAJECTORY]: Trajectory,
+    [COVJSON_MULTIPOLYGON]: MultiPolygon
 }
 
 export default function LayerFactory (options={}) {
@@ -25,18 +26,19 @@ export default function LayerFactory (options={}) {
 /**
  * Return a layer class usable for the given coverage,
  * or null if none was found.
+ * If multiple renderers match, then an arbitrary is returned. 
  */
 export function getLayerClass (cov, options={}) {
   if (options.renderers) {
-    if (options.renderers[cov.type]) {
-      return options.renderers[cov.type]
+    if (cov.profiles.some(p => options.renderers[p])) {
+      return options.renderers[cov.profiles.find(p => options.renderers[p])]
     }
-    if (options.renderers[cov.domainType]) {
-      return options.renderers[cov.domainType]
+    if (cov.domainProfiles.some(p => options.renderers[p])) {
+      return options.renderers[cov.domainProfiles.find(p => options.renderers[p])]
     }
   }
-  if (DEFAULT_RENDERERS[cov.domainType]) {
-    return DEFAULT_RENDERERS[cov.domainType]
+  if (cov.domainProfiles.some(p => DEFAULT_RENDERERS[p])) {
+    return DEFAULT_RENDERERS[cov.domainProfiles.find(p => DEFAULT_RENDERERS[p])]
   }
   return null
 }

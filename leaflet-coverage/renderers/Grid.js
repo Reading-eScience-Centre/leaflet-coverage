@@ -4,8 +4,7 @@ import {linearPalette, directPalette, scale} from './palettes.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
-
-const DOMAIN_TYPE = 'http://coveragejson.org/def#Grid'
+import {COVJSON_GRID, checkProfile} from '../util/constants.js'
   
 const DEFAULT_CONTINUOUS_PALETTE = () => linearPalette(['#deebf7', '#3182bd']) // blues
 const DEFAULT_CATEGORICAL_PALETTE = n => linearPalette(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3'], n)
@@ -47,9 +46,8 @@ export default class Grid extends L.TileLayer.Canvas {
    */
   constructor (cov, options) {
     super()
-    if (cov.domainType !== DOMAIN_TYPE) {
-      throw new Error('Unsupported domain type: ' + cov.domainType + ', must be: ' + DOMAIN_TYPE)
-    }
+    checkProfile(cov.domainProfiles, COVJSON_GRID)
+    
     this.cov = cov
     this.param = cov.parameters.get(options.keys[0])
     this._axesSubset = { // x and y are not subsetted
