@@ -34,6 +34,8 @@ export default class TimeAxis extends L.Control {
       dateMap.get(dateTimestamp).push(t)
     }
     this._dateMap = dateMap
+    
+    this.time = timeSlices[0]
   }
     
   onRemove (map) {
@@ -67,6 +69,7 @@ export default class TimeAxis extends L.Control {
       let timeSlice = this._dateMap.get(dateTimestamp)[0]
       this.covLayer.time = timeSlice
       this._initTimeSelect(dateTimestamp)
+      this.time = timeSlice
       this.fire('change', {time: timeSlice})
     })
     $('.time', el).on('change', event => {
@@ -74,6 +77,7 @@ export default class TimeAxis extends L.Control {
       let timeStr = event.target.value
       let time = new Date(dateStr + 'T' + timeStr)
       this.covLayer.time = time
+      this.time = time
       this.fire('change', {time: time})
     })
     
