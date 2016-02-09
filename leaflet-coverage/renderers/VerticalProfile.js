@@ -144,7 +144,7 @@ class VerticalProfile extends L.Class {
   }
   
   get palette () {
-    return this.param && this.targetZ !== null ? this._palette : null
+    return this.param && this.vertical !== undefined ? this._palette : undefined
   }
   
   set paletteExtent (extent) {
