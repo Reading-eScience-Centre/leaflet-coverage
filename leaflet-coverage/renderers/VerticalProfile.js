@@ -134,7 +134,12 @@ class VerticalProfile extends L.Class {
   }
   
   get verticalSlices () {
-    return this.domain.axes.get('z').values
+    let vals = this.domain.axes.get('z').values
+    if (ArrayBuffer.isView(vals)) {
+      // convert to plain Array to allow easier use
+      vals = [...vals]
+    }
+    return vals
   }
   
   set palette (p) {

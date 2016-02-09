@@ -322,7 +322,12 @@ export default class Grid extends L.TileLayer.Canvas {
   
   get verticalSlices () {
     if (this.domain.axes.has('z')) {
-      return this.domain.axes.get('z').values
+      let vals = this.domain.axes.get('z').values
+      if (ArrayBuffer.isView(vals)) {
+        // convert to plain Array to allow easier use
+        vals = [...vals]
+      }
+      return vals
     }
   }
    
