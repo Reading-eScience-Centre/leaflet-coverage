@@ -16,7 +16,9 @@ export default class TimeAxis extends L.Control {
     this.covLayer = covLayer
 
     this._remove = () => this.removeFrom(this._map)
-    covLayer.on('remove', this._remove)
+    if (covLayer.on) {
+      covLayer.on('remove', this._remove)
+    }
     
     this._axisListener = e => {
       if (e.axis === 'time') this.updateAxis(covLayer.time)
@@ -35,12 +37,16 @@ export default class TimeAxis extends L.Control {
   }
     
   onRemove (map) {
-    this.covLayer.off('remove', this._remove)
-    this.covLayer.off('axisChange', this._axisListener)
+    if (this.covLayer.off) {
+      this.covLayer.off('remove', this._remove)
+      this.covLayer.off('axisChange', this._axisListener)
+    }
   }
   
   onAdd (map) {
-    this.covLayer.on('axisChange', this._axisListener)
+    if (this.covLayer.on) {
+      this.covLayer.on('axisChange', this._axisListener)
+    }
     
     let el = HTML(TEMPLATE)[0]
     this._el = el
@@ -60,13 +66,15 @@ export default class TimeAxis extends L.Control {
       let dateTimestamp = getUTCTimestampDateOnly(event.target.value)
       let timeSlice = this._dateMap.get(dateTimestamp)[0]
       this.covLayer.time = timeSlice
-      this.initTimeSelect(dateTimestamp)
+      this._initTimeSelect(dateTimestamp)
+      this.fire('change', {time: timeSlice})
     })
     $('.time', el).on('change', event => {
       let dateStr = $('.date', el)[0].value
       let timeStr = event.target.value
       let time = new Date(dateStr + 'T' + timeStr)
       this.covLayer.time = time
+      this.fire('change', {time: time})
     })
     
     this.updateAxis(this.covLayer.time)
@@ -75,19 +83,20 @@ export default class TimeAxis extends L.Control {
   }
   
   updateAxis (covTime) {
+    if (!covTime) return
     let el = this._el
     // selects the date set in the cov layer, populates the time select, and selects the time
     let dateTimestamp = getUTCTimestampDateOnly(covTime.toISOString())
     let dateStr = getUTCDateString(dateTimestamp)
     $('.date', el)[0].value = dateStr 
     
-    this.initTimeSelect(dateTimestamp)
+    this._initTimeSelect(dateTimestamp)
     
     let timeStr = covTime.toISOString().substr(11)
     $('.time', el)[0].value = timeStr
   }
   
-  initTimeSelect (dateTimestamp) {
+  _initTimeSelect (dateTimestamp) {
     let el = this._el
     let timeSelect = $('.time', el)
     timeSelect.fill()
