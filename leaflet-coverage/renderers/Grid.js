@@ -233,7 +233,7 @@ export default class Grid extends L.TileLayer.Canvas {
       } else {
         ax.idx = getClosestIndex(axis, ax.coordPref)
       }
-      ax.coord = this.domain.axes.has(axis) ? this.domain.axes.get(axis).values[ax.idx] : null
+      ax.coord = this.domain.axes.has(axis) ? this.domain.axes.get(axis).values[ax.idx] : undefined
     }
     
     this.fire('dataLoading') // for supporting loading spinners
@@ -284,22 +284,20 @@ export default class Grid extends L.TileLayer.Canvas {
   
   /**
    * The currently active time on the temporal axis as Date object, 
-   * or null if the grid has no time axis.
+   * or undefined if the grid has no time axis.
    */
   get time () {
-    return this.domain.axes.has('t') ? new Date(this._axesSubset.t.coord) : null
+    return this.domain.axes.has('t') ? new Date(this._axesSubset.t.coord) : undefined
   }
   
   get timeSlices () {
-    if (!this.domain.axes.has('t')) {
-      return null
+    if (this.domain.axes.has('t')) {
+      return this.domain.axes.get('t').values.map(t => new Date(t))
     }
-    return this.domain.axes.get('t').values.map(t => new Date(t))
   }
   
   /**
    * Sets the currently active vertical coordinate to the one closest to the given value.
-   * This has no effect if the grid has no vertical axis.
    */
   set vertical (val) {
     if (!this.domain.axes.has('z')) {
@@ -316,17 +314,16 @@ export default class Grid extends L.TileLayer.Canvas {
   
   /**
    * The currently active vertical coordinate as a number, 
-   * or null if the grid has no vertical axis.
+   * or undefined if the grid has no vertical axis.
    */
   get vertical () {
     return this._axesSubset.z.coord
   }
   
   get verticalSlices () {
-    if (!this.domain.axes.has('z')) {
-      throw new Error('No vertical axis found')
+    if (this.domain.axes.has('z')) {
+      return this.domain.axes.get('z').values
     }
-    return this.domain.axes.get('z').values
   }
    
   set palette (p) {

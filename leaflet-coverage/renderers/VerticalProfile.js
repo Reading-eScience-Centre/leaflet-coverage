@@ -24,7 +24,9 @@ class VerticalProfile extends L.Class {
 
     this.cov = cov
     this.param = options.keys ? cov.parameters.get(options.keys[0]) : null
-    this._targetZ = 'targetZ' in options ? options.targetZ : null
+    this._axesSubset = {
+      z: {coordPref: options.vertical}
+    }
     this.defaultColor = options.color ? options.color : DEFAULT_COLOR
         
     if (this.param && this.param.categories) {
@@ -66,6 +68,7 @@ class VerticalProfile extends L.Class {
           console.log('domain and range loaded')
           this.domain = domain
           checkWGS84(domain)
+          this._subsetByCoordinatePreference()
           this.range = range
           this._updatePaletteExtent(this._paletteExtent)
           this._addMarker()
@@ -76,6 +79,7 @@ class VerticalProfile extends L.Class {
       promise = this.cov.loadDomain().then(domain => {
         console.log('domain loaded')
         this.domain = domain
+        this._subsetByCoordinatePreference()
         checkWGS84(domain)
         this._addMarker()
         this.fire('add')
@@ -91,6 +95,20 @@ class VerticalProfile extends L.Class {
     })
   }
   
+  _subsetByCoordinatePreference () {
+    // adapted from Grid.js
+    let z = this._axesSubset.z
+    if (z.coordPref == undefined) {
+      z.idx = z.coord = undefined
+    } else {
+      let vals = this.domain.axes.get('z').values
+      z.idx = arrays.indexOfNearest(vals, z.coordPref)
+      z.coord = vals[z.idx]
+    }
+    
+    // Note that we don't subset the coverage currently, since there is no real need for it
+  }
+  
   onRemove (map) {
     this.fire('remove')
     this._removeMarker()
@@ -104,14 +122,19 @@ class VerticalProfile extends L.Class {
     return this.param
   }
   
-  get targetZ () {
-    return this._targetZ
+  get vertical () {
+    return this._axesSubset.z.coord
   }
   
-  set targetZ (z) {
-    this._targetZ = z
+  set vertical (val) {
+    this._axesSubset.z.coordPref = val
+    this._subsetByCoordinatePreference()
     this._doAutoRedraw()
-    this.fire('targetZChange')
+    this.fire('axisChange', {axis: 'vertical'}) 
+  }
+  
+  get verticalSlices () {
+    return this.domain.axes.get('z').values
   }
   
   set palette (p) {
@@ -167,12 +190,9 @@ class VerticalProfile extends L.Class {
   }
   
   _getColor () {
-    let {z} = this.domain.axes.get('z').values
-        
-    if (this.param && this.targetZ !== null) {
+    if (this.param && this._axesSubset.z.coord !== undefined) {
       // use a palette
-      // find the value with z nearest to targetZ
-      let val = this.range.get({z: arrays.indexOfNearest(z, this.targetZ)})
+      let val = this.range.get({z: this._axesSubset.z.idx})
       if (val !== null) {
         let valScaled = scale(val, this.palette, this.paletteExtent)        
         let {red, green, blue} = this.palette
