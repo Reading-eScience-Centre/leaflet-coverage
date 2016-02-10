@@ -139,6 +139,21 @@ export function maskByPolygon (cov, polygon) {
   let polycoords = polygon.coordinates
   let polycount = polycoords.length
   
+  // we convert each polygon into two typed arrays of x and y coordinates
+  // this is purely a speed optimization to allow for efficient loops within pnpoly()
+  let polys = []
+  for (let coords of polycoords) {
+    let firstComponent = coords[0] // no hole support currently
+    let len = firstComponent.length
+    let vertx = new Float64Array(len)
+    let verty = new Float64Array(len)
+    for (let i=0; i < len; i++) {
+      vertx[i] = firstComponent[i][0]
+      verty[i] = firstComponent[i][1]
+    }
+    polys.push([vertx, verty])
+  }
+  
   return cov.loadDomain().then(domain => {
     let x = domain.axes.get('x').values
     let y = domain.axes.get('y').values
@@ -147,7 +162,7 @@ export function maskByPolygon (cov, polygon) {
       for (let j=0; j < y.length; j++) {
         let inside
         for (let p=0; p < polycount; p++) {
-          inside = pnpoly(x[i], y[j], polycoords[p][0])
+          inside = pnpoly(x[i], y[j], polys[p][0], polys[p][1])
           if (inside) {
             break
           }
@@ -200,7 +215,22 @@ export function subsetByBbox (cov, bbox) {
  * @param {Array} polygon an array of 2-item arrays of coordinates.
  * @returns {boolean} true if point is inside or false if not
  */
-export function pnpoly (x, y, polygon) {
+export function pnpoly (x, y, vertx, verty) {
+  let inside = false
+  for (let i = 0, j = vertx.length - 1; i < vertx.length; j = i++) {
+    let xi = vertx[i]
+    let yi = verty[i]
+    let xj = vertx[j]
+    let yj = verty[j]
+
+    if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+      inside = !inside
+    }
+  }
+  return inside
+}
+
+export function pnpoly_old (x, y, polygon) {
   let inside = false
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
     let [xi,yi] = polygon[i]
