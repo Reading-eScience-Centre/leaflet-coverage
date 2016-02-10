@@ -118,7 +118,7 @@ export function mapRange (cov, key, fn, dataType) {
  * domain types only.
  * 
  * @param {Coverage} cov A Coverage object.
- * @param {Object} polygon A GeoJSON Polygon or MultiPolygon object without holes.
+ * @param {Object} polygon A GeoJSON Polygon or MultiPolygon object.
  * @returns {Promise<Coverage>}
  */
 export function maskByPolygon (cov, polygon) {
@@ -132,25 +132,16 @@ export function maskByPolygon (cov, polygon) {
       coordinates: [polygon.coordinates]
     }
   }
-  /*
-  if (polygon.coordinates.some(poly => poly.length > 1)) {
-    throw new Error('Polygons cannot have holes currently')
-  }*/
-  let polycoords = polygon.coordinates
-  let polycount = polycoords.length
-  
-  // we convert each polygon into two typed arrays of x and y coordinates
-  // this is purely a speed optimization to allow for efficient loops within pnpoly()
-  let typedpolys = []
-  for (let coords of polycoords) {
-    let nvert = coords.map(c => c.length).reduce((len1,len2) => len1 + len2)
-    let vertIdx = 0
-    if (coords.length > 1) {
-      nvert += coords.length + 1 // for (0,0) pairs
-      vertIdx = 1 // jump over first (0,0)
-    }
-    let vertx = new Float64Array(nvert)
-    let verty = new Float64Array(nvert)
+
+  // prepare polygon coordinates for pnpoly algorithm
+  // each polygon component is surrounded by (0,0) vertices
+  let nvert = 1 + polygon.coordinates
+    .map(poly => poly.map(comp => comp.length + 1).reduce((n1,n2) => n1 + n2))
+    .reduce((n1,n2) => n1 + n2)
+  let vertx = new Float64Array(nvert)
+  let verty = new Float64Array(nvert)
+  let vertIdx = 1
+  for (let coords of polygon.coordinates) {
     for (let p=0; p < coords.length; p++) {
       let comp = coords[p]
       for (let i=0; i < comp.length; i++, vertIdx++) {
@@ -159,7 +150,6 @@ export function maskByPolygon (cov, polygon) {
       }      
       vertIdx++ // jump over (0,0)
     }
-    typedpolys.push([vertx, verty])
   }
   
   return cov.loadDomain().then(domain => {
@@ -168,13 +158,7 @@ export function maskByPolygon (cov, polygon) {
     let pnpolyCache = ndarray(new Uint8Array(x.length * y.length), [x.length, y.length])
     for (let i=0; i < x.length; i++) {
       for (let j=0; j < y.length; j++) {
-        let inside
-        for (let p=0; p < polycount; p++) {
-          inside = pnpoly(x[i], y[j], typedpolys[p][0], typedpolys[p][1])
-          if (inside) {
-            break
-          }
-        }
+        let inside = pnpoly(x[i], y[j], vertx, verty)
         pnpolyCache.set(i, j, inside)
       }
     }
