@@ -132,26 +132,34 @@ export function maskByPolygon (cov, polygon) {
       coordinates: [polygon.coordinates]
     }
   }
-  
+  /*
   if (polygon.coordinates.some(poly => poly.length > 1)) {
     throw new Error('Polygons cannot have holes currently')
-  }
+  }*/
   let polycoords = polygon.coordinates
   let polycount = polycoords.length
   
   // we convert each polygon into two typed arrays of x and y coordinates
   // this is purely a speed optimization to allow for efficient loops within pnpoly()
-  let polys = []
+  let typedpolys = []
   for (let coords of polycoords) {
-    let firstComponent = coords[0] // no hole support currently
-    let len = firstComponent.length
-    let vertx = new Float64Array(len)
-    let verty = new Float64Array(len)
-    for (let i=0; i < len; i++) {
-      vertx[i] = firstComponent[i][0]
-      verty[i] = firstComponent[i][1]
+    let nvert = coords.map(c => c.length).reduce((len1,len2) => len1 + len2)
+    let vertIdx = 0
+    if (coords.length > 1) {
+      nvert += coords.length + 1 // for (0,0) pairs
+      vertIdx = 1 // jump over first (0,0)
     }
-    polys.push([vertx, verty])
+    let vertx = new Float64Array(nvert)
+    let verty = new Float64Array(nvert)
+    for (let p=0; p < coords.length; p++) {
+      let comp = coords[p]
+      for (let i=0; i < comp.length; i++, vertIdx++) {
+        vertx[vertIdx] = comp[i][0]
+        verty[vertIdx] = comp[i][1]
+      }      
+      vertIdx++ // jump over (0,0)
+    }
+    typedpolys.push([vertx, verty])
   }
   
   return cov.loadDomain().then(domain => {
@@ -162,7 +170,7 @@ export function maskByPolygon (cov, polygon) {
       for (let j=0; j < y.length; j++) {
         let inside
         for (let p=0; p < polycount; p++) {
-          inside = pnpoly(x[i], y[j], polys[p][0], polys[p][1])
+          inside = pnpoly(x[i], y[j], typedpolys[p][0], typedpolys[p][1])
           if (inside) {
             break
           }
@@ -212,29 +220,18 @@ export function subsetByBbox (cov, bbox) {
  *
  * @param {number} x x coordinate of point
  * @param {number} y y coordinate of point
- * @param {Array} polygon an array of 2-item arrays of coordinates.
+ * @param {Array} vertx array of polygon x coordinates.
+ * @param {Array} verty array of polygon y coordinates.
  * @returns {boolean} true if point is inside or false if not
  */
 export function pnpoly (x, y, vertx, verty) {
   let inside = false
-  for (let i = 0, j = vertx.length - 1; i < vertx.length; j = i++) {
+  let nvert = vertx.length
+  for (let i = 0, j = nvert - 1; i < nvert; j = i++) {
     let xi = vertx[i]
     let yi = verty[i]
     let xj = vertx[j]
     let yj = verty[j]
-
-    if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
-      inside = !inside
-    }
-  }
-  return inside
-}
-
-export function pnpoly_old (x, y, polygon) {
-  let inside = false
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    let [xi,yi] = polygon[i]
-    let [xj,yj] = polygon[j]
 
     if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
       inside = !inside
