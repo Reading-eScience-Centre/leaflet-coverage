@@ -142,6 +142,28 @@ class ParameterSync extends L.Class {
       this.fire('parameterAdd', {syncLayer: new SyncLayer(param, this)})
     }
   }
+  /**
+   * Pause synchronization. This is useful when a property of
+   * many layers has to be set manually (like paletteExtent = 'fov') and
+   * the synchronization shall happen afterwards (see resume()).
+   */
+  pause () {
+    this.paused = true
+  }
+  
+  /**
+   * Resumes synchronization.
+   * 
+   * @param {bool} [sync] If true, then all layers will be synchronized immediately.
+   */
+  resume (sync) {
+    this.paused = false
+    if (sync) {
+      for (let param of this._paramLayers.keys()) {
+        this._syncProperties(param)
+      }
+    }
+  }
   
   _removeLayer (layer, param) {
     for (let [type, fn] of this._layerListeners.get(layer)) {
@@ -179,7 +201,7 @@ class ParameterSync extends L.Class {
   }
   
   _syncProperty (param, prop) {
-    if (this._propSyncing.has(prop)) {
+    if (this.paused || this._propSyncing.has(prop)) {
       return
     }
     let propreduce = this._syncProps[prop]
