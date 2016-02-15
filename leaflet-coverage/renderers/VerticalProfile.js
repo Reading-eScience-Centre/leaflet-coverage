@@ -117,6 +117,10 @@ class VerticalProfile extends L.Class {
   getBounds () {
     return this.marker.getBounds()
   }
+  
+  getLatLng () {
+    return this.marker.getLatLng()
+  }
     
   get parameter () {
     return this.param
