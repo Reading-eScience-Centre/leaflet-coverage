@@ -35,7 +35,7 @@ class Trajectory extends L.FeatureGroup {
     this.param = cov.parameters.get(options.keys[0])
     
     if (this.param.categories) {
-      throw new Error('category parameters are currently not support for Trajectory')
+      throw new Error('category parameters are currently not supported for Trajectory')
     }
     
     this._palette = options.palette || DEFAULT_PALETTE
@@ -114,6 +114,15 @@ class Trajectory extends L.FeatureGroup {
   
   get paletteExtent () {
     return this._paletteExtent
+  }
+  
+  /**
+   * Return the displayed value closest to the circle centre.
+   * If no point exists within the circle, undefined is returned,
+   * otherwise a number or null (for no-data).
+   */
+  getValueAt (latlng, radius) {
+    // TODO implement    
   }
   
   _updatePaletteExtent (extent) {

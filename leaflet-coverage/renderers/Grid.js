@@ -411,6 +411,36 @@ export default class Grid extends L.TileLayer.Canvas {
   get paletteExtent () {
     return this._paletteExtent
   }
+  
+  /**
+   * Return the displayed value at a given geographic position.
+   * If out of bounds, then undefined is returned, otherwise a number or null (for no data).
+   */
+  getValueAt (latlng) {
+    if (!latlng) throw new Error('latlng parameter missing')
+    // TODO see drawTile(), domain must be lat/lon for now
+    let x = this.domain.axes.get('x').values
+    let y = this.domain.axes.get('y').values
+    let bbox = this._getDomainBbox()
+    let lonRange = [bbox[0], bbox[0] + 360]
+    let {lat, lon} = latlng
+    
+    // we first check whether the tile pixel is outside the domain bounding box
+    // in that case we skip it as we do not want to extrapolate
+    if (lat < bbox[1] || lat > bbox[3]) {
+      return
+    }
+
+    lon = wrapLongitude(lon, lonRange)
+    if (lon < bbox[0] || lon > bbox[2]) {
+      return
+    }
+
+    let iLat = arrays.indexOfNearest(y, lat)
+    let iLon = arrays.indexOfNearest(x, lon)
+
+    return this.subsetRange.get({y: iLat, x: iLon})
+  }
     
   drawTile (canvas, tilePoint, zoom) {
     if (this.errored) return
@@ -486,8 +516,7 @@ export default class Grid extends L.TileLayer.Canvas {
       } else {
         // TODO if the map projection base CRS matches the CRS of the domain,
         //      could we still draw the grid in projected coordinates?
-        // -> e.g. UK domain CRS (not projected! easting, northing) and 
-        //         UK basemap in that CRS
+        // -> e.g. UK domain CRS and UK basemap in that CRS
         
         throw new Error('Cannot draw grid, spatial CRS is not geodetic ' + 
             'and no geodetic transform data is available')

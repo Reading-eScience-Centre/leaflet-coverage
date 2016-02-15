@@ -194,17 +194,30 @@ class VerticalProfile extends L.Class {
     delete this.marker
   }
   
-  _getColor () {
+  /**
+   * Return the displayed value (number, or null for no-data),
+   * or undefined if not fixed to a z-coordinate or parameter.
+   */
+  getValue () {
     if (this.param && this._axesSubset.z.coord !== undefined) {
-      // use a palette
       let val = this.range.get({z: this._axesSubset.z.idx})
-      if (val !== null) {
-        let valScaled = scale(val, this.palette, this.paletteExtent)        
-        let {red, green, blue} = this.palette
-        return `rgb(${red[valScaled]}, ${green[valScaled]}, ${blue[valScaled]})`
-      }
+      return val
+    }    
+  }
+  
+  _getColor () {
+    let val = this.getValue()
+    if (val === null) {
+      // no-data
+    } else if (val === undefined) {
+      // not fixed to a param or z-coordinate
+      return this.defaultColor
+    } else {
+      // use a palette
+      let valScaled = scale(val, this.palette, this.paletteExtent)        
+      let {red, green, blue} = this.palette
+      return `rgb(${red[valScaled]}, ${green[valScaled]}, ${blue[valScaled]})`
     }
-    return this.defaultColor
   }
   
   _updateMarker () {
