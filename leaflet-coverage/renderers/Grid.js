@@ -79,7 +79,7 @@ export default class Grid extends L.TileLayer.Canvas {
         throw new Error('paletteExtent cannot be given for categorical parameters')
       }
     } else {
-      if (options.paletteExtent === undefined) {
+      if (!options.paletteExtent) {
         this._paletteExtent = 'subset'
       } else if (Array.isArray(options.paletteExtent) || ['subset', 'fov'].indexOf(options.paletteExtent) !== -1) {
         this._paletteExtent = options.paletteExtent

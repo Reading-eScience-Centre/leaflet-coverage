@@ -1,5 +1,6 @@
 const COVJSON_PREFIX = 'http://coveragejson.org/def#'
 export const COVJSON_VERTICALPROFILE = COVJSON_PREFIX + 'VerticalProfile'
+export const COVJSON_VERTICALPROFILECOLLECTION = COVJSON_VERTICALPROFILE + 'CoverageCollection'
 export const COVJSON_GRID = COVJSON_PREFIX + 'Grid'
 export const COVJSON_TRAJECTORY = COVJSON_PREFIX + 'Trajectory'
 export const COVJSON_MULTIPOLYGON = COVJSON_PREFIX + 'MultiPolygon'

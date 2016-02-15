@@ -5,8 +5,8 @@ import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
 import {COVJSON_VERTICALPROFILE, checkProfile} from '../util/constants.js'
 
-const DEFAULT_COLOR = 'black'
-const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
+export const DEFAULT_COLOR = 'black'
+export const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
   
 /**
  * Renderer for Coverages with domain type Profile.
@@ -30,7 +30,7 @@ class VerticalProfile extends L.Class {
     this.defaultColor = options.color ? options.color : DEFAULT_COLOR
         
     if (this.param && this.param.categories) {
-      throw new Error('category parameters are currently not support for Profile')
+      throw new Error('category parameters are currently not support for VerticalProfile')
     }
     
     this._palette = options.palette || DEFAULT_PALETTE
@@ -173,7 +173,7 @@ class VerticalProfile extends L.Class {
     }
     
     if (!this.param) {
-      throw new Error('palette extent cannot be set when no profile parameter has been chosen')
+      throw new Error('palette extent cannot be set when no parameter has been chosen')
     }
 
     this._paletteExtent = rangeutil.minMax(this.range)
@@ -186,8 +186,8 @@ class VerticalProfile extends L.Class {
     let y = this.domain.axes.get('y').values[0]
     this.marker = L.circleMarker(L.latLng(y, x), {color: this._getColor()})
     
-    this.marker.on('click', () => {
-      this.fire('click')
+    this.marker.on('click', e => {
+      this.fire('click', e)
     })
     
     this.marker.addTo(this._map)
