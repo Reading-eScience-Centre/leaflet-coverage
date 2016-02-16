@@ -51,7 +51,7 @@ export default class Grid extends L.TileLayer.Canvas {
     this.cov = cov
     this.param = cov.parameters.get(options.keys[0])
     this._axesSubset = { // x and y are not subsetted
-        t: {coordPref: options.time},
+        t: {coordPref: options.time ? options.time.toISOString() : undefined},
         z: {coordPref: options.vertical}
     }
     this._initCategoryIdxMap()
@@ -206,47 +206,29 @@ export default class Grid extends L.TileLayer.Canvas {
    * After calling this method, _axesSubset.*.idx and _axesSubset.*.coord have
    * values from the actual axes.
    */
-  _subsetByCoordinatePreference () {    
-    /**
-     * Return the index of the coordinate value closest to the given value
-     * within the given axis. Supports ascending and descending axes.
-     * If the axis does not exist, then undefined is returned.
-     */
-    let getClosestIndex = (axis, val) => {
-      if (!this.domain.axes.has(axis)) {
-        return
-      }
-      let vals = this.domain.axes.get(axis).values
-      if (axis === 't') {
-        // convert to unix timestamps as we need numbers
-        val = val.getTime()
-        vals = vals.map(t => new Date(t).getTime())
-      }
-      let idx = arrays.indexOfNearest(vals, val)
-      return idx
-    }
-    
+  _subsetByCoordinatePreference () {        
+    let spec = {}
     for (let axis of Object.keys(this._axesSubset)) {
       let ax = this._axesSubset[axis]
       if (ax.coordPref == undefined && this.domain.axes.has(axis)) { // == also handles null
-        ax.idx = 0
+        spec[axis] = this.domain.axes.get(axis).values[0]
       } else {
-        ax.idx = getClosestIndex(axis, ax.coordPref)
+        spec[axis] = {target: ax.coordPref}
       }
-      ax.coord = this.domain.axes.has(axis) ? this.domain.axes.get(axis).values[ax.idx] : undefined
     }
     
     this.fire('dataLoading') // for supporting loading spinners
-    return this.cov.subsetByIndex({t: this._axesSubset.t.idx, z: this._axesSubset.z.idx})
+    return this.cov.subsetByValue(spec)
       .then(subsetCov => {
         this.subsetCov = subsetCov
         //  the goal is to avoid reloading data when approximating palette extent via subsetting
         //  but: memory has to be freed when the layer is removed from the map
         //      -> therefore cacheRanges is set on subsetCov whose reference is removed on onRemove
-        this.subsetCov.cacheRanges = true
-        return this.subsetCov.loadRange(this.param.key)
+        subsetCov.cacheRanges = true
+        return Promise.all([subsetCov.loadDomain(), subsetCov.loadRange(this.param.key)])
       })
-      .then(subsetRange => {
+      .then(([subsetDomain, subsetRange]) => {
+        this.subsetDomain = subsetDomain
         this.subsetRange = subsetRange
         if (!this.param.observedProperty.categories) {
           return this._updatePaletteExtent(this._paletteExtent)
@@ -267,14 +249,14 @@ export default class Grid extends L.TileLayer.Canvas {
   
   /**
    * Sets the currently active time to the one closest to the given Date object.
-   * This has no effect if the grid has no time axis.
+   * Throws an exception if there is no time axis.
    */
   set time (val) {
     if (!this.domain.axes.has('t')) {
       throw new Error('No time axis found')
     }
     let old = this.time
-    this._axesSubset.t.coordPref = val
+    this._axesSubset.t.coordPref = val.toISOString()
     this._subsetByCoordinatePreference().then(() => {
       if (old === this.time) return
       this._doAutoRedraw()
@@ -287,7 +269,10 @@ export default class Grid extends L.TileLayer.Canvas {
    * or undefined if the grid has no time axis.
    */
   get time () {
-    return this.domain.axes.has('t') ? new Date(this._axesSubset.t.coord) : undefined
+    if (this.domain.axes.has('t')) {
+      let time = this.subsetDomain.axes.get('t').values[0]
+      return new Date(time)
+    }
   }
   
   get timeSlices () {
@@ -317,7 +302,10 @@ export default class Grid extends L.TileLayer.Canvas {
    * or undefined if the grid has no vertical axis.
    */
   get vertical () {
-    return this._axesSubset.z.coord
+    if (this.domain.axes.has('z')) {
+      let val = this.subsetDomain.axes.get('z').values[0]
+      return val
+    }
   }
   
   get verticalSlices () {
