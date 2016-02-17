@@ -138,7 +138,7 @@ class PointCollection extends L.Class {
   }
   
   get palette () {
-    return this._palette
+    return this.param ? this._palette : undefined
   }
   
   set palette (val) {

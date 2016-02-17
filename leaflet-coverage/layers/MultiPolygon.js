@@ -73,7 +73,7 @@ class MultiPolygon extends L.Class {
   }
   
   get palette () {
-    return this.param && this.targetZ !== null ? this._palette : null
+    return this.param ? this._palette : null
   }
   
   set paletteExtent (extent) {
