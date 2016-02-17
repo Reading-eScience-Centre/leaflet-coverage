@@ -72,12 +72,13 @@ describe("util/transform methods", () => {
   
   describe("#pnpoly", () => {
     it('should produce correct results', () => {
-      let poly = [[1, 10], [2, 10], [2, 20], [1, 20]]
-      assert(transform.pnpoly(1.5, 15, poly))
-      assert(!transform.pnpoly(0.5, 15, poly))
-      assert(!transform.pnpoly(2.5, 15, poly))
-      assert(!transform.pnpoly(1.5, 25, poly))
-      assert(!transform.pnpoly(1.5, 5, poly))
+      let vertx = [1, 2, 2, 1]
+      let verty = [10, 10, 20, 20]
+      assert(transform.pnpoly(1.5, 15, vertx, verty))
+      assert(!transform.pnpoly(0.5, 15, vertx, verty))
+      assert(!transform.pnpoly(2.5, 15, vertx, verty))
+      assert(!transform.pnpoly(1.5, 25, vertx, verty))
+      assert(!transform.pnpoly(1.5, 5, vertx, verty))
     })
   })
   
@@ -91,7 +92,8 @@ describe("util/transform methods", () => {
           "x" : { "values": [-10,5] },
           "y" : { "values": [40] }
         },
-        "rangeAxisOrder": ["y", "x"]
+        "rangeAxisOrder": ["y", "x"],
+        "referencing": []
       },
       "parameters" : {
         "ICEC": {

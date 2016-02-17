@@ -1,6 +1,6 @@
 import assert from 'assert'
 
-import * as palettes from 'leaflet-coverage/renderers/palettes.js'
+import * as palettes from 'leaflet-coverage/layers/palettes.js'
 
 describe('renderers/palettes', () => {
   describe('#directPalette', () => {
