@@ -4,7 +4,6 @@ import {linearPalette, directPalette, scale} from './palettes.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
-import {COVJSON_GRID, checkProfile} from '../util/constants.js'
   
 const DEFAULT_CONTINUOUS_PALETTE = () => linearPalette(['#deebf7', '#3182bd']) // blues
 const DEFAULT_CATEGORICAL_PALETTE = n => linearPalette(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3'], n)
@@ -46,7 +45,6 @@ export default class Grid extends L.TileLayer.Canvas {
    */
   constructor (cov, options) {
     super()
-    checkProfile(cov.domainProfiles, COVJSON_GRID)
     
     this.cov = cov
     this.param = cov.parameters.get(options.keys[0])
@@ -86,13 +84,6 @@ export default class Grid extends L.TileLayer.Canvas {
       } else {
         throw new Error('paletteExtent must either be a 2-element array, one of "subset" or "fov", or be omitted')
       }
-    }
-    
-    switch (options.redraw) {
-    case 'manual': this._autoRedraw = false; break
-    case undefined:
-    case 'onchange': this._autoRedraw = true; break
-    default: throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")')
     }
   }
   
@@ -259,7 +250,7 @@ export default class Grid extends L.TileLayer.Canvas {
     this._axesSubset.t.coordPref = val.toISOString()
     this._subsetByCoordinatePreference().then(() => {
       if (old === this.time) return
-      this._doAutoRedraw()
+      this._redraw()
       this.fire('axisChange', {axis: 'time'})
     })
   }
@@ -292,7 +283,7 @@ export default class Grid extends L.TileLayer.Canvas {
     this._axesSubset.z.coordPref = val
     this._subsetByCoordinatePreference().then(() => {
       if (old === this.vertical) return
-      this._doAutoRedraw()
+      this._redraw()
       this.fire('axisChange', {axis: 'vertical'}) 
     })  
   }
@@ -321,7 +312,7 @@ export default class Grid extends L.TileLayer.Canvas {
    
   set palette (p) {
     this._palette = p
-    this._doAutoRedraw()
+    this._redraw()
     this.fire('paletteChange')
   }
   
@@ -391,7 +382,7 @@ export default class Grid extends L.TileLayer.Canvas {
     }
     this._updatePaletteExtent(extent).then(changed => {
       if (!changed) return
-      this._doAutoRedraw()
+      this._redraw()
       this.fire('paletteExtentChange')
     })
   }
@@ -673,10 +664,10 @@ export default class Grid extends L.TileLayer.Canvas {
     return false
   }
   
-  _doAutoRedraw () {
+  _redraw () {
     // we check getContainer() to prevent errors when trying to redraw when the layer has not
     // fully initialized yet
-    if (this._autoRedraw && this.getContainer()) {
+    if (this.getContainer()) {
       this.redraw()
     }
   }

@@ -1,7 +1,6 @@
 import L from 'leaflet'
 
-import {default as VerticalProfile, DEFAULT_COLOR, DEFAULT_PALETTE} from './VerticalProfile.js'
-import {COVJSON_VERTICALPROFILECOLLECTION, checkProfile} from '../util/constants.js'
+import {default as Point, DEFAULT_COLOR, DEFAULT_PALETTE} from './Point.js'
 import kdTree from '../util/kdTree.js'
 
 
@@ -12,18 +11,18 @@ import kdTree from '../util/kdTree.js'
  * A collection of vertical profiles sharing the same parameters / referencing.
  * 
  */
-class VerticalProfileCollection extends L.Class {
+class PointCollection extends L.Class {
   constructor (covcoll, options) {
     super()
-    checkProfile(covcoll.profiles, COVJSON_VERTICALPROFILECOLLECTION)
     
     // TODO how should we handle collection paging?
 
     this.covcoll = covcoll
     this.param = options.keys ? covcoll.parameters.get(options.keys[0]) : null
-    this._vertical = options.vertical
-    this.defaultColor = options.color ? options.color : DEFAULT_COLOR
-            
+    this.defaultColor = options.color || DEFAULT_COLOR
+    this.pointClass = options.pointClass || Point
+    this.pointOptionsFn = options.pointOptionsFn
+    
     if (this.param && this.param.categories) {
       throw new Error('category parameters are currently not supported for VerticalProfileCollection')
     }
@@ -36,14 +35,6 @@ class VerticalProfileCollection extends L.Class {
       this._paletteExtent = options.paletteExtent
     } else {
       throw new Error('paletteExtent must either be a 2-element array, one of "full" or "fov", or be omitted')
-    }
-        
-    // TODO remove code duplication
-    switch (options.redraw) {
-    case 'manual': this._autoRedraw = false; break
-    case undefined:
-    case 'onchange': this._autoRedraw = true; break
-    default: throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")')
     }
         
     this._layerGroup = L.layerGroup()
@@ -59,13 +50,17 @@ class VerticalProfileCollection extends L.Class {
     let options = {
       keys: this.param ? [this.param.key] : undefined,
       color: this.defaultColor,
-      vertical: this._vertical,
       palette: this._palette,
-      paletteExtent: this._paletteExtent,
-      redraw: this._autoRedraw ? 'onchange' : 'manual'
+      paletteExtent: this._paletteExtent
+    }
+    if (this.pointOptionsFn) {
+      let opts = this.pointOptionsFn()
+      for (let key in opts) {
+        options[key] = opts[key]
+      }
     }
     for (let cov of this.covcoll) {
-      let layer = new VerticalProfile(cov, options)
+      let layer = new this.pointClass(cov, options)
       this._attachListeners(layer, cov)
       this._layerGroup.addLayer(layer)
       this._layers.push(layer)
@@ -141,21 +136,14 @@ class VerticalProfileCollection extends L.Class {
   get parameter () {
     return this.param
   }
-    
-  set vertical (val) {
-    this._vertical = val
-    for (let layer of this._layerGroup.getLayers()) {
-      layer.vertical = val
-    }
-  }
   
   get palette () {
-    return this.param && this._vertical !== undefined ? this._palette : undefined
+    return this._palette
   }
   
   set palette (val) {
     this._palette = val
-    for (let layer of this._layerGroup.getLayers()) {
+    for (let layer of this._layers) {
       layer.palette = val
     }
     this.fire('paletteChange')
@@ -163,7 +151,7 @@ class VerticalProfileCollection extends L.Class {
   
   set paletteExtent (extent) {
     this._updatePaletteExtent(extent)
-    for (let layer of this._layerGroup.getLayers()) {
+    for (let layer of this._layers) {
       layer.paletteExtent = this._paletteExtent
     }
     this.fire('paletteExtentChange')
@@ -202,9 +190,15 @@ class VerticalProfileCollection extends L.Class {
     }
     this._paletteExtent = [min, max]
   }
+  
+  redraw () {
+    for (let layer of this._layers) {
+      layer.redraw()
+    }
+  }
 }
 
-VerticalProfileCollection.include(L.Mixin.Events)
+PointCollection.include(L.Mixin.Events)
 
-//work-around for Babel bug, otherwise VerticalProfileCollection cannot be referenced here
-export { VerticalProfileCollection as default }
+//work-around for Babel bug, otherwise PointCollection cannot be referenced here
+export { PointCollection as default }

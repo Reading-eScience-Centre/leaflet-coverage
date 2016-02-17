@@ -2,7 +2,6 @@ import L from 'leaflet'
 import {linearPalette, scale} from './palettes.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
-import {COVJSON_MULTIPOLYGON, checkProfile} from '../util/constants.js'
 
 const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
   
@@ -13,7 +12,6 @@ class MultiPolygon extends L.Class {
   
   constructor (cov, options) {
     super()
-    checkProfile(cov.domainProfiles, COVJSON_MULTIPOLYGON)
     
     this.cov = cov
     this.param = cov.parameters.get(options.keys[0])
@@ -23,14 +21,6 @@ class MultiPolygon extends L.Class {
       this._paletteExtent = options.paletteExtent
     } else {
       this._paletteExtent = 'full'
-    }
-        
-    // TODO remove code duplication
-    switch (options.redraw) {
-    case 'manual': this._autoRedraw = false; break
-    case undefined:
-    case 'onchange': this._autoRedraw = true; break
-    default: throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")')
     }
   }
   
@@ -78,7 +68,7 @@ class MultiPolygon extends L.Class {
     
   set palette (p) {
     this._palette = p
-    this._doAutoRedraw()
+    this.redraw()
     this.fire('paletteChange')
   }
   
@@ -88,7 +78,7 @@ class MultiPolygon extends L.Class {
   
   set paletteExtent (extent) {
     this._updatePaletteExtent(extent)
-    this._doAutoRedraw()
+    this.redraw()
     this.fire('paletteExtentChange')
   }
   
@@ -160,12 +150,6 @@ class MultiPolygon extends L.Class {
   _updatePolygons () {
     this._removePolygons()
     this._addPolygons()
-  }
-  
-  _doAutoRedraw () {
-    if (this._autoRedraw) {
-      this.redraw()
-    }
   }
   
   redraw () {

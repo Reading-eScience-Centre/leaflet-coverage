@@ -2,7 +2,6 @@ import L from 'leaflet'
 import {linearPalette, scale} from './palettes.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
-import {COVJSON_TRAJECTORY, checkProfile} from '../util/constants.js'
 
 const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
   
@@ -29,7 +28,6 @@ class Trajectory extends L.FeatureGroup {
   
   constructor (cov, options) {
     super()
-    checkProfile(cov.domainProfiles, COVJSON_TRAJECTORY)
     
     this.cov = cov
     this.param = cov.parameters.get(options.keys[0])
@@ -47,15 +45,6 @@ class Trajectory extends L.FeatureGroup {
       throw new Error('paletteExtent must either be a 2-element array, ' +
           'one of "full", "subset" (identical to "full" for trajectories) or "fov", or be omitted')
     }
-    // TODO remove code duplication
-    switch (options.redraw) {
-    case 'manual': this._autoRedraw = false; break
-    case undefined:
-    case 'onchange': this._autoRedraw = true; break
-    default: throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")')
-    }
-    
-    console.log('Trajectory layer created')
   }
   
   onAdd (map) {
@@ -98,7 +87,7 @@ class Trajectory extends L.FeatureGroup {
   
   set palette (p) {
     this._palette = p
-    this._doAutoRedraw()
+    this.redraw()
     this.fire('paletteChange')
   }
   
@@ -108,7 +97,7 @@ class Trajectory extends L.FeatureGroup {
   
   set paletteExtent (extent) {
     this._updatePaletteExtent(extent)
-    this._doAutoRedraw()
+    this.redraw()
     this.fire('paletteExtentChange')
   }
   
@@ -185,12 +174,6 @@ class Trajectory extends L.FeatureGroup {
       })
     
     this.addLayer(polyline)
-  }
-  
-  _doAutoRedraw () {
-    if (this._autoRedraw) {
-      this.redraw()
-    }
   }
   
   redraw () {

@@ -1,13 +1,12 @@
 import L from 'leaflet'
-import {linearPalette, scale} from './palettes.js'
+import {scale} from './palettes.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
-import {COVJSON_VERTICALPROFILE, checkProfile} from '../util/constants.js'
+import MarkerMixin from './MarkerMixin.js'
 
-export const DEFAULT_COLOR = 'black'
-export const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
-  
+import {DEFAULT_COLOR, DEFAULT_PALETTE} from './Point.js'
+
 /**
  * Renderer for Coverages with domain type Profile.
  * 
@@ -16,11 +15,10 @@ export const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
  * The dot either has a defined standard color, or it uses
  * a palette together with a target depth if a parameter is chosen.
  */
-class VerticalProfile extends L.Class {
+class VerticalProfile extends MarkerMixin(L.Class) {
   
   constructor (cov, options) {
     super()
-    checkProfile(cov.domainProfiles, COVJSON_VERTICALPROFILE)
 
     this.cov = cov
     this.param = options.keys ? cov.parameters.get(options.keys[0]) : null
@@ -28,6 +26,7 @@ class VerticalProfile extends L.Class {
       z: {coordPref: options.vertical}
     }
     this.defaultColor = options.color ? options.color : DEFAULT_COLOR
+    this.showNoData = options.showNoData // if true, draw with default color
         
     if (this.param && this.param.categories) {
       throw new Error('category parameters are currently not support for VerticalProfile')
@@ -38,14 +37,6 @@ class VerticalProfile extends L.Class {
       this._paletteExtent = options.paletteExtent
     } else {
       this._paletteExtent = 'full'
-    }
-        
-    // TODO remove code duplication
-    switch (options.redraw) {
-    case 'manual': this._autoRedraw = false; break
-    case undefined:
-    case 'onchange': this._autoRedraw = true; break
-    default: throw new Error('redraw must be "onchange", "manual", or omitted (defaults to "onchange")')
     }
   }
   
@@ -65,9 +56,8 @@ class VerticalProfile extends L.Class {
     if (this.param) {
       promise = Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)])
         .then(([domain, range]) => {
-          console.log('domain and range loaded')
-          this.domain = domain
           checkWGS84(domain)
+          this.domain = domain
           this._subsetByCoordinatePreference()
           this.range = range
           this._updatePaletteExtent(this._paletteExtent)
@@ -77,10 +67,9 @@ class VerticalProfile extends L.Class {
         })
     } else {
       promise = this.cov.loadDomain().then(domain => {
-        console.log('domain loaded')
+        checkWGS84(domain)
         this.domain = domain
         this._subsetByCoordinatePreference()
-        checkWGS84(domain)
         this._addMarker()
         this.fire('add')
         this.fire('dataLoad')
@@ -90,7 +79,6 @@ class VerticalProfile extends L.Class {
     promise.catch(e => {
       console.error(e)
       this.fire('error', e)
-      
       this.fire('dataLoad')
     })
   }
@@ -109,17 +97,20 @@ class VerticalProfile extends L.Class {
     // Note that we don't subset the coverage currently, since there is no real need for it
   }
   
-  onRemove (map) {
+  onRemove () {
     this.fire('remove')
     this._removeMarker()
   }
   
   getBounds () {
-    return this.marker.getBounds()
+    return L.latLngBounds([this.getLatLng()])
   }
   
   getLatLng () {
-    return this.marker.getLatLng()
+    // TODO convert coordinates to lat/lon if necessary
+    let x = this.domain.axes.get('x').values[0]
+    let y = this.domain.axes.get('y').values[0]
+    return L.latLng(y, x)
   }
     
   get parameter () {
@@ -133,7 +124,7 @@ class VerticalProfile extends L.Class {
   set vertical (val) {
     this._axesSubset.z.coordPref = val
     this._subsetByCoordinatePreference()
-    this._doAutoRedraw()
+    this.redraw()
     this.fire('axisChange', {axis: 'vertical'}) 
   }
   
@@ -148,7 +139,7 @@ class VerticalProfile extends L.Class {
   
   set palette (p) {
     this._palette = p
-    this._doAutoRedraw()
+    this.redraw()
     this.fire('paletteChange')
   }
   
@@ -158,7 +149,7 @@ class VerticalProfile extends L.Class {
   
   set paletteExtent (extent) {
     this._updatePaletteExtent(extent)
-    this._doAutoRedraw()
+    this.redraw()
     this.fire('paletteExtentChange')
   }
   
@@ -178,26 +169,7 @@ class VerticalProfile extends L.Class {
 
     this._paletteExtent = rangeutil.minMax(this.range)
   }
-  
-  _addMarker () {
-    // TODO do coordinate transformation to lat/lon if necessary
     
-    let x = this.domain.axes.get('x').values[0]
-    let y = this.domain.axes.get('y').values[0]
-    this.marker = L.circleMarker(L.latLng(y, x), {color: this._getColor()})
-    
-    this.marker.on('click', e => {
-      this.fire('click', e)
-    })
-    
-    this.marker.addTo(this._map)
-  }
-  
-  _removeMarker () {
-    this._map.removeLayer(this.marker)
-    delete this.marker
-  }
-  
   /**
    * Return the displayed value (number, or null for no-data),
    * or undefined if not fixed to a z-coordinate or parameter.
@@ -213,6 +185,7 @@ class VerticalProfile extends L.Class {
     let val = this.getValue()
     if (val === null) {
       // no-data
+      return this.defaultColor
     } else if (val === undefined) {
       // not fixed to a param or z-coordinate
       return this.defaultColor
@@ -223,22 +196,6 @@ class VerticalProfile extends L.Class {
       return `rgb(${red[valScaled]}, ${green[valScaled]}, ${blue[valScaled]})`
     }
   }
-  
-  _updateMarker () {
-    this.marker.options.color = this._getColor()
-  }
-  
-  _doAutoRedraw () {
-    if (this._autoRedraw) {
-      this.redraw()
-    }
-  }
-  
-  redraw () {
-    this._updateMarker()
-    this.marker.redraw()
-  }
-  
 }
 
 VerticalProfile.include(L.Mixin.Events)
