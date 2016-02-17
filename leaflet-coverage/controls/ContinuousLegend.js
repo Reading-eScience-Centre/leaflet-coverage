@@ -32,35 +32,100 @@ const DEFAULT_TEMPLATE_CSS = `
 `
 
 /**
- * Displays a palette legend for the parameter displayed by the given
- * Coverage layer.
+ * Displays a continuous legend for the parameter displayed by the given
+ * coverage data layer.
+ * 
+ * Note that this class should only be used if the palette is continuous
+ * by nature, typically having at least 100-200 color steps.
+ * If there are only a few color steps (e.g. 10), then this class
+ * will still show a continuous legend due to its rendering technique
+ * (CSS gradient based).
+ * 
+ * @example <caption>Coverage data layer</caption>
+ * new ContinuousLegend(covLayer).addTo(map)
+ * 
+ * @example <caption>Fake layer</caption>
+ * var fakeLayer = {
+ *   parameter: {
+ *     observedProperty: {
+ *       label: { en: 'Temperature' }
+ *     },
+ *     unit: {
+ *       symbol: 'K',
+ *       label: { en: 'Kelvin' }
+ *     }
+ *   },
+ *   palette: linearPalette(['#FFFFFF', '#000000']),
+ *   paletteExtent: [0, 10]
+ * }
+ * var legend = new ContinuousLegend(fakeLayer).addTo(map)
+ * 
+ * // change palette and trigger manual update
+ * fakeLayer.palette = linearPalette(['blue', 'red'])
+ * legend.update()
  */
 export default class ContinuousLegend extends L.Control {
   
-  constructor (covLayer, options) {
+  /**
+   * Creates a continuous legend control.
+   * 
+   * @param {object} covLayer 
+   *   The coverage data layer, or any object with <code>palette</code>,
+   *   <code>paletteExtent</code>, and <code>parameter</code> properties.
+   *   If the object has <code>on</code>/<code>off</code> methods, then the legend will
+   *   listen for <code>"paletteChange"</code> and <code>"paletteExtentChange"</code>
+   *   events and update itself automatically.
+   *   If the layer fires a <code>"remove"</code> event, then the legend will remove itself
+   *   from the map. 
+   * @param {object} [options] Legend options.
+   * @param {string} [options.position] The initial position of the control (see Leaflet docs).
+   * @param {string} [options.language] A language tag, indicating the preferred language to use for labels.
+   * @param {string} [options.id] Uses the HTML element with the given id as template.
+   */
+  constructor (covLayer, options = {}) {
     super(options.position ? {position: options.position} : {})
-    this.covLayer = covLayer
-    this.id = options.id || DEFAULT_TEMPLATE_ID
-    this.language = options.language || i18n.DEFAULT_LANGUAGE
+    this._covLayer = covLayer
+    this._id = options.id || DEFAULT_TEMPLATE_ID
+    this._language = options.language || i18n.DEFAULT_LANGUAGE
     
     if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
       inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS)
     }   
 
-    // arrow function is broken here with traceur, this is a workaround
-    // see https://github.com/google/traceur-compiler/issues/1987
-    let self = this
-    this._remove = function () {
-      self.removeFrom(self._map)
+    this._remove = () => this.removeFrom(this._map)
+    this._update = () => this._doUpdate(false)
+    if (covLayer.on) {
+      covLayer.on('remove', this._remove)
     }
-    covLayer.on('remove', this._remove)
   }
   
-  updateLegend () {
+  /**
+   * Triggers a manual update of the legend.
+   * 
+   * Useful if the supplied coverage data layer is not a real layer
+   * and won't fire the necessary events for automatic updates.
+   */
+  update () {
+    this._doUpdate(true)
+  }
+  
+  _doUpdate (fullUpdate) {
     let el = this._el
     
-    let palette = this.covLayer.palette
-    let [low,high] = this.covLayer.paletteExtent
+    if (fullUpdate) {
+      let param = this._covLayer.parameter
+      // if requested language doesn't exist, use the returned one for all other labels
+      let language = i18n.getLanguageTag(param.observedProperty.label, this._language) 
+      let title = i18n.getLanguageString(param.observedProperty.label, language)
+      let unit = param.unit ? 
+                 (param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, language)) :
+                 ''
+       $('.legend-title', el).fill(title)
+       $('.legend-uom', el).fill(unit)        
+    }
+    
+    let palette = this._covLayer.palette
+    let [low,high] = this._covLayer.paletteExtent
     
     $('.legend-min', el).fill(low.toFixed(2))
     $('.legend-max', el).fill(high.toFixed(2))
@@ -75,33 +140,31 @@ export default class ContinuousLegend extends L.Control {
          'transparent linear-gradient(to top, ' + gradient + ') repeat scroll 0% 0%')
   }
   
-  onRemove (map) {
-    this.covLayer.off('remove', this._remove)
-    this.covLayer.off('paletteChange', () => this.updateLegend())
-    this.covLayer.off('paletteExtentChange', () => this.updateLegend())
-  }
-  
+  /**
+   * @ignore
+   */
   onAdd (map) {
     this._map = map
     
-    this.covLayer.on('paletteChange', () => this.updateLegend())
-    this.covLayer.on('paletteExtentChange', () => this.updateLegend())
+    if (this._covLayer.on) {
+      this._covLayer.on('paletteChange', this._update)
+      this._covLayer.on('paletteExtentChange', this._update)
+    }
     
-    let param = this.covLayer.parameter
-    // if requested language doesn't exist, use the returned one for all other labels
-    let language = i18n.getLanguageTag(param.observedProperty.label, this.language) 
-    let title = i18n.getLanguageString(param.observedProperty.label, language)
-    let unit = param.unit ? 
-               (param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, language)) :
-               ''
-    
-    let el = fromTemplate(this.id)
-    this._el = el
-    $('.legend-title', el).fill(title)
-    $('.legend-uom', el).fill(unit)
-    this.updateLegend()
-    
-    return el
+    this._el = fromTemplate(this._id)
+    this.update()
+    return this._el
+  }
+  
+  /**
+   * @ignore
+   */
+  onRemove () {
+    if (this._covLayer.off) {
+      this._covLayer.off('remove', this._remove)
+      this._covLayer.off('paletteChange', this._update)
+      this._covLayer.off('paletteExtentChange', this._update)
+    }
   }
   
 }
