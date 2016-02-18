@@ -1,6 +1,8 @@
 import L from 'leaflet'
 import {$,HTML} from 'minified'
 
+import EventedControl from './EventedControl.js'
+
 let TEMPLATE = 
 `<div class="info" style="clear:none">
   <strong class="title">Time</strong><br>
@@ -8,20 +10,25 @@ let TEMPLATE =
   <select name="time" class="time"></select>
 </div>`
 
-export default class TimeAxis extends L.Control {
+/**
+ * Displays a simple date/time picker by grouping
+ * time steps of the coverage data layer hierarchically into dates
+ * and times.
+ */
+export default class TimeAxis extends EventedControl {
   constructor (covLayer, options) {
     options = options || {}
     super(options.position ? {position: options.position} : {position: 'topleft'})
     this._title = options.title
     this.covLayer = covLayer
 
-    this._remove = () => this.removeFrom(this._map)
     if (covLayer.on) {
+      this._remove = () => this.removeFrom(this._map)
       covLayer.on('remove', this._remove)
-    }
-    
-    this._axisListener = e => {
-      if (e.axis === 'time') this.updateAxis(covLayer.time)
+      
+      this._axisListener = e => {
+        if (e.axis === 'time') this.update()
+      }
     }
     
     let timeSlices = this.covLayer.timeSlices
@@ -34,18 +41,11 @@ export default class TimeAxis extends L.Control {
       dateMap.get(dateTimestamp).push(t)
     }
     this._dateMap = dateMap
-    
-    this.time = timeSlices[0]
-  }
-    
-  onRemove (map) {
-    if (this.covLayer.off) {
-      this.covLayer.off('remove', this._remove)
-      this.covLayer.off('axisChange', this._axisListener)
-    }
   }
   
   onAdd (map) {
+    this._map = map
+    
     if (this.covLayer.on) {
       this.covLayer.on('axisChange', this._axisListener)
     }
@@ -69,7 +69,6 @@ export default class TimeAxis extends L.Control {
       let timeSlice = this._dateMap.get(dateTimestamp)[0]
       this.covLayer.time = timeSlice
       this._initTimeSelect(dateTimestamp)
-      this.time = timeSlice
       this.fire('change', {time: timeSlice})
     })
     $('.time', el).on('change', event => {
@@ -77,16 +76,23 @@ export default class TimeAxis extends L.Control {
       let timeStr = event.target.value
       let time = new Date(dateStr + 'T' + timeStr)
       this.covLayer.time = time
-      this.time = time
       this.fire('change', {time: time})
     })
     
-    this.updateAxis(this.covLayer.time)
+    this.update()
     
     return el
   }
   
-  updateAxis (covTime) {
+  onRemove () {
+    if (this.covLayer.off) {
+      this.covLayer.off('remove', this._remove)
+      this.covLayer.off('axisChange', this._axisListener)
+    }
+  }
+  
+  update () {
+    let covTime = this.covLayer.time
     if (!covTime) return
     let el = this._el
     // selects the date set in the cov layer, populates the time select, and selects the time
@@ -127,7 +133,3 @@ function getUTCDateString (timestamp) {
   return date
 }
 
-TimeAxis.include(L.Mixin.Events)
-
-//work-around for Babel bug, otherwise SelectControl cannot be referenced here
-export { TimeAxis as default }

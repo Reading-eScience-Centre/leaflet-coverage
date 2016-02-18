@@ -43,6 +43,8 @@ const DEFAULT_TEMPLATE_CSS = `
  * 
  * @example <caption>Coverage data layer</caption>
  * new ContinuousLegend(covLayer).addTo(map)
+ * // changing the palette of the layer automatically updates the legend 
+ * covLayer.palette = linearPalette(['blue', 'red'])
  * 
  * @example <caption>Fake layer</caption>
  * var fakeLayer = {
@@ -60,9 +62,12 @@ const DEFAULT_TEMPLATE_CSS = `
  * }
  * var legend = new ContinuousLegend(fakeLayer).addTo(map)
  * 
- * // change palette and trigger manual update
+ * // change the palette and trigger a manual update
  * fakeLayer.palette = linearPalette(['blue', 'red'])
  * legend.update()
+ * 
+ * @example <caption>Non-module access</caption>
+ * L.coverage.control.ContinuousLegend
  */
 export default class ContinuousLegend extends L.Control {
   
@@ -92,9 +97,9 @@ export default class ContinuousLegend extends L.Control {
       inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS)
     }   
 
-    this._remove = () => this.removeFrom(this._map)
-    this._update = () => this._doUpdate(false)
     if (covLayer.on) {
+      this._remove = () => this.removeFrom(this._map)
+      this._update = () => this._doUpdate(false)
       covLayer.on('remove', this._remove)
     }
   }
