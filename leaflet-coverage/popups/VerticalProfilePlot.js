@@ -5,22 +5,36 @@ import 'c3/c3.css!'
 import * as i18n from '../util/i18n.js'
 import * as referencingUtil from '../util/referencing.js'
 
-// not used currently
-const DEFAULT_PLOT_OPTIONS = {}
-
+/**
+ * Displays a popup with an interactive plot showing the measurements
+ * of the vertical profile coverage.
+ */
 export default class VerticalProfilePlot extends L.Popup {
-  constructor (cov, options, plotOptions) {
+  
+  // 
+  
+  /**
+   * Creates a vertical profile plot popup.
+   * 
+   * @param {object} coverage The vertical profile coverage to visualize.
+   * @param {object} [options] Popup options.
+   * @param {array} [options.keys] A single-element array of a parameter key
+   * @param {string} [options.language] A language tag, indicating the preferred language to use for labels.
+   */
+  constructor (coverage, options) {
     super({maxWidth: 350})
-    this._cov = cov
-    this.param = options.keys ? cov.parameters.get(options.keys[0]) : null
-    this.language = options.language || i18n.DEFAULT_LANGUAGE
-    this.plotOptions = plotOptions || DEFAULT_PLOT_OPTIONS
+    this._cov = coverage
+    this._param = options.keys ? coverage.parameters.get(options.keys[0]) : null
+    this._language = options.language || i18n.DEFAULT_LANGUAGE
     
-    if (this.param === null) {
+    if (this._param === null) {
       throw new Error('multiple params not supported yet')
     }
   }
   
+  /**
+   * @ignore
+   */
   onAdd (map) {
     map.fire('dataloading')
     Promise.all([this._cov.loadDomain(), this._cov.loadRanges()])
@@ -48,7 +62,7 @@ export default class VerticalProfilePlot extends L.Popup {
   }
   
   _getPlotElement () {
-    let param = this.param
+    let param = this._param
     
     let zName = 'Vertical'
     let zUnit = ''
@@ -71,9 +85,9 @@ export default class VerticalProfilePlot extends L.Popup {
     }
     
     let unit = param.unit ? 
-               (param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, this.language)) :
+               (param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, this._language)) :
                ''
-    let obsPropLabel = i18n.getLanguageString(param.observedProperty.label, this.language) 
+    let obsPropLabel = i18n.getLanguageString(param.observedProperty.label, this._language) 
     let x = ['x']
     for (let z of this.domain.axes.get('z').values) {
       x.push(z)

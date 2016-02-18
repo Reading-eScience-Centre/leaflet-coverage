@@ -68,19 +68,19 @@ export default class DiscreteLegend extends L.Control {
    * Creates a discrete legend control.
    * 
    * @param {object} covLayer 
-   *   The coverage data layer, or any object with <code>palette</code>,
+   *   The coverage data layer, or any object with <code>palette</code>
    *   and <code>parameter</code> properties.
    *   If the object has <code>on</code>/<code>off</code> methods, then the legend will
    *   listen for <code>"paletteChange"</code> events and update itself automatically.
    *   If the layer fires a <code>"remove"</code> event, then the legend will remove itself
    *   from the map. 
    * @param {object} [options] Legend options.
-   * @param {string} [options.position] The initial position of the control (see Leaflet docs).
+   * @param {string} [options.position='bottomright'] The initial position of the control (see Leaflet docs).
    * @param {string} [options.language] A language tag, indicating the preferred language to use for labels.
    * @param {string} [options.id] Uses the HTML element with the given id as template.
    */
-  constructor (covLayer, options) {
-    super(options.position ? {position: options.position} : {})
+  constructor (covLayer, options = {}) {
+    super({position: options.position || 'bottomright'})
     this._covLayer = covLayer
     this._id = options.id || DEFAULT_TEMPLATE_ID
     this._language = options.language || i18n.DEFAULT_LANGUAGE

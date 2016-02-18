@@ -5,6 +5,8 @@ import {$, HTML} from 'minified'
  * 
  * @param html The html to inject at the end of the body element.
  * @param css The CSS styles to inject at the end of the head element.
+ * 
+ * @ignore
  */
 export function inject (html, css) {
   // inject default template and CSS into DOM
@@ -24,6 +26,9 @@ export function inject (html, css) {
   }
 }
 
+/**
+ * @ignore
+ */
 export function fromTemplate (id) {
   let node = $('#' + id)[0]
   // browsers without <template> support don't wrap everything in .content

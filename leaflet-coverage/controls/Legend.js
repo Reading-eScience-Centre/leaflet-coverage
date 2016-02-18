@@ -22,11 +22,12 @@ import ContinuousLegend from './ContinuousLegend.js'
  * 
  * @param {object} covLayer The coverage data layer.
  * @param {object} [options] Legend options.
- * @param {string} [options.position] The initial position of the control (see Leaflet docs).
+ * @param {string} [options.position='bottomright'] The initial position of the control (see Leaflet docs).
  * @param {string} [options.language] A language tag, indicating the preferred language to use for labels.
  * @return {DiscreteLegend|ContinuousLegend}
  */
-export default function (layer, options) {
+export default function (layer, options = {}) {
+  options.position = options.position || 'bottomright'
   if (layer.parameter.observedProperty.categories) {
     return new DiscreteLegend(layer, options)
   } else {
