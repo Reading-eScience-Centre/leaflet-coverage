@@ -6,23 +6,30 @@ import * as i18n from '../util/i18n.js'
 import * as referencingUtil from '../util/referencing.js'
 
 /**
- * Displays a popup with an interactive plot showing the measurements
+ * Displays a popup with an interactive plot showing the data
  * of the vertical profile coverage.
+ * 
+ * @example
+ * layer.bindPopup(new VerticalProfilePlot(coverage))
+ * 
+ * @example <caption>Non-module access</caption>
+ * L.coverage.popup.VerticalProfilePlot
  */
 export default class VerticalProfilePlot extends L.Popup {
   
-  // 
+  // TODO rethink options.keys, feels weird
   
   /**
    * Creates a vertical profile plot popup.
    * 
    * @param {object} coverage The vertical profile coverage to visualize.
-   * @param {object} [options] Popup options.
-   * @param {array} [options.keys] A single-element array of a parameter key
+   * @param {object} [options] Popup options. See also http://leafletjs.com/reference.html#popup-options.
+   * @param {Array} [options.keys] A single-element array of a parameter key
    * @param {string} [options.language] A language tag, indicating the preferred language to use for labels.
    */
-  constructor (coverage, options) {
-    super({maxWidth: 350})
+  constructor (coverage, options = {}) {
+    options.maxWidth = options.maxWidth || 350
+    super(options)
     this._cov = coverage
     this._param = options.keys ? coverage.parameters.get(options.keys[0]) : null
     this._language = options.language || i18n.DEFAULT_LANGUAGE
@@ -39,8 +46,8 @@ export default class VerticalProfilePlot extends L.Popup {
     map.fire('dataloading')
     Promise.all([this._cov.loadDomain(), this._cov.loadRanges()])
       .then(([domain, ranges]) => {
-        this.domain = domain
-        this.ranges = ranges
+        this._domain = domain
+        this._ranges = ranges
         this._addPlotToPopup()
         super.onAdd(map)
         this.fire('add')
@@ -54,9 +61,12 @@ export default class VerticalProfilePlot extends L.Popup {
   
   _addPlotToPopup () {
     // TODO transform if necessary
-    let x = this.domain.axes.get('x')
-    let y = this.domain.axes.get('y')
-    this.setLatLng(L.latLng(y.values[0], x.values[0]))
+    if (!this.getLatLng()) {
+      // in case bindPopup is not used and the caller did not set a position
+      let x = this._domain.axes.get('x')
+      let y = this._domain.axes.get('y')
+      this.setLatLng(L.latLng(y.values[0], x.values[0]))
+    }
     let el = this._getPlotElement()
     this.setContent(el)
   }
@@ -67,7 +77,7 @@ export default class VerticalProfilePlot extends L.Popup {
     let zName = 'Vertical'
     let zUnit = ''
       
-    let vertSrs = referencingUtil.getRefSystem(this.domain, ['z'])
+    let vertSrs = referencingUtil.getRefSystem(this._domain, ['z'])
     if (vertSrs) {
       if (vertSrs.cs && vertSrs.cs.axes) {
         let ax = vertSrs.cs.axes[0]
@@ -89,12 +99,12 @@ export default class VerticalProfilePlot extends L.Popup {
                ''
     let obsPropLabel = i18n.getLanguageString(param.observedProperty.label, this._language) 
     let x = ['x']
-    for (let z of this.domain.axes.get('z').values) {
+    for (let z of this._domain.axes.get('z').values) {
       x.push(z)
     }
     let y = [param.key]
-    for (let i=0; i < this.domain.axes.get('z').values.length; i++) {
-      y.push(this.ranges.get(param.key).get({z: i}))
+    for (let i=0; i < this._domain.axes.get('z').values.length; i++) {
+      y.push(this._ranges.get(param.key).get({z: i}))
     }
 
     let el = document.createElement('div')

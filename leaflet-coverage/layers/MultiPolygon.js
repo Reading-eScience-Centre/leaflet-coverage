@@ -2,13 +2,14 @@ import L from 'leaflet'
 import {linearPalette, scale} from './palettes.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
+import EventMixin from '../util/EventMixin.js'
 
 const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
   
 /**
- * Renderer for Coverages with domain type MultiPolygon.
+ * Renderer for coverages with domain profile MultiPolygon.
  */
-class MultiPolygon extends L.Class {
+export default class MultiPolygon extends EventMixin(L.Class) {
   
   constructor (cov, options) {
     super()
@@ -158,8 +159,3 @@ class MultiPolygon extends L.Class {
   }
   
 }
-
-MultiPolygon.include(L.Mixin.Events)
-
-// work-around for Babel bug, otherwise MultiPolygon cannot be referenced here
-export { MultiPolygon as default }

@@ -1,9 +1,12 @@
 import L from 'leaflet'
 import {linearPalette, scale} from './palettes.js'
 import * as referencingutil from '../util/referencing.js'
-import MarkerMixin from './MarkerMixin.js'
+import CircleMarkerMixin from './CircleMarkerMixin.js'
+import EventMixin from '../util/EventMixin.js'
 
+/** @ignore */
 export const DEFAULT_COLOR = 'black'
+/** @ignore */
 export const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
   
 /**
@@ -14,7 +17,7 @@ export const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
  * The dot either has a defined standard color, or it uses
  * a palette if a parameter is chosen.
  */
-class Point extends MarkerMixin(L.Class) {
+export default class Point extends CircleMarkerMixin(EventMixin(L.Class)) {
   
   constructor (cov, options) {
     super()
@@ -156,8 +159,3 @@ class Point extends MarkerMixin(L.Class) {
     }
   }
 }
-
-Point.include(L.Mixin.Events)
-
-//work-around for Babel bug, otherwise Point cannot be referenced here
-export { Point as default }

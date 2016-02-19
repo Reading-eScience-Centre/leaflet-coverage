@@ -3,7 +3,8 @@ import {scale} from './palettes.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
-import MarkerMixin from './MarkerMixin.js'
+import CircleMarkerMixin from './CircleMarkerMixin.js'
+import EventMixin from '../util/EventMixin.js'
 
 import {DEFAULT_COLOR, DEFAULT_PALETTE} from './Point.js'
 
@@ -15,7 +16,7 @@ import {DEFAULT_COLOR, DEFAULT_PALETTE} from './Point.js'
  * The dot either has a defined standard color, or it uses
  * a palette together with a target depth if a parameter is chosen.
  */
-class VerticalProfile extends MarkerMixin(L.Class) {
+export default class VerticalProfile extends CircleMarkerMixin(EventMixin(L.Class)) {
   
   constructor (cov, options) {
     super()
@@ -197,8 +198,3 @@ class VerticalProfile extends MarkerMixin(L.Class) {
     }
   }
 }
-
-VerticalProfile.include(L.Mixin.Events)
-
-// work-around for Babel bug, otherwise Profile cannot be referenced here
-export { VerticalProfile as default }

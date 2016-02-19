@@ -28,6 +28,28 @@ const DEFAULT_COLLECTION_LAYER_CLASSES = {
   [COVJSON_VERTICALPROFILECOLLECTION]: VerticalProfileCollection 
 }
 
+/**
+ * Return a factory function that creates a layer for a given coverage data object
+ * or throws an error if no layer class could be found.
+ * 
+ * This is a convenience function over using {@link getLayerClass} and manually
+ * instantiating the layer.
+ * 
+ * @example
+ * var factory = LayerFactory() // has to be defined just once
+ * var cov = ...
+ * var layer = factory(cov, {keys: ['temperature']}).addTo(map)
+ * 
+ * @example <caption>Non-module access</caption>
+ * L.coverage.LayerFactory
+ * 
+ * @param {object} [options] Options for influencing the layer class matching algorithm.
+ * @param {object} [options.classes] An object that maps profile URIs to layer classes.
+ *   Those classes are preferred over the default layer classes.
+ * @return {function} A function fn(cov, options) which returns a new layer for
+ *   the given coverage data object and which is initialized with the given layer options.
+ * @throws {Error} If no layer class could be found.
+ */
 export default function LayerFactory (options={}) {
   return (cov, opts) => {
     let clazz = getLayerClass(cov, options)
@@ -39,9 +61,22 @@ export default function LayerFactory (options={}) {
 }
 
 /**
- * Return a layer class usable for the given coverage,
- * or null if none was found.
- * If multiple layers match, then an arbitrary is returned. 
+ * Return a layer class usable for the given coverage data object,
+ * or <code>undefined</code> if none was found.
+ * If multiple layers match, then an arbitrary one is returned.
+ *  
+ * @example
+ * var cov = ...
+ * var clazz = getLayerClass(cov)
+ * if (clazz) {
+ *   var layer = new clazz(cov, {keys: ['temperature']}).addTo(map)
+ * }
+ * 
+ * @param {object} cov The coverage data object.
+ * @param {object} [options] Options for influencing the matching algorithm.
+ * @param {object} [options.classes] An object that maps profile URIs to layer classes.
+ *   Those classes are preferred over the default layer classes.
+ * @return {class|undefined} The layer class.
  */
 export function getLayerClass (cov, options={}) {
   if (options.classes) {
@@ -58,5 +93,4 @@ export function getLayerClass (cov, options={}) {
   if (cov.profiles.some(p => DEFAULT_COLLECTION_LAYER_CLASSES[p])) {
     return DEFAULT_COLLECTION_LAYER_CLASSES[cov.profiles.find(p => DEFAULT_COLLECTION_LAYER_CLASSES[p])]
   }
-  return null
 }

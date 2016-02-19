@@ -21,7 +21,7 @@ const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
  * "paletteExtentChange" - Palette extent has changed
  * 
  */
-class Trajectory extends L.FeatureGroup {
+export default class Trajectory extends L.FeatureGroup {
   
   // TODO FeatureGroup is not ideal since click events etc should not be blindly propagated
   //    (we use it for now to have getBounds() which LayerGroup misses)
@@ -182,8 +182,3 @@ class Trajectory extends L.FeatureGroup {
   }
   
 }
-
-Trajectory.include(L.Mixin.Events)
-
-// work-around for Babel bug, otherwise Trajectory cannot be referenced here
-export { Trajectory as default }

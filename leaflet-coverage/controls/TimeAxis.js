@@ -1,7 +1,7 @@
 import L from 'leaflet'
 import {$,HTML} from 'minified'
 
-import EventedControl from './EventedControl.js'
+import EventMixin from '../util/EventMixin.js'
 
 let TEMPLATE = 
 `<div class="info" style="clear:none">
@@ -35,7 +35,7 @@ let TEMPLATE =
  * @example <caption>Non-module access</caption>
  * L.coverage.control.TimeAxis
  */
-export default class TimeAxis extends EventedControl {
+export default class TimeAxis extends EventMixin(L.Control) {
   
   /**
    * Creates a time axis control.

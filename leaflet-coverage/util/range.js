@@ -1,6 +1,13 @@
 /**
- * Return the minimum/maximum across all range values,
- * ignoring null's.
+ * @external {Range} https://github.com/Reading-eScience-Centre/coverage-jsapi/blob/master/Range.md
+ */
+
+/**
+ * Return the minimum/maximum across all range values, ignoring null's.
+ * 
+ * @param {Range<number>} range The numeric coverage data range.
+ * @return {[min,max]} The minimum and maximum values of the range,
+ *   or [undefined, undefined] if the range contains only `null` values.
  */
 export function minMax (range) {
   let min = Infinity
@@ -11,16 +18,21 @@ export function minMax (range) {
     if (val > max) max = val
   }
   iterate(range, fn)
-  return [min, max]
+  return min === Infinity ? [undefined, undefined] : [min, max]
 }
 
 /**
  * Apply a reduce function over the range values.
+ * 
+ * @param {Range} range The coverage data range.
+ * @param {function} callback Function to execute on each value in the array with arguments `(previousValue, currentValue)`.
+ * @param start Value to use as the first argument to the first call of the `callback`.
+ * @return The reduced value.
  */
-export function reduce (range, fn, start) {
+export function reduce (range, callback, start) {
   let v1 = start
   let iterFn = v2 => {
-    v1 = fn(v1, v2)
+    v1 = callback(v1, v2)
   }
   iterate(range, iterFn)
   return v1
