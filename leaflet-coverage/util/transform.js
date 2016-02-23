@@ -132,10 +132,8 @@ export function maskByPolygon (cov, polygon) {
       coordinates: [polygon.coordinates]
     }
   }
-  let t0 = new Date()
   // prepare polygon coordinates for pnpoly algorithm
   // each polygon component is surrounded by (0,0) vertices
-  
   let nvert = 1 + polygon.coordinates
     .map(poly => poly.map(comp => comp.length + 1).reduce((n1,n2) => n1 + n2))
     .reduce((n1,n2) => n1 + n2)
@@ -153,37 +151,17 @@ export function maskByPolygon (cov, polygon) {
     }
   }
   
-  
-  /*
-  
-  let ctx = document.createElement('canvas').getContext('2d')
-  let path = new Path2D()
-  path.moveTo(0, 0)
-  for (let coords of polygon.coordinates) {
-    for (let p=0; p < coords.length; p++) {
-      let comp = coords[p]
-      for (let i=0; i < comp.length; i++) {
-        path.lineTo(comp[i][0], comp[i][1])
-      }      
-      path.lineTo(0,0)
-    }
-  }
-  */
-  console.log('poly prep:', new Date()-t0)
-  
   return cov.loadDomain().then(domain => {
     let x = domain.axes.get('x').values
     let y = domain.axes.get('y').values
     let pnpolyCache = ndarray(new Uint8Array(x.length * y.length), [x.length, y.length])
-    let t0 = new Date()
+
     for (let i=0; i < x.length; i++) {
       for (let j=0; j < y.length; j++) {
         let inside = pnpoly(x[i], y[j], vertx, verty)
-        //let inside = pnpoly_canvas(x[i], y[j], path, ctx)
         pnpolyCache.set(i, j, inside)
       }
     }
-    console.log('pnpoly:', new Date()-t0)
     
     let fn = (obj, range) => {
       if (pnpolyCache.get(obj.x || 0, obj.y || 0)) {
@@ -243,11 +221,6 @@ export function pnpoly (x, y, vertx, verty) {
       inside = !inside
     }
   }
-  return inside
-}
-
-export function pnpoly_canvas (x, y, path, ctx) {
-  let inside = ctx.isPointInPath(path, x, y)
   return inside
 }
 
