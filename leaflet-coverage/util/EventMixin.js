@@ -9,7 +9,21 @@ import L from 'leaflet'
  * @return {class} The base class with EventMixin.
  */
 export default function EventMixin (base) {
-  let clazz = class extends base {}
-  clazz.prototype = L.Mixin.Events
-  return clazz
+  return class extends base {
+    on (...args) {
+      return L.Mixin.Events.on.call(this, ...args)
+    }
+    off (...args) {
+      return L.Mixin.Events.off.call(this, ...args)
+    }
+    once (...args) {
+      return L.Mixin.Events.once.call(this, ...args)
+    }
+    fire (...args) {
+      return L.Mixin.Events.fire.call(this, ...args)
+    }
+    hasEventListeners (...args) {
+      return L.Mixin.Events.hasEventListeners.call(this, ...args)
+    }
+  }
 }
