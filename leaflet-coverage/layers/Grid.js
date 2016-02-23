@@ -201,7 +201,10 @@ export default class Grid extends L.TileLayer.Canvas {
     let spec = {}
     for (let axis of Object.keys(this._axesSubset)) {
       let ax = this._axesSubset[axis]
-      if (ax.coordPref == undefined && this.domain.axes.has(axis)) { // == also handles null
+      if (!this.domain.axes.has(axis)) {
+        continue
+      }
+      if (ax.coordPref == undefined) { // == also handles null
         spec[axis] = this.domain.axes.get(axis).values[0]
       } else {
         spec[axis] = {target: ax.coordPref}
