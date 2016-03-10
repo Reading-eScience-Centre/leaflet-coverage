@@ -18,15 +18,15 @@ export function isGeodeticWGS84CRS (rs) {
 }
 
 /**
- * Returns the referencing system matching the given dimension identifiers.
+ * Returns the referencing system matching the given component identifiers.
  * 
- * Note: If the input dimensions used for searching are associated
+ * Note: If the input components used for searching are associated
  * to multiple referencing systems, then this function returns `undefined`.
  */
-export function getRefSystem (domain, dimensions) {
+export function getRefSystem (domain, components) {
   let refs = domain.referencing
   let ref = refs.find(ref => 
-    dimensions.every(id => ref.dimensions.indexOf(id) !== -1))
+    components.every(id => ref.components.indexOf(id) !== -1))
   if (ref) {
     return ref.system
   }
