@@ -3,12 +3,8 @@ import L from 'leaflet'
 import {default as Point, DEFAULT_COLOR, DEFAULT_PALETTE} from './Point.js'
 import kdTree from '../util/kdTree.js'
 
-
-// We implement this specifically for vertical profiles for now and see what we can move into
-// a common class later.
-
 /**
- * A collection of vertical profiles sharing the same parameters / referencing.
+ * A collection of points sharing the same parameters / referencing.
  * 
  */
 class PointCollection extends L.Class {
