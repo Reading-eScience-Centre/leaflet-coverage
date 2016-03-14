@@ -25,5 +25,18 @@ export default function EventMixin (base) {
     hasEventListeners (...args) {
       return L.Mixin.Events.hasEventListeners.call(this, ...args)
     }
+    // aliases
+    addEventListener (...args) {
+      return L.Mixin.Events.addEventListener.call(this, ...args)
+    }
+    removeEventListener (...args) {
+      return L.Mixin.Events.removeEventListener.call(this, ...args)
+    }
+    addOneTimeEventListener (...args) {
+      return L.Mixin.Events.addOneTimeEventListener.call(this, ...args)
+    }
+    fireEvent (...args) {
+      return L.Mixin.Events.fireEvent.call(this, ...args)
+    }
   }
 }
