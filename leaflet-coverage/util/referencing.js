@@ -3,13 +3,13 @@ import {COVJSON_DATATYPE_TUPLE, COVJSON_DATATYPE_POLYGON} from './constants.js'
 const OPENGIS_CRS_PREFIX = 'http://www.opengis.net/def/crs/'
 
 /** 3D WGS84 in lat-lon-height order */
-const EPSG4979 = OPENGIS_CRS_PREFIX + '/EPSG/0/4979'
+const EPSG4979 = OPENGIS_CRS_PREFIX + 'EPSG/0/4979'
 
 /** 2D WGS84 in lat-lon order */
-const EPSG4326 = OPENGIS_CRS_PREFIX + '/EPSG/0/4326'
+const EPSG4326 = OPENGIS_CRS_PREFIX + 'EPSG/0/4326'
 
 /** 2D WGS84 in lon-lat order */
-const CRS84 = OPENGIS_CRS_PREFIX + '/OGC/1.3/CRS84'
+const CRS84 = OPENGIS_CRS_PREFIX + 'OGC/1.3/CRS84'
   
 /** CRSs in which horizontal position is specified by geodetic latitude and longitude */
 const EllipsoidalCRSs = [EPSG4979, EPSG4326, CRS84]
