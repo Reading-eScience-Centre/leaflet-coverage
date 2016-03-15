@@ -1,7 +1,7 @@
 import L from 'leaflet'
 
 import {default as Point, DEFAULT_COLOR, DEFAULT_PALETTE} from './Point.js'
-import kdTree from '../util/kdTree.js'
+import {kdTree} from '../util/kdTree.js'
 
 /**
  * A collection of points sharing the same parameters / referencing.
@@ -101,6 +101,7 @@ class PointCollection extends L.Class {
     let points = this._layers.map(layer => {
       let point = layer.getLatLng()
       point.layer = layer
+      return point
     })
     let distance = (point1, point2) => point1.distanceTo(point2)
     let dimensions = ['lat', 'lng']

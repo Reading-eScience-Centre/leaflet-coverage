@@ -11,17 +11,8 @@
  * @license MIT License <http://www.opensource.org/licenses/mit-license.php>
  */
 
-(function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define([], factory);
-    } else if (typeof module === 'object' && module.exports) {
-        // Node. Does not work with strict CommonJS, but
-        // only CommonJS-like environments that support module.exports,
-        // like Node.
-        module.exports = factory();
-    }
-}(this, function () {
+
+
   function Node(obj, dimension, parent) {
     this.obj = obj;
     this.left = null;
@@ -464,5 +455,4 @@
     }
   };
   
-  return {kdTree: kdTree, BinaryHeap: BinaryHeap};
-}));
+export {kdTree, BinaryHeap}
