@@ -111,13 +111,13 @@ class PointCollection extends L.Class {
   }
   
   /**
-   * Return the displayed value of the vertical profile closest to
+   * Return the displayed value of the point coverage closest to
    * the given position and within the given maximum distance.
-   * If no profile is found, undefined is returned, otherwise
+   * If no coverage is found, undefined is returned, otherwise
    * a number or null (no-data).
    * 
    * @param {number} maxDistance
-   *   Maximum distance in meters that the vertical profile may be
+   *   Maximum distance in meters that the point coverage may be
    *   apart from the given position.
    */
   getValueAt (latlng, maxDistance) {
