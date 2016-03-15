@@ -55,7 +55,7 @@ class PointCollection extends L.Class {
         options[key] = opts[key]
       }
     }
-    for (let cov of this.covcoll) {
+    for (let cov of this.covcoll.coverages) {
       let layer = new this.pointClass(cov, options)
       this._attachListeners(layer, cov)
       this._layerGroup.addLayer(layer)
