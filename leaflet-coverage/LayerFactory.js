@@ -83,11 +83,12 @@ export function getLayerClass (cov, options={}) {
     if (cov.profiles.some(p => options.classes[p])) {
       return options.classes[cov.profiles.find(p => options.classes[p])]
     }
-    if (cov.domainProfiles.some(p => options.classes[p])) {
+    // domainProfiles is not defined for collections, hence the check
+    if (cov.domainProfiles && cov.domainProfiles.some(p => options.classes[p])) {
       return options.classes[cov.domainProfiles.find(p => options.classes[p])]
     }
   }
-  if (cov.domainProfiles.some(p => DEFAULT_DOMAIN_LAYER_CLASSES[p])) {
+  if (cov.domainProfiles && cov.domainProfiles.some(p => DEFAULT_DOMAIN_LAYER_CLASSES[p])) {
     return DEFAULT_DOMAIN_LAYER_CLASSES[cov.domainProfiles.find(p => DEFAULT_DOMAIN_LAYER_CLASSES[p])]
   }
   if (cov.profiles.some(p => DEFAULT_COLLECTION_LAYER_CLASSES[p])) {
