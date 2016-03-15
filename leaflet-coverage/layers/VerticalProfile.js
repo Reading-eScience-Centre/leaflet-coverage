@@ -198,7 +198,7 @@ export default class VerticalProfile extends CircleMarkerMixin(EventMixin(L.Clas
       // use a palette
       let valScaled = scale(val, this.palette, this.paletteExtent)        
       let {red, green, blue} = this.palette
-      return `rgb(${red[valScaled]}, ${green[valScaled]}, ${blue[valScaled]})`
+      return {r: red[valScaled], g: green[valScaled], b: blue[valScaled]}
     }
   }
 }

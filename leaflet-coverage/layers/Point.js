@@ -41,7 +41,18 @@ export default class Point extends CircleMarkerMixin(EventMixin(L.Class)) {
   
   onAdd (map) {
     this._map = map
-    
+
+    this.load().then(() => {
+      this._addMarker()
+      this.fire('add')
+    })
+  }
+  
+  /**
+   * Load all data without adding anything to the map.
+   * After loading is done, all functions and properties can be accessed (like getLatLng()).
+   */
+  load () {    
     this.fire('dataLoading') // for supporting loading spinners
     
     function checkWGS84 (domain) {
@@ -59,16 +70,12 @@ export default class Point extends CircleMarkerMixin(EventMixin(L.Class)) {
           checkWGS84(domain)
           this.range = range
           this._updatePaletteExtent(this._paletteExtent)
-          this._addMarker()
-          this.fire('add')
           this.fire('dataLoad')
         })
     } else {
       promise = this.cov.loadDomain().then(domain => {
         this.domain = domain
         checkWGS84(domain)
-        this._addMarker()
-        this.fire('add')
         this.fire('dataLoad')
       })
     }
@@ -78,6 +85,7 @@ export default class Point extends CircleMarkerMixin(EventMixin(L.Class)) {
       this.fire('error', e)
       this.fire('dataLoad')
     })
+    return promise
   }
   
   onRemove () {
@@ -159,7 +167,7 @@ export default class Point extends CircleMarkerMixin(EventMixin(L.Class)) {
       // use a palette
       let valScaled = scale(val, this.palette, this.paletteExtent)
       let {red, green, blue} = this.palette
-      return `rgb(${red[valScaled]}, ${green[valScaled]}, ${blue[valScaled]})`
+      return {r: red[valScaled], g: green[valScaled], b: blue[valScaled]}
     }
   }
 }

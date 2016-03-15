@@ -40,7 +40,7 @@ class PointCollection extends L.Class {
   
   onAdd (map) {
     this._map = map
-    this._layerAddCount = 0
+    this._layerLoadCount = 0
     this._layerErrors = []
     
     let options = {
@@ -57,11 +57,12 @@ class PointCollection extends L.Class {
     }
     for (let cov of this.covcoll.coverages) {
       let layer = new this.pointClass(cov, options)
+      layer.load()
       this._attachListeners(layer, cov)
       this._layerGroup.addLayer(layer)
       this._layers.push(layer)
     }
-    this._layerGroup.addTo(map)
+    
   }
   
   onRemove (map) {
@@ -70,12 +71,11 @@ class PointCollection extends L.Class {
   }
   
   _attachListeners (layer, cov) {
-    layer.once('add', () => {
-      ++this._layerAddCount
+    layer.once('dataLoad', () => {
+      ++this._layerLoadCount
       this._fireIfOnAddDone()
     }).once('error', e => {
       this._layerErrors.push(e)
-      this._fireIfOnAddDone()
     }).on('click', e => {
       e.coverage = cov
       this.fire('click', e)
@@ -83,15 +83,15 @@ class PointCollection extends L.Class {
   }
   
   _fireIfOnAddDone () {
-    if (this._layerAddCount + this._layerErrors.length === this._layers.length) {
+    if (this._layerLoadCount === this._layers.length) {
       if (this._layerErrors.length > 0) {
         this.fire('error', {errors: this._layerErrors})
       } else {
         this._initKdtree()
-        if (this.param && this._vertical) {
-          this._updatePaletteExtent()
+        if (this.param) {
+          this._updatePaletteExtent(this._paletteExtent)
         }
-        this._layerGroup.addTo(this._map)        
+        this._layerGroup.addTo(this._map)
         this.fire('add')
       }
     }
@@ -154,9 +154,6 @@ class PointCollection extends L.Class {
   
   set paletteExtent (extent) {
     this._updatePaletteExtent(extent)
-    for (let layer of this._layers) {
-      layer.paletteExtent = this._paletteExtent
-    }
     this.fire('paletteExtentChange')
   }
   
@@ -188,10 +185,16 @@ class PointCollection extends L.Class {
     let max = -Infinity
     for (let layer of layers) {
       let val = layer.getValue()
-      min = Math.min(min, val)
-      max = Math.max(max, val)
+      if (val != null) {
+        min = Math.min(min, val)
+        max = Math.max(max, val)
+      }
     }
     this._paletteExtent = [min, max]
+    
+    for (let layer of this._layers) {
+      layer.paletteExtent = this._paletteExtent
+    }
   }
   
   redraw () {

@@ -1,10 +1,6 @@
 import PointCollection from './PointCollection.js'
 import VerticalProfile from './VerticalProfile.js'
 
-
-// We implement this specifically for vertical profiles for now and see what we can move into
-// a common class later.
-
 /**
  * A collection of vertical profiles sharing the same parameters / referencing.
  * 

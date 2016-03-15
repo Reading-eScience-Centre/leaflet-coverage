@@ -28,15 +28,26 @@ export default function CircleMarkerMixin (base) {
       if (val === null && !this.showNoData) {
         return
       }
-      let color = this._getColor(val)    
+      let {r,g,b} = this._getColor(val)    
       let latlng = this.getLatLng()
       
-      this._marker = L.circleMarker(latlng, {color})
-        .on('click', e => {
-          e.coverage = this.coverage
-          this.fire('click', e)
-        })
-        .addTo(this._map)
+      let strokeBrightness = 0.7
+      
+      this._marker = L.circleMarker(latlng, {
+        fillColor: 'rgb(' + r + ',' + g + ',' + b + ')',
+        fillOpacity: 1,
+        radius: 5,
+        stroke: true,
+        opacity: 1,
+        weight: 1,
+        color: 'rgb(' + Math.round(r*strokeBrightness) + ',' + 
+                        Math.round(g*strokeBrightness) + ',' + 
+                        Math.round(b*strokeBrightness) + ')'
+      }).on('click', e => {
+        e.coverage = this.coverage
+        this.fire('click', e)
+      }).addTo(this._map)
+      
       if (this._deferBindPopup) {
         this._marker.bindPopup(...this._deferBindPopup)
       }
