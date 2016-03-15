@@ -13,11 +13,12 @@ export default function CircleMarkerMixin (base) {
   return class extends base {
   
     /*
-     * The base class must supply the following:
+     * The base class must supply the following functions/properties:
      * 
      * getValue()
      * _getColor(val)
      * getLatLng()
+     * coverage
      */
   
     _addMarker () {
@@ -31,7 +32,10 @@ export default function CircleMarkerMixin (base) {
       let latlng = this.getLatLng()
       
       this._marker = L.circleMarker(latlng, {color})
-        .on('click', e => this.fire('click', e))
+        .on('click', e => {
+          e.coverage = this.coverage
+          this.fire('click', e)
+        })
         .addTo(this._map)
       if (this._deferBindPopup) {
         this._marker.bindPopup(...this._deferBindPopup)

@@ -48,12 +48,10 @@ export default class Trajectory extends L.FeatureGroup {
   }
   
   onAdd (map) {
-    console.log('adding trajectory to map')
     this._map = map
     this.fire('dataLoading') // for supporting loading spinners
     Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)])
       .then(([domain, range]) => {
-        console.log('domain and range loaded')
         this.domain = domain
         let srs = referencingutil.getRefSystem(domain, ['x', 'y'])
         if (!referencingutil.isGeodeticWGS84CRS(srs)) {
@@ -77,8 +75,11 @@ export default class Trajectory extends L.FeatureGroup {
   
   onRemove (map) {
     this.fire('remove')
-    console.log('removing trajectory from map')
     super.onRemove(map)
+  }
+  
+  get coverage () {
+    return this.cov
   }
   
   get parameter () {

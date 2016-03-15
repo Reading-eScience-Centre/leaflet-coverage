@@ -113,6 +113,10 @@ export default class VerticalProfile extends CircleMarkerMixin(EventMixin(L.Clas
     let y = this.domain.axes.get('y').values[0]
     return L.latLng(y, x)
   }
+  
+  get coverage () {
+    return this.cov
+  }
     
   get parameter () {
     return this.param

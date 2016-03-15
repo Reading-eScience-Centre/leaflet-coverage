@@ -237,6 +237,10 @@ export default class Grid extends L.TileLayer.Canvas {
       })
   }
   
+  get coverage () {
+    return this.cov
+  }
+  
   get parameter () {
     return this.param
   }

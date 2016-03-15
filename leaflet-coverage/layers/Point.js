@@ -95,6 +95,10 @@ export default class Point extends CircleMarkerMixin(EventMixin(L.Class)) {
     let y = this.domain.axes.get('y').values[0]
     return L.latLng(y, x)
   }
+  
+  get coverage () {
+    return this.cov
+  }
     
   get parameter () {
     return this.param
