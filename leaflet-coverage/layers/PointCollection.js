@@ -61,6 +61,12 @@ class PointCollection extends L.Class {
       this._layerGroup.addLayer(layer)
       this._layers.push(layer)
     }
+    this._layerGroup.addTo(map)
+  }
+  
+  onRemove (map) {
+    this._map.removeLayer(this._layerGroup)
+    this._layerGroup = L.layerGroup()
   }
   
   _attachListeners (layer, cov) {
