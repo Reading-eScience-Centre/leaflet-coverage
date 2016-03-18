@@ -205,7 +205,7 @@ export default class Grid extends L.TileLayer.Canvas {
         continue
       }
       if (ax.coordPref == undefined) { // == also handles null
-        spec[axis] = this.domain.axes.get(axis).values[0]
+        spec[axis] = {target: this.domain.axes.get(axis).values[0]}
       } else {
         spec[axis] = {target: ax.coordPref}
       }
