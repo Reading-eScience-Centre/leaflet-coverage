@@ -91,6 +91,34 @@ export function directPalette (colors) {
 }
 
 /**
+ * Create a palette from a description object.
+ * 
+ * Currently, two forms are supported:
+ * 
+ * {
+ *   "colors": ["red", "blue", ..]
+ *   "interpolation": "linear"
+ * }
+ * 
+ * {
+ *   "colors": ["red", "blue", ..]
+ * }
+ */
+export function create (paletteSpec) {
+  if (!paletteSpec) {
+    return
+  }
+  let colors = paletteSpec.colors
+  let palette
+  if (paletteSpec.interpolation === 'linear') {
+    palette = linearPalette(colors, paletteSpec.steps)
+  } else {
+    palette = directPalette(colors)
+  }
+  return palette
+}
+
+/**
  * Linearly scales a value to a given palette and value extent.
  * 
  * @example

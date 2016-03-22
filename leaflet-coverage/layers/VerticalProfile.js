@@ -1,5 +1,6 @@
 import L from 'leaflet'
 import {scale} from './palettes.js'
+import * as palettes from './palettes.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
@@ -33,7 +34,14 @@ export default class VerticalProfile extends CircleMarkerMixin(EventMixin(L.Clas
       throw new Error('category parameters are currently not support for VerticalProfile')
     }
     
-    this._palette = options.palette || DEFAULT_PALETTE
+    if (options.palette) {
+      this._palette = options.palette
+    } else if (this.param && this.param.preferredPalette) {
+      this._palette = palettes.create(this.param.preferredPalette)
+    } else {
+      this._palette = DEFAULT_PALETTE
+    }
+    
     if (Array.isArray(options.paletteExtent)) {
       this._paletteExtent = options.paletteExtent
     } else {

@@ -1,5 +1,6 @@
 import L from 'leaflet'
 import {linearPalette, scale} from './palettes.js'
+import * as palettes from './palettes.js'
 import * as referencingutil from '../util/referencing.js'
 import CircleMarkerMixin from './CircleMarkerMixin.js'
 import EventMixin from '../util/EventMixin.js'
@@ -31,7 +32,14 @@ export default class Point extends CircleMarkerMixin(EventMixin(L.Class)) {
       throw new Error('category parameters are currently not supported for Point')
     }
     
-    this._palette = options.palette || DEFAULT_PALETTE
+    if (options.palette) {
+      this._palette = options.palette
+    } else if (this.param && this.param.preferredPalette) {
+      this._palette = palettes.create(this.param.preferredPalette)
+    } else {
+      this._palette = DEFAULT_PALETTE
+    }
+    
     if (Array.isArray(options.paletteExtent)) {
       this._paletteExtent = options.paletteExtent
     } else {

@@ -1,6 +1,7 @@
 import L from 'leaflet'
 
 import {default as Point, DEFAULT_COLOR, DEFAULT_PALETTE} from './Point.js'
+import * as palettes from './palettes.js'
 import {kdTree} from '../util/kdTree.js'
 
 /**
@@ -23,7 +24,13 @@ class PointCollection extends L.Class {
       throw new Error('category parameters are currently not supported for VerticalProfileCollection')
     }
     
-    this._palette = options.palette || DEFAULT_PALETTE
+    if (options.palette) {
+      this._palette = options.palette
+    } else if (this.param && this.param.preferredPalette) {
+      this._palette = palettes.create(this.param.preferredPalette)
+    } else {
+      this._palette = DEFAULT_PALETTE
+    }
 
     if (!options.paletteExtent) {
       this._paletteExtent = 'full'
