@@ -64,7 +64,7 @@
     "babel-eslint": "^4.0.10",
     "esdoc": "^0.3.0",
     "esdoc-importpath-plugin": "0.0.1",
-    "jspm": "^0.16.12",
+    "jspm": "^0.16.32",
     "karma": "^0.13.9",
     "karma-chrome-launcher": "^0.2.0",
     "karma-jspm": "^2.0.1",
