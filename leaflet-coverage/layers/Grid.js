@@ -343,10 +343,18 @@ export default class Grid extends L.TileLayer.Canvas {
         
     if (extent === 'subset') {
       // scan the current subset for min/max values
+      
+      let xlen = this.subsetRange.shape.get('x')
+      let ylen = this.subsetRange.shape.get('y')
 
       // check if subsetted size is manageable
-      if (this.subsetRange.shape.x * this.subsetRange.shape.y < 10000) {
+      if (xlen * ylen < 10000) {
         extent = rangeutil.minMax(this.subsetRange)
+        // enlarge extent if there is just a single value
+        if (extent[0] === extent[1]) {
+          let buffer = extent[0]*0.1
+          extent = [extent[0]-buffer, extent[1]+buffer]
+        }
         let changed = hasChanged(extent)
         this._paletteExtent = extent
         return Promise.resolve(changed)
@@ -354,8 +362,6 @@ export default class Grid extends L.TileLayer.Canvas {
         // subset x and y to get a fast estimate of the palette extent
         // since it is an estimate, the lower and upper bound needs a small buffer
         // (to prevent out-of-bounds colours)
-        let xlen = this.subsetRange.shape.get('x')
-        let ylen = this.subsetRange.shape.get('y')
         let xconstraint = {start: 0, stop: xlen, step: Math.max(Math.round(xlen/100), 1)}
         let yconstraint = {start: 0, stop: ylen, step: Math.max(Math.round(ylen/100), 1)}
         
