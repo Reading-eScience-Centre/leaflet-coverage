@@ -517,22 +517,26 @@ export default class Grid extends L.TileLayer.Canvas {
    * @returns {Array} [xmin,ymin,xmax,ymax]
    */
   _getDomainBbox () {
-    let x = this.domain.axes.get('x').values
-    let y = this.domain.axes.get('y').values
+    let xAxis = this.domain.axes.get('x')
+    let yAxis = this.domain.axes.get('y')
+    let x = xAxis.values
+    let y = yAxis.values
+    let xBounds = xAxis.bounds
+    let yBounds = yAxis.bounds
     
-    // TODO use bounds if they are supplied
     let xend = x.length - 1
     let yend = y.length - 1
-    let [xmin,xmax] = [x[0], x[xend]]
-    let [ymin,ymax] = [y[0], y[yend]]
-    // TODO only enlarge when bounds haven't been used above
-    if (x.length > 1) {
-      xmin -= Math.abs(x[0] - x[1]) / 2
-      xmax += Math.abs(x[xend] - x[xend - 1]) / 2
+    let xmin, xmax
+    if (xBounds) {
+      [xmin,xmax] = [xBounds.get(0)[0], xBounds.get(xend)[1]]
+    } else {
+      [xmin,xmax] = [x[0], x[xend]]
     }
-    if (y.length > 1) {
-      ymin -= Math.abs(y[0] - y[1]) / 2
-      ymax += Math.abs(y[yend] - y[yend - 1]) / 2
+    let ymin, ymax
+    if (yBounds) {
+      [ymin,ymax] = [yBounds.get(0)[0], yBounds.get(yend)[1]]
+    } else {
+      [ymin,ymax] = [y[0], y[yend]]
     }
     if (xmin > xmax) {
       [xmin,xmax] = [xmax,xmin]
@@ -540,6 +544,15 @@ export default class Grid extends L.TileLayer.Canvas {
     if (ymin > ymax) {
       [ymin,ymax] = [ymax,ymin]
     }
+    if (!xBounds && x.length > 1) {
+      xmin -= Math.abs(x[0] - x[1]) / 2
+      xmax += Math.abs(x[xend] - x[xend - 1]) / 2
+    }
+    if (!yBounds && y.length > 1) {
+      ymin -= Math.abs(y[0] - y[1]) / 2
+      ymax += Math.abs(y[yend] - y[yend - 1]) / 2
+    }
+
     return [xmin,ymin,xmax,ymax]
   }
   
