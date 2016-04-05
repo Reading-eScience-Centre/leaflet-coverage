@@ -5,13 +5,16 @@ import * as referencingutil from '../util/referencing.js'
 import CircleMarkerMixin from './CircleMarkerMixin.js'
 import EventMixin from '../util/EventMixin.js'
 
+import {isDomain} from 'covutils/lib/validate.js'
+import {toCoverage} from 'covutils/lib/transform.js'
+
 /** @ignore */
 export const DEFAULT_COLOR = 'black'
 /** @ignore */
 export const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
   
 /**
- * Renderer for Coverages with domain type Point.
+ * Renderer for Coverages and Domains with (domain) profile Point.
  * 
  * This will simply display a dot on the map and fire a click
  * event when a user clicks on it.
@@ -22,6 +25,11 @@ export default class Point extends CircleMarkerMixin(EventMixin(L.Class)) {
   
   constructor (cov, options) {
     super()
+    
+    if (isDomain(cov)) {
+      cov = toCoverage(cov)
+      delete options.keys
+    }
 
     this.cov = cov
     this.param = options.keys ? cov.parameters.get(options.keys[0]) : null

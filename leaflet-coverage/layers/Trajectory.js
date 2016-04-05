@@ -3,10 +3,13 @@ import {linearPalette, scale} from './palettes.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
 
+import {isDomain} from 'covutils/lib/validate.js'
+import {toCoverage} from 'covutils/lib/transform.js'
+
 const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
   
 /**
- * Renderer for Coverages with domain type Trajectory.
+ * Renderer for Coverages and Domains with (domain) profile Trajectory.
  * 
  * Displays the trajectory as a path with coloured points using
  * a given palette for a given parameter.
@@ -28,6 +31,11 @@ export default class Trajectory extends L.FeatureGroup {
   
   constructor (cov, options) {
     super()
+    
+    if (isDomain(cov)) {
+      cov = toCoverage(cov)
+      options.keys = [cov.parameters.keys().next.value]
+    }
     
     this.cov = cov
     this.param = cov.parameters.get(options.keys[0])

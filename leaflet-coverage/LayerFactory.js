@@ -88,10 +88,13 @@ export function getLayerClass (cov, options={}) {
       return options.classes[cov.domainProfiles.find(p => options.classes[p])]
     }
   }
-  if (cov.domainProfiles && cov.domainProfiles.some(p => DEFAULT_DOMAIN_LAYER_CLASSES[p])) {
+  if (cov.type === 'Coverage' && cov.domainProfiles && cov.domainProfiles.some(p => DEFAULT_DOMAIN_LAYER_CLASSES[p])) {
     return DEFAULT_DOMAIN_LAYER_CLASSES[cov.domainProfiles.find(p => DEFAULT_DOMAIN_LAYER_CLASSES[p])]
   }
-  if (cov.profiles.some(p => DEFAULT_COLLECTION_LAYER_CLASSES[p])) {
+  if (cov.type === 'Domain' && cov.profiles && cov.profiles.some(p => DEFAULT_DOMAIN_LAYER_CLASSES[p])) {
+    return DEFAULT_DOMAIN_LAYER_CLASSES[cov.profiles.find(p => DEFAULT_DOMAIN_LAYER_CLASSES[p])]
+  }
+  if (cov.type === 'CoverageCollection' && cov.profiles.some(p => DEFAULT_COLLECTION_LAYER_CLASSES[p])) {
     return DEFAULT_COLLECTION_LAYER_CLASSES[cov.profiles.find(p => DEFAULT_COLLECTION_LAYER_CLASSES[p])]
   }
 }

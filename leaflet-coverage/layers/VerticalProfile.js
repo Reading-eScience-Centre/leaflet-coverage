@@ -7,6 +7,9 @@ import * as referencingutil from '../util/referencing.js'
 import CircleMarkerMixin from './CircleMarkerMixin.js'
 import EventMixin from '../util/EventMixin.js'
 
+import {isDomain} from 'covutils/lib/validate.js'
+import {toCoverage} from 'covutils/lib/transform.js'
+
 import {DEFAULT_COLOR, DEFAULT_PALETTE} from './Point.js'
 
 /**
@@ -21,6 +24,11 @@ export default class VerticalProfile extends CircleMarkerMixin(EventMixin(L.Clas
   
   constructor (cov, options) {
     super()
+    
+    if (isDomain(cov)) {
+      cov = toCoverage(cov)
+      delete options.keys
+    }
 
     this.cov = cov
     this.param = options.keys ? cov.parameters.get(options.keys[0]) : null

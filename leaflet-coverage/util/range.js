@@ -1,3 +1,5 @@
+// TODO move to covutils
+
 /**
  * @external {Range} https://github.com/Reading-eScience-Centre/coverage-jsapi/blob/master/Range.md
  */

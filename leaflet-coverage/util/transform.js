@@ -1,7 +1,9 @@
 import ndarray from 'ndarray'
 
-import {COVJSON_GRID, COVJSON_DATATYPE_TUPLE} from './constants.js'
+import {COVJSON_GRID, COVJSON_DATATYPE_TUPLE, COVERAGE, DOMAIN} from './constants.js'
 import {getHorizontalCRSReferenceObject, getProjection} from './referencing.js'
+
+import {checkCoverage} from 'covutils/lib/validate.js'
 
 /**
  * Returns a copy of the given Coverage object with the parameters
@@ -11,6 +13,7 @@ import {getHorizontalCRSReferenceObject, getProjection} from './referencing.js'
  */
 export function withParameters (cov, params) {
   let newcov = {
+    type: COVERAGE,
     profiles: cov.profiles,
     domainProfiles: cov.domainProfiles,
     parameters: params,
@@ -41,6 +44,7 @@ export function withCategories (cov, key, observedProperty, mapping) {
     throw new Error('mapping parameter must be a Map from/to category ID')
   }
   */
+  checkCoverage(cov)
   if (observedProperty.categories.some(c => !c.id)) {
     throw new Error('At least one category object is missing the "id" property')
   }
@@ -78,6 +82,8 @@ export function withCategories (cov, key, observedProperty, mapping) {
  * @returns {Coverage}
  */
 export function mapRange (cov, key, fn, dataType) {
+  checkCoverage(cov)
+  
   let rangeWrapper = range => {
     let newrange = {
       shape: range.shape,
@@ -93,6 +99,7 @@ export function mapRange (cov, key, fn, dataType) {
     .then(ranges => new Map([...ranges].map(([paramKey, range]) => [paramKey, key === paramKey ? rangeWrapper(range) : range])))
   
   let newcov = {
+    type: COVERAGE,
     profiles: cov.profiles,
     domainProfiles: cov.domainProfiles,
     parameters: cov.parameters,
@@ -119,6 +126,7 @@ export function mapRange (cov, key, fn, dataType) {
  * @returns {Promise<Coverage>}
  */
 export function maskByPolygon (cov, polygon) {
+  checkCoverage(cov)
   if (cov.domainProfiles.indexOf(COVJSON_GRID) === -1) {
     throw new Error('Only grids can be masked by polygon currently, domain profiles: ' + cov.domainProfiles)
   }
@@ -266,12 +274,14 @@ export function reproject (cov, refDomain) {
     })
     
     let newDomain = {
+      type: DOMAIN,
       profiles: sourceDomain.profiles,
       axes: newAxes,
       referencing: newReferencing
     }
     
     let newCoverage = {
+      type: COVERAGE,
       profiles: cov.profiles,
       domainProfiles: cov.domainProfiles,
       parameters: cov.parameters,

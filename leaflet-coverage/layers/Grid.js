@@ -4,12 +4,16 @@ import {linearPalette, directPalette, scale} from './palettes.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
+
+import {isDomain} from 'covutils/lib/validate.js'
+import {toCoverage} from 'covutils/lib/transform.js'
   
 const DEFAULT_CONTINUOUS_PALETTE = () => linearPalette(['#deebf7', '#3182bd']) // blues
 const DEFAULT_CATEGORICAL_PALETTE = n => linearPalette(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3'], n)
 
 /**
- * Renderer for Coverages with domain type Grid.
+ * Renderer for Coverages and Domains with (domain) profile Grid.
+ * For Domain objects, a dummy parameter and range data is created.
  * 
  * Events:
  * "add" - Layer is initialized and is about to be added to the map
@@ -26,7 +30,8 @@ const DEFAULT_CATEGORICAL_PALETTE = n => linearPalette(['#e41a1c', '#377eb8', '#
 export default class Grid extends L.TileLayer.Canvas {
   
   /**
-   * The parameter to display must be given as the 'parameter' options property.
+   * The key of the parameter to display must be given in the 'keys' options property,
+   * except when the coverage data object is a Domain object.
    * 
    * Optional time and vertical axis target values can be defined with the 'time' and
    * 'vertical' options properties. The closest values on the respective axes are chosen.
@@ -45,6 +50,11 @@ export default class Grid extends L.TileLayer.Canvas {
    */
   constructor (cov, options) {
     super()
+    
+    if (isDomain(cov)) {
+      cov = toCoverage(cov)
+      options.keys = [cov.parameters.keys().next.value]
+    }
     
     this.cov = cov
     this.param = cov.parameters.get(options.keys[0])

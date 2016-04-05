@@ -1,3 +1,5 @@
+// TODO move to covutils
+
 /** @ignore */
 export const DEFAULT_LANGUAGE = 'en'
 

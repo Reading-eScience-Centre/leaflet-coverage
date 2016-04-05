@@ -12,3 +12,6 @@ export const COVJSON_MULTIPOLYGON = COVJSON_PREFIX + 'MultiPolygon'
 // alternatively, profile URIs should live somewhere else
 export const COVJSON_DATATYPE_TUPLE = COVJSON_PREFIX + 'Tuple'
 export const COVJSON_DATATYPE_POLYGON = COVJSON_PREFIX + 'Polygon'
+
+// JS API object types
+export {COVERAGE, COVERAGECOLLECTION, DOMAIN} from 'covutils/lib/constants.js'
