@@ -5,8 +5,8 @@ import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
 
-import {isDomain} from 'covutils/lib/validate.js'
-import {toCoverage} from 'covutils/lib/transform.js'
+import {isDomain} from 'covutils/validate.js'
+import {toCoverage} from 'covutils/transform.js'
   
 const DEFAULT_CONTINUOUS_PALETTE = () => linearPalette(['#deebf7', '#3182bd']) // blues
 const DEFAULT_CATEGORICAL_PALETTE = n => linearPalette(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3'], n)

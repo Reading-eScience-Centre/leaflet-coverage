@@ -14,4 +14,4 @@ export const COVJSON_DATATYPE_TUPLE = COVJSON_PREFIX + 'Tuple'
 export const COVJSON_DATATYPE_POLYGON = COVJSON_PREFIX + 'Polygon'
 
 // JS API object types
-export {COVERAGE, COVERAGECOLLECTION, DOMAIN} from 'covutils/lib/constants.js'
+export {COVERAGE, COVERAGECOLLECTION, DOMAIN} from 'covutils/constants.js'
