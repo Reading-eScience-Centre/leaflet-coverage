@@ -3,8 +3,8 @@ import {linearPalette, scale} from './palettes.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
 
-import {isDomain} from 'covutils/validate.js'
-import {toCoverage} from 'covutils/transform.js'
+import {isDomain} from 'covutils/lib/validate.js'
+import {toCoverage} from 'covutils/lib/transform.js'
 
 const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
   

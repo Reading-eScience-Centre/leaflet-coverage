@@ -5,8 +5,8 @@ import * as referencingutil from '../util/referencing.js'
 import CircleMarkerMixin from './CircleMarkerMixin.js'
 import EventMixin from '../util/EventMixin.js'
 
-import {isDomain} from 'covutils/validate.js'
-import {toCoverage} from 'covutils/transform.js'
+import {isDomain} from 'covutils/lib/validate.js'
+import {toCoverage} from 'covutils/lib/transform.js'
 
 /** @ignore */
 export const DEFAULT_COLOR = 'black'

@@ -3,7 +3,7 @@ import ndarray from 'ndarray'
 import {COVJSON_GRID, COVJSON_DATATYPE_TUPLE, COVERAGE, DOMAIN} from './constants.js'
 import {getHorizontalCRSReferenceObject, getProjection} from './referencing.js'
 
-import {checkCoverage} from 'covutils/validate.js'
+import {checkCoverage} from 'covutils/lib/validate.js'
 
 /**
  * Returns a copy of the given Coverage object with the parameters

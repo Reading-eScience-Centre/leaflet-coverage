@@ -1,1 +1,1 @@
-export {indicesOfNearest, indexOfNearest} from 'covutils/array.js'
+export {indicesOfNearest, indexOfNearest} from 'covutils/lib/array.js'
