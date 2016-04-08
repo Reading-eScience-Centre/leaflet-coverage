@@ -114,6 +114,25 @@ export default class ContinuousLegend extends L.Control {
     this._doUpdate(true)
   }
   
+  // TODO move this into a reusable unit-formatting module
+  _getUnitString (param, language) {
+    if (!param.unit) {
+      return ''
+    }
+    if (param.unit.symbol) {
+      let unit = param.unit.symbol.value || param.unit.symbol
+      let scheme = param.unit.symbol.type
+      if (scheme === 'http://www.opengis.net/def/uom/UCUM/') {
+        if (unit === 'Cel') {
+          unit = '°C'
+        }
+      }
+      return unit
+    } else {
+      return i18n.getLanguageString(param.unit.label, language)
+    }
+  }
+  
   _doUpdate (fullUpdate) {
     let el = this._el
     
@@ -122,9 +141,7 @@ export default class ContinuousLegend extends L.Control {
       // if requested language doesn't exist, use the returned one for all other labels
       let language = i18n.getLanguageTag(param.observedProperty.label, this._language) 
       let title = i18n.getLanguageString(param.observedProperty.label, language)
-      let unit = param.unit ? 
-                 (param.unit.symbol ? param.unit.symbol.value || param.unit.symbol : i18n.getLanguageString(param.unit.label, language)) :
-                 ''
+      let unit = this._getUnitString(param, language)
        $('.legend-title', el).fill(title)
        $('.legend-uom', el).fill(unit)        
     }
