@@ -53,7 +53,7 @@ const DEFAULT_TEMPLATE_CSS = `
  *       label: { en: 'Temperature' }
  *     },
  *     unit: {
- *       symbol: 'K',
+ *       symbol: { value: 'K' },
  *       label: { en: 'Kelvin' }
  *     }
  *   },
@@ -123,7 +123,7 @@ export default class ContinuousLegend extends L.Control {
       let language = i18n.getLanguageTag(param.observedProperty.label, this._language) 
       let title = i18n.getLanguageString(param.observedProperty.label, language)
       let unit = param.unit ? 
-                 (param.unit.symbol ? param.unit.symbol : i18n.getLanguageString(param.unit.label, language)) :
+                 (param.unit.symbol ? param.unit.symbol.value || param.unit.symbol : i18n.getLanguageString(param.unit.label, language)) :
                  ''
        $('.legend-title', el).fill(title)
        $('.legend-uom', el).fill(unit)        
