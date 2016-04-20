@@ -149,6 +149,26 @@ export default class VerticalProfilePlot extends L.Popup {
     return refParam
   }
   
+  // TODO move this into a reusable unit-formatting module
+  // TODO code duplication with ContinuousLegend
+  _getUnitString (param, language) {
+    if (!param.unit) {
+      return ''
+    }
+    if (param.unit.symbol) {
+      let unit = param.unit.symbol.value || param.unit.symbol
+      let scheme = param.unit.symbol.type
+      if (scheme === 'http://www.opengis.net/def/uom/UCUM/') {
+        if (unit === 'Cel') {
+          unit = '°C'
+        }
+      }
+      return unit
+    } else {
+      return i18n.getLanguageString(param.unit.label, language)
+    }
+  }
+  
   _getPlotElement (paramKeyGroup) {    
     let refDomain = this._domains[0]
     let covsWithParamKey = zip(this._covs, paramKeyGroup)
@@ -163,7 +183,7 @@ export default class VerticalProfilePlot extends L.Popup {
     if (vertSrs) {
       if (vertSrs.cs && vertSrs.cs.axes) {
         let ax = vertSrs.cs.axes[0]
-        zUnit = ax.unit.symbol
+        zUnit = this._getUnitString(ax, this._language)
         if (ax.name) {
           zName = i18n.getLanguageString(ax.name, this._language)
         }
@@ -175,11 +195,7 @@ export default class VerticalProfilePlot extends L.Popup {
       xLabel += ' (' + zUnit + ')'
     }
     
-    let unit = refParam.unit ? 
-               (refParam.unit.symbol ? 
-                refParam.unit.symbol : 
-                i18n.getLanguageString(refParam.unit.label, this._language)) :
-               ''
+    let unit = this._getUnitString(refParam, this._language)
     let obsPropLabel = i18n.getLanguageString(refParam.observedProperty.label, this._language)
     
     // http://c3js.org/samples/simple_xy_multiple.html
