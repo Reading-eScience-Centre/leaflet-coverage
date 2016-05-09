@@ -178,9 +178,7 @@ export default class PointSeriesPlot extends L.Popup {
     let refParam = this._getRefParam(paramKeyGroup)
     
     // axis labels
-    let tName = 'Time'
-        
-    let xLabel = tName
+    let xLabel = 'Time'
     
     let unit = this._getUnitString(refParam, this._language)
     let obsPropLabel = i18n.getLanguageString(refParam.observedProperty.label, this._language)
@@ -214,7 +212,7 @@ export default class PointSeriesPlot extends L.Popup {
         if (val === null) {
           continue
         }
-        let t = tVals[j]
+        let t = new Date(tVals[j])
         x.push(t)
         y.push(val)
       }
@@ -234,6 +232,7 @@ export default class PointSeriesPlot extends L.Popup {
       },
       axis: {
         x: {
+          type: 'timeseries',
           label: {
             text: xLabel,
             position: 'outer-center'
@@ -263,7 +262,6 @@ export default class PointSeriesPlot extends L.Popup {
       },
       tooltip: {
         format: {
-          title: d => tName + ': ' + d,
           value: (value, ratio, id) => value.toPrecision(this._precision) + ' ' + unit
         }
       },

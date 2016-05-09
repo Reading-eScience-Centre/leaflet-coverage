@@ -168,6 +168,9 @@ export default class PointSeries extends CircleMarkerMixin(EventMixin(L.Class)) 
    * or undefined if the grid has no time axis.
    */
   get time () {
+    if (!this._axesSubset.t.coord) {
+      return
+    }
     let time = this.domain.axes.get('t').values[this._axesSubset.t.idx]
     return new Date(time)
   }
@@ -211,11 +214,11 @@ export default class PointSeries extends CircleMarkerMixin(EventMixin(L.Class)) 
     
   /**
    * Return the displayed value (number, or null for no-data),
-   * or undefined if not fixed to a z-coordinate or parameter.
+   * or undefined if not fixed to a t-coordinate or parameter.
    */
   getValue () {
-    if (this.param && this._axesSubset.z.coord !== undefined) {
-      let val = this.range.get({z: this._axesSubset.z.idx})
+    if (this.param && this._axesSubset.t.coord !== undefined) {
+      let val = this.range.get({t: this._axesSubset.t.idx})
       return val
     }    
   }
