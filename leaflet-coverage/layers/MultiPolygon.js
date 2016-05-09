@@ -76,6 +76,10 @@ export default class MultiPolygon extends EventMixin(L.Class) {
   getBounds () {
     return this._geojson.getBounds()
   }
+  
+  getLatLng () {
+    return this.getBounds().getCenter()
+  }
     
   get coverage () {
     return this.cov

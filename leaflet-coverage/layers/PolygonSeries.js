@@ -131,6 +131,10 @@ export default class PolygonSeries extends EventMixin(L.Class) {
     return this._geojson.getBounds()
   }
   
+  getLatLng () {
+    return this.getBounds().getCenter()
+  }
+  
   get coverage () {
     return this.cov
   }
