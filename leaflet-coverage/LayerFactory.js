@@ -1,12 +1,14 @@
 import Grid from './layers/Grid.js'
 import Trajectory from './layers/Trajectory.js'
 import Point from './layers/Point.js'
+import PointSeries from './layers/PointSeries.js'
 import PointCollection from './layers/PointCollection.js'
 import VerticalProfile from './layers/VerticalProfile.js'
 import VerticalProfileCollection from './layers/VerticalProfileCollection.js'
 import MultiPolygon from './layers/MultiPolygon.js'
 import {
   COVJSON_POINT, 
+  COVJSON_POINTSERIES, 
   COVJSON_VERTICALPROFILE, 
   COVJSON_GRID, 
   COVJSON_TRAJECTORY, 
@@ -18,6 +20,7 @@ import {
 const DEFAULT_DOMAIN_LAYER_CLASSES = {
   [COVJSON_GRID]: Grid,
   [COVJSON_POINT]: Point,
+  [COVJSON_POINTSERIES]: PointSeries,
   [COVJSON_VERTICALPROFILE]: VerticalProfile,
   [COVJSON_TRAJECTORY]: Trajectory,
   [COVJSON_MULTIPOLYGON]: MultiPolygon 
