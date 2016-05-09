@@ -135,6 +135,24 @@ export default class PolygonSeries extends EventMixin(L.Class) {
     return this.getBounds().getCenter()
   }
   
+  bindPopup (...args) {
+    this._popup = args
+    if (this._geojson) {
+      this._geojson.bindPopup(...args)
+    }
+    return this
+  }
+  
+  openPopup () {
+    this._geojson.openPopup()
+    return this
+  }
+  
+  closePopup () {
+    this._geojson.closePopup()
+    return this
+  }
+  
   get coverage () {
     return this.cov
   }
@@ -233,6 +251,10 @@ export default class PolygonSeries extends EventMixin(L.Class) {
         layer.on('click', () => this.fire('click'))
       }
     })
+    
+    if (this._popup) {
+      this._geojson.bindPopup(...this._popup)
+    }
     
     this._geojson.addTo(this._map)
   }

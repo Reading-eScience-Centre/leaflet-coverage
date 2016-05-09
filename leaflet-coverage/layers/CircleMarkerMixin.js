@@ -48,8 +48,8 @@ export default function CircleMarkerMixin (base) {
         this.fire('click', e)
       }).addTo(this._map)
       
-      if (this._deferBindPopup) {
-        this._marker.bindPopup(...this._deferBindPopup)
+      if (this._popup) {
+        this._marker.bindPopup(...this._popup)
       }
     }
     
@@ -65,11 +65,20 @@ export default function CircleMarkerMixin (base) {
     }
     
     bindPopup (...args) {
+      this._popup = args
       if (this._marker) {
         this._marker.bindPopup(...args)
-      } else {
-        this._deferBindPopup = args
       }
+    }
+    
+    openPopup () {
+      this._marker.openPopup()
+      return this
+    }
+    
+    closePopup () {
+      this._marker.closePopup()
+      return this
     }
     
     redraw () {
