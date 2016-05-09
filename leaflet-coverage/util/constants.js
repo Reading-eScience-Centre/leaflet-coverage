@@ -7,6 +7,7 @@ export const COVJSON_VERTICALPROFILE = COVJSON_PREFIX + 'VerticalProfile'
 export const COVJSON_VERTICALPROFILECOLLECTION = COVJSON_VERTICALPROFILE + COLLECTION_SUFFIX
 export const COVJSON_GRID = COVJSON_PREFIX + 'Grid'
 export const COVJSON_TRAJECTORY = COVJSON_PREFIX + 'Trajectory'
+export const COVJSON_POLYGONSERIES = COVJSON_PREFIX + 'PolygonSeries'
 export const COVJSON_MULTIPOLYGON = COVJSON_PREFIX + 'MultiPolygon'
 
 // FIXME these should maybe live under a different namespace (Polygon collides with the same-named profile)

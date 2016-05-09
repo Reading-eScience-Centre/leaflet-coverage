@@ -33,9 +33,7 @@ export default class MultiPolygon extends EventMixin(L.Class) {
     }
   }
   
-  onAdd (map) {
-    this._map = map
-    
+  load () {
     this.fire('dataLoading') // for supporting loading spinners
     
     function checkWGS84 (domain) {
@@ -45,20 +43,28 @@ export default class MultiPolygon extends EventMixin(L.Class) {
       }
     }
     
-    Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)]).then(([domain, range]) => {
-      console.log('domain and range loaded')
+    let promise = Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)]).then(([domain, range]) => {
       this.domain = domain
       checkWGS84(domain)
       this.range = range
       this._updatePaletteExtent(this._paletteExtent)
-      this._addPolygons()
-      this.fire('add')
       this.fire('dataLoad')
     }).catch(e => {
       console.error(e)
       this.fire('error', e)
       
       this.fire('dataLoad')
+    })
+    
+    return promise
+  }
+  
+  onAdd (map) {
+    this._map = map
+    
+    this.load().then(() => {
+      this._addPolygons()
+      this.fire('add')
     })
   }
   

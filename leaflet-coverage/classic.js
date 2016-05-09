@@ -15,6 +15,7 @@ import VerticalProfile from './layers/VerticalProfile.js'
 import Trajectory from './layers/Trajectory.js'
 import Point from './layers/Point.js'
 import MultiPolygon from './layers/MultiPolygon.js'
+import PolygonSeries from './layers/PolygonSeries.js'
 import PointCollection from './layers/PointCollection.js'
 import VerticalProfileCollection from './layers/VerticalProfileCollection.js'
 
@@ -49,6 +50,7 @@ c.layer.VerticalProfile = VerticalProfile
 c.layer.Trajectory = Trajectory
 c.layer.Point = Point
 c.layer.MultiPolygon = MultiPolygon
+c.layer.PolygonSeries = PolygonSeries
 c.layer.PointCollection = PointCollection
 c.layer.VerticalProfileCollection = VerticalProfileCollection
 c.popup.VerticalProfilePlot = VerticalProfilePlot

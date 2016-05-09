@@ -4,7 +4,6 @@ import * as palettes from './palettes.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
-import CircleMarkerMixin from './CircleMarkerMixin.js'
 import EventMixin from '../util/EventMixin.js'
 
 import {isDomain} from 'covutils/lib/validate.js'
@@ -22,7 +21,7 @@ import {DEFAULT_COLOR, DEFAULT_PALETTE} from './Point.js'
  * The dot either has a defined standard color, or it uses
  * a palette together with a target depth if a parameter is chosen.
  */
-export default class PointSeries extends CircleMarkerMixin(EventMixin(L.Class)) {
+export default class PolygonSeries extends EventMixin(L.Class) {
   
   constructor (cov, options) {
     super()
@@ -38,10 +37,9 @@ export default class PointSeries extends CircleMarkerMixin(EventMixin(L.Class)) 
       t: {coordPref: options.time}
     }
     this.defaultColor = options.color ? options.color : DEFAULT_COLOR
-    this.showNoData = options.showNoData // if true, draw with default color
         
     if (this.param && this.param.categories) {
-      throw new Error('category parameters are currently not support for VerticalProfile')
+      throw new Error('category parameters are currently not support for PolygonSeries')
     }
     
     if (options.palette) {
@@ -63,7 +61,7 @@ export default class PointSeries extends CircleMarkerMixin(EventMixin(L.Class)) 
     this._map = map
 
     this.load().then(() => {
-      this._addMarker()
+      this._addPolygon()
       this.fire('add')
     })
   }
@@ -126,18 +124,11 @@ export default class PointSeries extends CircleMarkerMixin(EventMixin(L.Class)) 
   
   onRemove () {
     this.fire('remove')
-    this._removeMarker()
+    this._removePolygon()
   }
   
   getBounds () {
-    return L.latLngBounds([this.getLatLng()])
-  }
-  
-  getLatLng () {
-    // TODO convert coordinates to lat/lon if necessary
-    let x = this.domain.axes.get('x').values[0]
-    let y = this.domain.axes.get('y').values[0]
-    return L.latLng(y, x)
+    return this._geojson.getBounds()
   }
   
   get coverage () {
@@ -210,6 +201,41 @@ export default class PointSeries extends CircleMarkerMixin(EventMixin(L.Class)) 
     }
 
     this._paletteExtent = rangeutil.minMax(this.range)
+  }
+  
+  _addPolygon () {
+    // TODO do coordinate transformation to lat/lon if necessary
+    
+    let polygon = this.domain.axes.get('composite').values[0]
+    
+    let geojson = {
+      "type": "Feature",
+      "properties": {
+        "color": this._getColor()
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": polygon
+      }
+    }
+    
+    this._geojson = L.geoJson(geojson, {
+      style: feature => ({
+        color: feature.properties.color,
+        fillOpacity: 1,
+        stroke: false
+      }),
+      onEachFeature: (feature, layer) => {
+        layer.on('click', () => this.fire('click'))
+      }
+    })
+    
+    this._geojson.addTo(this._map)
+  }
+  
+  _removePolygon () {
+    this._map.removeLayer(this._geojson)
+    delete this._geojson
   }
     
   /**
