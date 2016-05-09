@@ -9,21 +9,23 @@ import * as referencingUtil from '../util/referencing.js'
 
 /**
  * Displays a popup with an interactive plot showing the data
- * of the point series coverage.
+ * of a time series coverage (all axes fixed except time).
+ * 
+ * Examples are VerticalProfile or PointSeries coverages.
  * 
  * @example
- * layer.bindPopup(new PointSeriesPlot(coverage))
+ * layer.bindPopup(new TimeSeriesPlot(coverage))
  * 
  * @example <caption>Non-module access</caption>
- * L.coverage.popup.PointSeriesPlot
+ * L.coverage.popup.TimeSeriesPlot
  */
-export default class PointSeriesPlot extends L.Popup {
+export default class TimeSeriesPlot extends L.Popup {
   
   /**
-   * Creates a point series plot popup.
+   * Creates a time series plot popup.
    * 
-   * @param {Coverage|Array<Coverage>} coverage The point series coverage to visualize.
-   *   If an array of point series coverages is given, then the reference systems
+   * @param {Coverage|Array<Coverage>} coverage The time series coverage to visualize.
+   *   If an array of time series coverages is given, then the reference systems
    *   are assumed to be identical.
    * @param {object} [options] Popup options. See also http://leafletjs.com/reference.html#popup-options.
    * @param {Array|Array<Array>} [options.keys] The parameters to display.

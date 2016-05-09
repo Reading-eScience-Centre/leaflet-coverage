@@ -22,6 +22,7 @@ import * as palettes from './layers/palettes.js'
 import ParameterSync from './layers/ParameterSync.js'
 
 import VerticalProfilePlot from './popups/VerticalProfilePlot.js'
+import TimeSeriesPlot from './popups/TimeSeriesPlot.js'
 
 import * as transform from './util/transform.js'
 
@@ -51,6 +52,7 @@ c.layer.MultiPolygon = MultiPolygon
 c.layer.PointCollection = PointCollection
 c.layer.VerticalProfileCollection = VerticalProfileCollection
 c.popup.VerticalProfilePlot = VerticalProfilePlot
+c.popup.TimeSeriesPlot = TimeSeriesPlot
 c.palette = palettes
 c.transform = transform
 
