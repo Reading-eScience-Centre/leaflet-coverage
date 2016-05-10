@@ -1,6 +1,6 @@
 {
   "name": "leaflet-coverage",
-  "version": "0.3.0-dev",
+  "version": "0.3.0",
   "license": "BSD-3-Clause",
   "description": "A Leaflet plugin for visualizing coverage data",
   "repository": {
