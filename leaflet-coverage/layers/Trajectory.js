@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import {linearPalette, scale} from './palettes.js'
+import {linearPalette, scale, enlargeExtentIfEqual} from './palettes.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
 
@@ -144,7 +144,9 @@ export default class Trajectory extends L.FeatureGroup {
       throw new Error('Unknown extent specification: ' + extent)
     }
 
-    this._paletteExtent = rangeutil.minMax(range)
+    extent = rangeutil.minMax(range)
+    extent = enlargeExtentIfEqual(extent)    
+    this._paletteExtent = extent
   }
   
   _addTrajectoryLayers () {

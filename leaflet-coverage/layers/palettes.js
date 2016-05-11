@@ -97,7 +97,8 @@ export function directPalette (colors) {
  * 
  * {
  *   "colors": ["red", "blue", ..]
- *   "interpolation": "linear"
+ *   "interpolation": "linear",
+ *   "steps": 200
  * }
  * 
  * {
@@ -138,6 +139,23 @@ export function scale (val, palette, extent) {
   // (IDL bytscl formula: http://www.exelisvis.com/docs/BYTSCL.html)
   let scaled = Math.trunc((palette.steps - 1 + 0.9999) * (val - extent[0]) / (extent[1] - extent[0]))
   return scaled
+}
+
+/**
+ * Return enlarged extent if start and end are the same value,
+ * otherwise return unchanged.
+ * 
+ * @param {Array<number>} extent The extent [min,max] to enlarge.
+ * @param {number} [amount] The ratio by which to extend on each side.
+ * @return {Array<number>} The enlarged extent.
+ */
+export function enlargeExtentIfEqual (extent, amount=0.1) {
+  if (extent[0] === extent[1]) {
+    let buffer = extent[0]*amount
+    return [extent[0]-buffer, extent[1]+buffer]
+  } else {
+    return extent
+  }
 }
 
 /**

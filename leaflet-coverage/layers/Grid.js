@@ -1,6 +1,6 @@
 import L from 'leaflet'
 import ndarray from 'ndarray'
-import {linearPalette, directPalette, scale} from './palettes.js'
+import {linearPalette, directPalette, enlargeExtentIfEqual, scale} from './palettes.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
@@ -360,11 +360,7 @@ export default class Grid extends L.TileLayer.Canvas {
       // check if subsetted size is manageable
       if (xlen * ylen < 10000) {
         extent = rangeutil.minMax(this.subsetRange)
-        // enlarge extent if there is just a single value
-        if (extent[0] === extent[1]) {
-          let buffer = extent[0]*0.1
-          extent = [extent[0]-buffer, extent[1]+buffer]
-        }
+        extent = enlargeExtentIfEqual(extent)
         let changed = hasChanged(extent)
         this._paletteExtent = extent
         return Promise.resolve(changed)

@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import {linearPalette, scale} from './palettes.js'
+import {linearPalette, scale, enlargeExtentIfEqual} from './palettes.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
 import EventMixin from '../util/EventMixin.js'
@@ -115,7 +115,9 @@ export default class MultiPolygon extends EventMixin(L.Class) {
       return
     }
     
-    this._paletteExtent = rangeutil.minMax(this.range)
+    extent = rangeutil.minMax(this.range)
+    extent = enlargeExtentIfEqual(extent)
+    this._paletteExtent = extent
   }
   
   _addPolygons () {

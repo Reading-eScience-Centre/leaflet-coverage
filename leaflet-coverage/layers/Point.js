@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import {linearPalette, scale} from './palettes.js'
+import {linearPalette, scale, enlargeExtentIfEqual} from './palettes.js'
 import * as palettes from './palettes.js'
 import * as referencingutil from '../util/referencing.js'
 import CircleMarkerMixin from './CircleMarkerMixin.js'
@@ -159,7 +159,8 @@ export default class Point extends CircleMarkerMixin(EventMixin(L.Class)) {
     }
 
     let val = this.getValue()
-    this._paletteExtent = [val, val]
+    extent = enlargeExtentIfEqual([val, val])
+    this._paletteExtent = extent
   }
   
   /**

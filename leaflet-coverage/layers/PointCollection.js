@@ -1,7 +1,7 @@
 import L from 'leaflet'
 
 import {default as Point, DEFAULT_COLOR, DEFAULT_PALETTE} from './Point.js'
-import * as palettes from './palettes.js'
+import {create as createPalette, enlargeExtentIfEqual} from './palettes.js'
 import {kdTree} from '../util/kdTree.js'
 
 /**
@@ -27,7 +27,7 @@ class PointCollection extends L.Class {
     if (options.palette) {
       this._palette = options.palette
     } else if (this.param && this.param.preferredPalette) {
-      this._palette = palettes.create(this.param.preferredPalette)
+      this._palette = createPalette(this.param.preferredPalette)
     } else {
       this._palette = DEFAULT_PALETTE
     }
@@ -197,7 +197,7 @@ class PointCollection extends L.Class {
         max = Math.max(max, val)
       }
     }
-    this._paletteExtent = [min, max]
+    this._paletteExtent = enlargeExtentIfEqual([min, max])
     
     for (let layer of this._layers) {
       layer.paletteExtent = this._paletteExtent

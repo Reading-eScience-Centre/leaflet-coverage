@@ -1,6 +1,5 @@
 import L from 'leaflet'
-import {scale} from './palettes.js'
-import * as palettes from './palettes.js'
+import {scale, create as createPalette, enlargeExtentIfEqual} from './palettes.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
@@ -47,7 +46,7 @@ export default class PointSeries extends CircleMarkerMixin(EventMixin(L.Class)) 
     if (options.palette) {
       this._palette = options.palette
     } else if (this.param && this.param.preferredPalette) {
-      this._palette = palettes.create(this.param.preferredPalette)
+      this._palette = createPalette(this.param.preferredPalette)
     } else {
       this._palette = DEFAULT_PALETTE
     }
@@ -209,7 +208,9 @@ export default class PointSeries extends CircleMarkerMixin(EventMixin(L.Class)) 
       throw new Error('palette extent cannot be set when no parameter has been chosen')
     }
 
-    this._paletteExtent = rangeutil.minMax(this.range)
+    extent = rangeutil.minMax(this.range)
+    extent = enlargeExtentIfEqual(extent)
+    this._paletteExtent = extent
   }
     
   /**
