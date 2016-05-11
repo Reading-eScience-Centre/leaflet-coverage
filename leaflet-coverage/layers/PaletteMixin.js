@@ -1,7 +1,13 @@
 import {linearPalette, directPalette, create as createPalette, scale} from './palettes.js'
 
 const DEFAULT_CONTINUOUS_PALETTE = () => linearPalette(['#deebf7', '#3182bd']) // blues
-const DEFAULT_CATEGORICAL_PALETTE = n => linearPalette(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3'], n)
+const DEFAULT_CATEGORICAL_PALETTE = n => {
+  if (n > 12) {
+    throw new Error('not enough built-in categorical colors, must supply custom colors')
+  }
+  return directPalette(['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c',
+                        '#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928'].slice(0,n))
+}
 
 /**
  * A mixin that encapsulates the palette logic of a coverage layer,
