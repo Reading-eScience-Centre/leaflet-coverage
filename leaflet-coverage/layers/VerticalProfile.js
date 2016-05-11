@@ -1,15 +1,16 @@
 import L from 'leaflet'
-import {scale, create as createPalette, enlargeExtentIfEqual} from './palettes.js'
+import {enlargeExtentIfEqual} from './palettes.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
 import CircleMarkerMixin from './CircleMarkerMixin.js'
+import PaletteMixin from './PaletteMixin.js'
 import EventMixin from '../util/EventMixin.js'
 
 import {isDomain} from 'covutils/lib/validate.js'
 import {toCoverage} from 'covutils/lib/transform.js'
 
-import {DEFAULT_COLOR, DEFAULT_PALETTE} from './Point.js'
+import {DEFAULT_COLOR} from './Point.js'
 
 /**
  * Renderer for Coverages with domain type Profile.
@@ -19,7 +20,7 @@ import {DEFAULT_COLOR, DEFAULT_PALETTE} from './Point.js'
  * The dot either has a defined standard color, or it uses
  * a palette together with a target depth if a parameter is chosen.
  */
-export default class VerticalProfile extends CircleMarkerMixin(EventMixin(L.Class)) {
+export default class VerticalProfile extends PaletteMixin(CircleMarkerMixin(EventMixin(L.Class))) {
   
   constructor (cov, options) {
     super()
@@ -28,6 +29,12 @@ export default class VerticalProfile extends CircleMarkerMixin(EventMixin(L.Clas
       cov = toCoverage(cov)
       delete options.keys
     }
+    
+    if (!options.paletteExtent) {
+      options.paletteExtent = 'full'
+    }
+    
+    L.Util.setOptions(this, options)
 
     this.cov = cov
     this.param = options.keys ? cov.parameters.get(options.keys[0]) : null
@@ -36,24 +43,6 @@ export default class VerticalProfile extends CircleMarkerMixin(EventMixin(L.Clas
     }
     this.defaultColor = options.color ? options.color : DEFAULT_COLOR
     this.showNoData = options.showNoData // if true, draw with default color
-        
-    if (this.param && this.param.categories) {
-      throw new Error('category parameters are currently not support for VerticalProfile')
-    }
-    
-    if (options.palette) {
-      this._palette = options.palette
-    } else if (this.param && this.param.preferredPalette) {
-      this._palette = createPalette(this.param.preferredPalette)
-    } else {
-      this._palette = DEFAULT_PALETTE
-    }
-    
-    if (Array.isArray(options.paletteExtent)) {
-      this._paletteExtent = options.paletteExtent
-    } else {
-      this._paletteExtent = 'full'
-    }
   }
   
   onAdd (map) {
@@ -87,7 +76,7 @@ export default class VerticalProfile extends CircleMarkerMixin(EventMixin(L.Clas
           this.domain = domain
           this._subsetByCoordinatePreference()
           this.range = range
-          this._updatePaletteExtent(this._paletteExtent)
+          this.initializePalette()
           this.fire('dataLoad')
         })
     } else {
@@ -164,40 +153,23 @@ export default class VerticalProfile extends CircleMarkerMixin(EventMixin(L.Clas
     }
     return vals
   }
-  
-  set palette (p) {
-    this._palette = p
-    this.redraw()
-    this.fire('paletteChange')
-  }
-  
-  get palette () {
-    return this.param && this.vertical !== undefined ? this._palette : undefined
-  }
-  
-  set paletteExtent (extent) {
-    this._updatePaletteExtent(extent)
-    this.redraw()
-    this.fire('paletteExtentChange')
-  }
-  
-  get paletteExtent () {
-    return this._paletteExtent
-  }
-  
-  _updatePaletteExtent (extent) {
-    if (Array.isArray(extent) && extent.length === 2) {
-      this._paletteExtent = extent
-      return
-    }
     
-    if (!this.param) {
-      throw new Error('palette extent cannot be set when no parameter has been chosen')
+  canUsePalette () {
+    return this.vertical !== undefined
+  }
+    
+  computePaletteExtent (extent) {
+    if (extent === 'full') {
+      if (!this.parameter) {
+        throw new Error('palette extent cannot be set when no parameter has been chosen')
+      }
+      
+      extent = rangeutil.minMax(this.range)
+      extent = enlargeExtentIfEqual(extent)
+      return Promise.resolve(extent)
+    } else {
+      throw new Error('Unknown extent specification: ' + extent)
     }
-
-    extent = rangeutil.minMax(this.range)
-    extent = enlargeExtentIfEqual(extent)
-    this._paletteExtent = extent
   }
     
   /**
@@ -221,9 +193,9 @@ export default class VerticalProfile extends CircleMarkerMixin(EventMixin(L.Clas
       return this.defaultColor
     } else {
       // use a palette
-      let valScaled = scale(val, this.palette, this.paletteExtent)        
+      let idx = this.getPaletteIndex(val)
       let {red, green, blue} = this.palette
-      return {r: red[valScaled], g: green[valScaled], b: blue[valScaled]}
+      return {r: red[idx], g: green[idx], b: blue[idx]}
     }
   }
 }

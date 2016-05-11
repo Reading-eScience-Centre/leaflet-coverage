@@ -1,6 +1,7 @@
 import L from 'leaflet'
 import ndarray from 'ndarray'
-import {linearPalette, directPalette, enlargeExtentIfEqual, scale} from './palettes.js'
+import {enlargeExtentIfEqual} from './palettes.js'
+import PaletteMixin from './PaletteMixin.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
@@ -8,9 +9,6 @@ import * as referencingutil from '../util/referencing.js'
 import {isDomain} from 'covutils/lib/validate.js'
 import {toCoverage} from 'covutils/lib/transform.js'
   
-const DEFAULT_CONTINUOUS_PALETTE = () => linearPalette(['#deebf7', '#3182bd']) // blues
-const DEFAULT_CATEGORICAL_PALETTE = n => linearPalette(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3'], n)
-
 /**
  * Renderer for Coverages and Domains with (domain) profile Grid.
  * For Domain objects, a dummy parameter and range data is created.
@@ -27,7 +25,7 @@ const DEFAULT_CATEGORICAL_PALETTE = n => linearPalette(['#e41a1c', '#377eb8', '#
  * "remove" - Layer is removed from the map
  * 
  */
-export default class Grid extends L.TileLayer.Canvas {
+export default class Grid extends PaletteMixin(L.TileLayer.Canvas) {
   
   /**
    * The key of the parameter to display must be given in the 'keys' options property,
@@ -56,91 +54,18 @@ export default class Grid extends L.TileLayer.Canvas {
       options.keys = [cov.parameters.keys().next.value]
     }
     
+    if (!options.paletteExtent) {
+      options.paletteExtent = 'subset'
+    }
+    
+    L.Util.setOptions(this, options)
+    
     this.cov = cov
     this.param = cov.parameters.get(options.keys[0])
     this._axesSubset = { // x and y are not subsetted
         t: {coordPref: options.time ? options.time.toISOString() : undefined},
         z: {coordPref: options.vertical}
     }
-    this._initCategoryIdxMap()
-    
-    let categories = this.param.observedProperty.categories
-    
-    if (options.palette) {
-      this._palette = options.palette
-    } else if (categories) {
-      if (categories.every(cat => cat.preferredColor)) {
-        this._palette = directPalette(categories.map(cat => cat.preferredColor))
-      } else {
-        this._palette = DEFAULT_CATEGORICAL_PALETTE(categories.length)
-      }
-    } else {
-      this._palette = DEFAULT_CONTINUOUS_PALETTE()
-    }
-    
-    if (categories && categories.length !== this._palette.steps) {
-      throw new Error('Categorical palettes must match the number of categories of the parameter')
-    }
-    
-    if (categories) {
-      if (options.paletteExtent) {
-        throw new Error('paletteExtent cannot be given for categorical parameters')
-      }
-    } else {
-      if (!options.paletteExtent) {
-        this._paletteExtent = 'subset'
-      } else if (Array.isArray(options.paletteExtent) || ['subset', 'fov'].indexOf(options.paletteExtent) !== -1) {
-        this._paletteExtent = options.paletteExtent
-      } else {
-        throw new Error('paletteExtent must either be a 2-element array, one of "subset" or "fov", or be omitted')
-      }
-    }
-  }
-  
-  /**
-   * Sets up a lookup table from categorical range value to palette index.
-   */
-  _initCategoryIdxMap () {
-    if (!this.param.categoryEncoding) return
-    
-    // categorical parameter with integer encoding
-    // Note: The palette order is equal to the categories array order.
-    let max = -Infinity
-    let min = Infinity
-    let categories = this.param.observedProperty.categories
-    let encoding = this.param.categoryEncoding
-    for (let category of categories) {
-      if (encoding.has(category.id)) {
-        for (let val of encoding.get(category.id)) {
-          max = Math.max(max, val)
-          min = Math.min(min, val)
-        }
-      }
-    }
-    let valIdxMap
-    if (categories.length < 256) {
-      if (max > 10000 || min < 0) {
-        // TODO implement fallback to Map implementation
-        throw new Error('category values too high (>10000) or low (<0)')
-      }
-      valIdxMap = new Uint8Array(max+1)
-      for (let i=0; i <= max; i++) {
-        // the above length < 256 check ensures that no palette index is ever 255
-        valIdxMap[i] = 255
-      }
-      
-      for (let idx=0; idx < categories.length; idx++) {
-        let category = categories[idx]
-        if (encoding.has(category.id)) {
-          for (let val of this.param.categoryEncoding.get(category.id)) {
-            valIdxMap[val] = idx
-          }
-        }
-      }
-    } else {
-      throw new Error('Too many categories: ' + categories.length)
-    }
-    this._categoryIdxMap = valIdxMap
   }
   
   onAdd (map) {
@@ -158,6 +83,7 @@ export default class Grid extends L.TileLayer.Canvas {
         }
       })
       .then(() => this._subsetByCoordinatePreference())
+      .then(() => this.initializePalette())
       .then(() => {
         this.errored = false
         this.fire('add')
@@ -234,11 +160,6 @@ export default class Grid extends L.TileLayer.Canvas {
       .then(([subsetDomain, subsetRange]) => {
         this.subsetDomain = subsetDomain
         this.subsetRange = subsetRange
-        if (!this.param.observedProperty.categories) {
-          return this._updatePaletteExtent(this._paletteExtent)
-        }
-      })
-      .then(() => {
         this.fire('dataLoad')
       })
       .catch(e => {
@@ -326,31 +247,8 @@ export default class Grid extends L.TileLayer.Canvas {
       return vals
     }
   }
-   
-  set palette (p) {
-    this._palette = p
-    this._redraw()
-    this.fire('paletteChange')
-  }
   
-  get palette () {
-    return this._palette
-  }
-  
-  _updatePaletteExtent (extent) {
-    let hasChanged = newExtent => {
-      let oldExtent = this._paletteExtent
-      if (!Array.isArray(oldExtent)) return true
-      if (oldExtent[0] !== newExtent[0] || oldExtent[1] !== newExtent[1]) return true
-      return false
-    }
-    
-    if (Array.isArray(extent) && extent.length === 2) {
-      let changed = hasChanged(extent)
-      this._paletteExtent = extent
-      return Promise.resolve(changed)
-    }
-        
+  computePaletteExtent (extent) {
     if (extent === 'subset') {
       // scan the current subset for min/max values
       
@@ -361,9 +259,7 @@ export default class Grid extends L.TileLayer.Canvas {
       if (xlen * ylen < 10000) {
         extent = rangeutil.minMax(this.subsetRange)
         extent = enlargeExtentIfEqual(extent)
-        let changed = hasChanged(extent)
-        this._paletteExtent = extent
-        return Promise.resolve(changed)
+        return Promise.resolve(extent)
       } else {
         // subset x and y to get a fast estimate of the palette extent
         // since it is an estimate, the lower and upper bound needs a small buffer
@@ -377,9 +273,7 @@ export default class Grid extends L.TileLayer.Canvas {
                let [min,max] = rangeutil.minMax(subsetRange)
                let buffer = (max-min)*0.1 // 10% buffer on each side
                extent = [min-buffer, max+buffer]
-               let changed = hasChanged(extent)
-               this._paletteExtent = extent
-               return changed
+               return extent
             })
           })
       }
@@ -393,21 +287,6 @@ export default class Grid extends L.TileLayer.Canvas {
     } else {
       throw new Error('Unknown extent specification: ' + extent)
     }
-  }
-  
-  set paletteExtent (extent) {
-    if (this.param.observedProperty.categories) {
-      throw new Error('Cannot set palette extent for categorical parameters')
-    }
-    this._updatePaletteExtent(extent).then(changed => {
-      if (!changed) return
-      this._redraw()
-      this.fire('paletteExtentChange')
-    })
-  }
-  
-  get paletteExtent () {
-    return this._paletteExtent
   }
   
   /**
@@ -455,34 +334,16 @@ export default class Grid extends L.TileLayer.Canvas {
     let startX = start.x
     let startY = start.y
     
-    let palette = this.palette
     let {red, green, blue} = this.palette
-    let paletteExtent = this.paletteExtent
-    
-    let doSetPixel = (tileY, tileX, idx) => {
-      rgba.set(tileY, tileX, 0, red[idx])
-      rgba.set(tileY, tileX, 1, green[idx])
-      rgba.set(tileY, tileX, 2, blue[idx])
-      rgba.set(tileY, tileX, 3, 255)
-    }
-    
-    let setPixel
-    if (this.param.categoryEncoding) {
-      // categorical parameter with integer encoding
-      let valIdxMap = this._categoryIdxMap
-      let max = valIdxMap.length - 1
-      setPixel = (tileY, tileX, val) => {
-        if (val === null || val < 0 || val > max) return
-        let idx = valIdxMap[val]
-        if (idx === 255) return
-        doSetPixel(tileY, tileX, idx)
-      }
-    } else {
-      // continuous parameter
-      setPixel = (tileY, tileX, val) => {
-        if (val === null) return
-        let idx = scale(val, palette, paletteExtent)
-        doSetPixel(tileY, tileX, idx)
+        
+    let getPaletteIndex = this.getPaletteIndex
+    let setPixel = (tileY, tileX, val) => {
+      let idx = getPaletteIndex(val)
+      if (idx !== undefined) {
+        rgba.set(tileY, tileX, 0, red[idx])
+        rgba.set(tileY, tileX, 1, green[idx])
+        rgba.set(tileY, tileX, 2, blue[idx])
+        rgba.set(tileY, tileX, 3, 255)
       }
     }
     
@@ -695,15 +556,14 @@ export default class Grid extends L.TileLayer.Canvas {
     // TODO implement
     return false
   }
-  
-  _redraw () {
+    
+  redraw () {
     // we check getContainer() to prevent errors when trying to redraw when the layer has not
     // fully initialized yet
     if (this.getContainer()) {
-      this.redraw()
+      L.TileLayer.Canvas.prototype.redraw.call(this)
     }
   }
-  
 }
 
 function wrapLongitude (lon, range) {

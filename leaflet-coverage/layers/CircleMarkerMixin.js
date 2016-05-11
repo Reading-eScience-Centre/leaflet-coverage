@@ -19,6 +19,7 @@ export default function CircleMarkerMixin (base) {
      * _getColor(val)
      * getLatLng()
      * coverage
+     * showNoData (default: false)
      */
   
     _addMarker () {

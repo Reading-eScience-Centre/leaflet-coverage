@@ -1,18 +1,20 @@
 import L from 'leaflet'
-import {linearPalette, scale, enlargeExtentIfEqual} from './palettes.js'
+import {enlargeExtentIfEqual} from './palettes.js'
+import PaletteMixin from './PaletteMixin.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
 import EventMixin from '../util/EventMixin.js'
 
 import {isDomain} from 'covutils/lib/validate.js'
 import {toCoverage} from 'covutils/lib/transform.js'
-
-const DEFAULT_PALETTE = linearPalette(['#deebf7', '#3182bd']) // blues
   
+/** @ignore */
+export const DEFAULT_COLOR = 'black'
+
 /**
  * Renderer for Coverages and Domains with (domain) profile MultiPolygon.
  */
-export default class MultiPolygon extends EventMixin(L.Class) {
+export default class MultiPolygon extends PaletteMixin(EventMixin(L.Class)) {
   
   constructor (cov, options) {
     super()
@@ -22,15 +24,15 @@ export default class MultiPolygon extends EventMixin(L.Class) {
       options.keys = [cov.parameters.keys().next.value]
     }
     
-    this.cov = cov
-    this.param = cov.parameters.get(options.keys[0])
-    
-    this._palette = options.palette || DEFAULT_PALETTE
-    if (Array.isArray(options.paletteExtent)) {
-      this._paletteExtent = options.paletteExtent
-    } else {
-      this._paletteExtent = 'full'
+    if (!options.paletteExtent) {
+      options.paletteExtent = 'full'
     }
+    
+    L.Util.setOptions(this, options)
+    
+    this.cov = cov
+    this.param = options.keys ? cov.parameters.get(options.keys[0]) : null
+    this.defaultColor = options.color || DEFAULT_COLOR
   }
   
   load () {
@@ -43,16 +45,27 @@ export default class MultiPolygon extends EventMixin(L.Class) {
       }
     }
     
-    let promise = Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)]).then(([domain, range]) => {
-      this.domain = domain
-      checkWGS84(domain)
-      this.range = range
-      this._updatePaletteExtent(this._paletteExtent)
-      this.fire('dataLoad')
-    }).catch(e => {
+    let promise    
+    if (this.param) {
+      promise = Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)])
+        .then(([domain, range]) => {
+          this.domain = domain
+          checkWGS84(domain)
+          this.range = range
+          this.initializePalette()
+          this.fire('dataLoad')
+        })
+    } else {
+      promise = this.cov.loadDomain().then(domain => {
+        this.domain = domain
+        checkWGS84(domain)
+        this.fire('dataLoad')
+      })
+    }
+    
+    promise.catch(e => {
       console.error(e)
       this.fire('error', e)
-      
       this.fire('dataLoad')
     })
     
@@ -88,36 +101,19 @@ export default class MultiPolygon extends EventMixin(L.Class) {
   get parameter () {
     return this.param
   }
+      
+  computePaletteExtent (extent) {
+    if (extent === 'full') {
+      if (!this.parameter) {
+        throw new Error('palette extent cannot be computed when no parameter has been chosen')
+      }
     
-  set palette (p) {
-    this._palette = p
-    this.redraw()
-    this.fire('paletteChange')
-  }
-  
-  get palette () {
-    return this.param ? this._palette : null
-  }
-  
-  set paletteExtent (extent) {
-    this._updatePaletteExtent(extent)
-    this.redraw()
-    this.fire('paletteExtentChange')
-  }
-  
-  get paletteExtent () {
-    return this._paletteExtent
-  }
-  
-  _updatePaletteExtent (extent) {
-    if (Array.isArray(extent) && extent.length === 2) {
-      this._paletteExtent = extent
-      return
+      extent = rangeutil.minMax(this.range)
+      extent = enlargeExtentIfEqual(extent)
+      return Promise.resolve(extent)
+    } else {
+      throw new Error('Unknown extent specification: ' + extent)
     }
-    
-    extent = rangeutil.minMax(this.range)
-    extent = enlargeExtentIfEqual(extent)
-    this._paletteExtent = extent
   }
   
   _addPolygons () {
@@ -131,7 +127,7 @@ export default class MultiPolygon extends EventMixin(L.Class) {
         "type": "Feature",
         "properties": {
           "index": i,
-          "color": this._getColor(i)
+          "color": this._getColor(this._getValue(i))
         },
         "geometry": {
           "type": "Polygon",
@@ -161,15 +157,26 @@ export default class MultiPolygon extends EventMixin(L.Class) {
     delete this._geojson
   }
   
-  _getColor (index) {
-    // use a palette
-    let val = this.range.get({composite: index})
-    if (val !== null) {
-      let valScaled = scale(val, this.palette, this.paletteExtent)        
-      let {red, green, blue} = this.palette
-      return `rgb(${red[valScaled]}, ${green[valScaled]}, ${blue[valScaled]})`
+  _getValue (index) {
+    if (this.param) {
+      return this.range.get({composite: index})
     }
-    
+  }
+  
+  // NOTE: this returns a string, not an {r,g,b} object as in other classes!
+  _getColor (val) {
+    if (val === null) {
+      // no-data
+      return this.defaultColor
+    } else if (val === undefined) {
+      // not fixed to a param
+      return this.defaultColor
+    } else {
+      // use a palette
+      let idx = this.getPaletteIndex(val)
+      let {red, green, blue} = this.palette
+      return `rgb(${red[idx]}, ${green[idx]}, ${blue[idx]})`
+    }
   }
   
   _updatePolygons () {

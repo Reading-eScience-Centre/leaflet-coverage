@@ -1,48 +1,47 @@
 import L from 'leaflet'
 
-import {default as Point, DEFAULT_COLOR, DEFAULT_PALETTE} from './Point.js'
-import {create as createPalette, enlargeExtentIfEqual} from './palettes.js'
+import PaletteMixin from './PaletteMixin.js'
+import EventMixin from '../util/EventMixin.js'
+import {default as Point, DEFAULT_COLOR} from './Point.js'
+import {enlargeExtentIfEqual} from './palettes.js'
 import {kdTree} from '../util/kdTree.js'
 
 /**
  * A collection of points sharing the same parameters / referencing.
  * 
  */
-class PointCollection extends L.Class {
+export default class PointCollection extends PaletteMixin(EventMixin(L.Class)) {
   constructor (covcoll, options) {
     super()
     
     // TODO how should we handle collection paging?
+    
+    if (!options.paletteExtent) {
+      options.paletteExtent = 'full'
+    }
+    
+    L.Util.setOptions(this, options)
 
     this.covcoll = covcoll
     this.param = options.keys ? covcoll.parameters.get(options.keys[0]) : null
     this.defaultColor = options.color || DEFAULT_COLOR
     this.pointClass = options.pointClass || Point
     this.pointOptionsFn = options.pointOptionsFn
-    
-    if (this.param && this.param.categories) {
-      throw new Error('category parameters are currently not supported for VerticalProfileCollection')
-    }
-    
-    if (options.palette) {
-      this._palette = options.palette
-    } else if (this.param && this.param.preferredPalette) {
-      this._palette = createPalette(this.param.preferredPalette)
-    } else {
-      this._palette = DEFAULT_PALETTE
-    }
-
-    if (!options.paletteExtent) {
-      this._paletteExtent = 'full'
-    } else if (Array.isArray(options.paletteExtent) || ['full', 'fov'].indexOf(options.paletteExtent) !== -1) {
-      this._paletteExtent = options.paletteExtent
-    } else {
-      throw new Error('paletteExtent must either be a 2-element array, one of "full" or "fov", or be omitted')
-    }
         
     this._layerGroup = L.layerGroup()
     this._layers = []
     this._kdtree = undefined
+    
+    this.on('paletteChange', () => {
+      for (let layer of this._layers) {
+        layer.palette = this.palette
+      }
+    })
+    this.on('paletteExtentChange', () => {
+      for (let layer of this._layers) {
+        layer.paletteExtent = this.paletteExtent
+      }
+    })
   }
   
   onAdd (map) {
@@ -53,8 +52,8 @@ class PointCollection extends L.Class {
     let options = {
       keys: this.param ? [this.param.key] : undefined,
       color: this.defaultColor,
-      palette: this._palette,
-      paletteExtent: this._paletteExtent
+      palette: this.palette,
+      paletteExtent: this.paletteExtent
     }
     if (this.pointOptionsFn) {
       let opts = this.pointOptionsFn()
@@ -96,7 +95,7 @@ class PointCollection extends L.Class {
       } else {
         this._initKdtree()
         if (this.param) {
-          this._updatePaletteExtent(this._paletteExtent)
+          this.initializePalette()
         }
         this._layerGroup.addTo(this._map)
         this.fire('add')
@@ -146,34 +145,8 @@ class PointCollection extends L.Class {
   get parameter () {
     return this.param
   }
-  
-  get palette () {
-    return this.param ? this._palette : undefined
-  }
-  
-  set palette (val) {
-    this._palette = val
-    for (let layer of this._layers) {
-      layer.palette = val
-    }
-    this.fire('paletteChange')
-  }
-  
-  set paletteExtent (extent) {
-    this._updatePaletteExtent(extent)
-    this.fire('paletteExtentChange')
-  }
-  
-  get paletteExtent () {
-    return this._paletteExtent
-  }
-  
-  _updatePaletteExtent (extent) {
-    if (Array.isArray(extent) && extent.length === 2) {
-      this._paletteExtent = extent
-      return
-    }
     
+  computePaletteExtent (extent) {
     if (!this.param) {
       throw new Error('palette extent cannot be set when no parameter has been chosen')
     }
@@ -197,11 +170,8 @@ class PointCollection extends L.Class {
         max = Math.max(max, val)
       }
     }
-    this._paletteExtent = enlargeExtentIfEqual([min, max])
-    
-    for (let layer of this._layers) {
-      layer.paletteExtent = this._paletteExtent
-    }
+    extent = enlargeExtentIfEqual([min, max])
+    return Promise.resolve(extent)
   }
   
   redraw () {
@@ -210,8 +180,3 @@ class PointCollection extends L.Class {
     }
   }
 }
-
-PointCollection.include(L.Mixin.Events)
-
-//work-around for Babel bug, otherwise PointCollection cannot be referenced here
-export { PointCollection as default }
