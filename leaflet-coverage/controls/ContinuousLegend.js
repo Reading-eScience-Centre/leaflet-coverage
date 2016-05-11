@@ -125,6 +125,8 @@ export default class ContinuousLegend extends L.Control {
       if (scheme === 'http://www.opengis.net/def/uom/UCUM/') {
         if (unit === 'Cel') {
           unit = '°C'
+        } else if (unit === '1') {
+          unit = ''
         }
       }
       return unit
