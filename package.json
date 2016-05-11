@@ -1,6 +1,6 @@
 {
   "name": "leaflet-coverage",
-  "version": "0.3.0-dev",
+  "version": "0.3.0",
   "license": "BSD-3-Clause",
   "description": "A Leaflet plugin for visualizing coverage data",
   "repository": {
@@ -26,9 +26,11 @@
     "test": "karma start --single-run",
     "karma": "karma start",
     "saucelabs": "karma start karma.conf-ci.js",
-    "build": "npm run build-src && npm run build-min",
-    "build-src": "jspm bundle-sfx leaflet-coverage/classic - leaflet - c3 leaflet-coverage.src.js --globals \"{leaflet:'L', c3:'c3'}\" --format global --skip-source-maps",
-    "build-min": "jspm bundle-sfx leaflet-coverage/classic - leaflet - c3 leaflet-coverage.min.js --globals \"{leaflet:'L', c3:'c3'}\" --format global --minify --skip-source-maps",
+    "build": "npm run buildsrc && npm run buildmin",
+    "buildsrc": "jspm bundle-sfx leaflet-coverage/classic - leaflet - c3 leaflet-coverage.src.js --globals \"{leaflet:'L', c3:'c3'}\" --format global --skip-source-maps",
+    "postbuildsrc": "prepend leaflet-coverage.src.js \"c3 = window.c3 || {};\"",
+    "buildmin": "jspm bundle-sfx leaflet-coverage/classic - leaflet - c3 leaflet-coverage.min.js --globals \"{leaflet:'L', c3:'c3'}\" --format global --minify --skip-source-maps",
+    "postbuildmin": "prepend leaflet-coverage.min.js \"c3 = window.c3 || {};\"",
     "prepublish": "npm run build"
   },
   "standard": {
@@ -72,6 +74,7 @@
     "karma-mocha": "^0.2.0",
     "karma-sauce-launcher": "^0.2.14",
     "mocha": "^2.2.5",
-    "standard": "^5.1.0"
+    "standard": "^5.1.0",
+    "prepend-file-cli": "^1.0.2"
   }
 }
