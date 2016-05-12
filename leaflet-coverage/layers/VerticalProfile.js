@@ -2,7 +2,8 @@ import L from 'leaflet'
 import {enlargeExtentIfEqual} from './palettes.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
-import * as referencingutil from '../util/referencing.js'
+
+import CoverageMixin from './CoverageMixin.js'
 import CircleMarkerMixin from './CircleMarkerMixin.js'
 import PaletteMixin from './PaletteMixin.js'
 import EventMixin from '../util/EventMixin.js'
@@ -20,7 +21,7 @@ import {DEFAULT_COLOR} from './Point.js'
  * The dot either has a defined standard color, or it uses
  * a palette together with a target depth if a parameter is chosen.
  */
-export default class VerticalProfile extends PaletteMixin(CircleMarkerMixin(EventMixin(L.Class))) {
+export default class VerticalProfile extends PaletteMixin(CircleMarkerMixin(CoverageMixin(EventMixin(L.Class)))) {
   
   constructor (cov, options) {
     super()
@@ -48,54 +49,14 @@ export default class VerticalProfile extends PaletteMixin(CircleMarkerMixin(Even
   onAdd (map) {
     this._map = map
 
-    this.load().then(() => {
-      this._addMarker()
-      this.fire('add')
-    })
-  }
-  
-  /**
-   * Load all data without adding anything to the map.
-   * After loading is done, all functions and properties can be accessed (like getLatLng()).
-   */
-  load () {    
-    this.fire('dataLoading') // for supporting loading spinners
-    
-    function checkWGS84 (domain) {
-      let srs = referencingutil.getRefSystem(domain, ['x', 'y'])
-      if (!referencingutil.isGeodeticWGS84CRS(srs)) {
-        throw new Error('Unsupported CRS, must be WGS84')
-      }
-    }
-    
-    let promise    
-    if (this.param) {
-      promise = Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)])
-        .then(([domain, range]) => {
-          checkWGS84(domain)
-          this.domain = domain
-          this._subsetByCoordinatePreference()
-          this.range = range
-          this.initializePalette()
-          this.fire('dataLoad')
-        })
-    } else {
-      promise = this.cov.loadDomain().then(domain => {
-        checkWGS84(domain)
-        this.domain = domain
-        this._subsetByCoordinatePreference()
-        this.fire('dataLoad')
+    this.load()
+      .then(() => this.initializePalette())
+      .then(() => {
+        this._addMarker()
+        this.fire('add')
       })
-    }
-          
-    promise.catch(e => {
-      console.error(e)
-      this.fire('error', e)
-      this.fire('dataLoad')
-    })
-    return promise
   }
-  
+    
   _subsetByCoordinatePreference () {
     // adapted from Grid.js
     let z = this._axesSubset.z
@@ -183,8 +144,7 @@ export default class VerticalProfile extends PaletteMixin(CircleMarkerMixin(Even
     }    
   }
   
-  _getColor () {
-    let val = this.getValue()
+  _getColor (val) {
     if (val === null) {
       // no-data
       return this.defaultColor

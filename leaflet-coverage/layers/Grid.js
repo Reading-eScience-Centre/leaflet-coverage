@@ -2,6 +2,7 @@ import L from 'leaflet'
 import ndarray from 'ndarray'
 import {enlargeExtentIfEqual} from './palettes.js'
 import PaletteMixin from './PaletteMixin.js'
+import CoverageMixin from './CoverageMixin.js'
 import * as arrays from '../util/arrays.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
@@ -25,7 +26,7 @@ import {toCoverage} from 'covutils/lib/transform.js'
  * "remove" - Layer is removed from the map
  * 
  */
-export default class Grid extends PaletteMixin(L.TileLayer.Canvas) {
+export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)) {
   
   /**
    * The key of the parameter to display must be given in the 'keys' options property,
@@ -70,35 +71,21 @@ export default class Grid extends PaletteMixin(L.TileLayer.Canvas) {
   
   onAdd (map) {
     // "loading" and "load" events are provided by the underlying TileLayer class
-    
     this._map = map
-    this.fire('dataLoading') // for supporting loading spinners
-    this.cov.loadDomain()
-      .then(domain => {
-        this.domain = domain
-        
-        let srs = referencingutil.getRefSystem(domain, ['x', 'y'])
-        if (!referencingutil.isGeodeticWGS84CRS(srs)) {
-          throw new Error('Unsupported CRS, must be WGS84')
-        }
-      })
-      .then(() => this._subsetByCoordinatePreference())
+
+    this.load()
       .then(() => this.initializePalette())
       .then(() => {
         this.errored = false
+        super.onAdd(map)
         this.fire('add')
-        super.onAdd(map)
-        this.fire('dataLoad')
       })
-      .catch(e => {
+      .catch(() => {
         this.errored = true
-        console.error(e)
-        this.fire('error', e)
         super.onAdd(map)
-        this.fire('dataLoad')
       })
   }
-  
+    
   onRemove (map) {
     delete this._map
     // TODO delete references to domain/range, caching logic should happen elsewhere

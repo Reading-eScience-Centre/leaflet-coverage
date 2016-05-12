@@ -39,6 +39,9 @@ export default function PaletteMixin (base) {
     initializePalette () {
       let options = this.options
       let parameter = this.parameter
+      if (!parameter) {
+        return Promise.resolve()
+      }
       let categories = parameter.observedProperty.categories
       
       if (options.palette) {
@@ -62,13 +65,8 @@ export default function PaletteMixin (base) {
             
       this._paletteExtent = options.paletteExtent
       
-      return this.setPaletteExtent(this._paletteExtent, true)
-        .then(() => this._updatePaletteIndexFn())
-    }
-    
-    _updatePaletteIndexFn () {
       if (this.parameter.categoryEncoding) {
-        // categorical parameter
+        // categorical parameter, does not depend on palette extent
         let valIdxMap = this._categoryIdxMap
         let max = valIdxMap.length - 1
         this.getPaletteIndex = val => {
@@ -77,7 +75,18 @@ export default function PaletteMixin (base) {
           if (idx === 255) return
           return idx
         }
+      }
+      
+      if (!this.canUsePalette || this.canUsePalette()) {
+        return this.setPaletteExtent(this._paletteExtent, true)
+          .then(() => this._updatePaletteIndexFn())
       } else {
+        return Promise.resolve()
+      }
+    }
+    
+    _updatePaletteIndexFn () {
+      if (!this.parameter.categoryEncoding) {
         // continuous parameter
         let palette = this.palette
         let extent = this.paletteExtent

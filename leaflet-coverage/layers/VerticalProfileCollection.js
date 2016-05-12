@@ -25,8 +25,7 @@ export default class VerticalProfileCollection extends PointCollection {
     }
   }
   
-  // overrides PointCollection.palette
-  get palette () {
-    return this.param && this._vertical !== undefined ? this._palette : undefined
+  canUsePalette () {
+    return this._vertical !== undefined
   }
 }

@@ -1,8 +1,8 @@
 import L from 'leaflet'
 import {enlargeExtentIfEqual} from './palettes.js'
 import PaletteMixin from './PaletteMixin.js'
+import CoverageMixin from './CoverageMixin.js'
 import * as rangeutil from '../util/range.js'
-import * as referencingutil from '../util/referencing.js'
 import EventMixin from '../util/EventMixin.js'
 
 import {isDomain} from 'covutils/lib/validate.js'
@@ -14,7 +14,7 @@ export const DEFAULT_COLOR = 'black'
 /**
  * Renderer for Coverages and Domains with (domain) profile MultiPolygon.
  */
-export default class MultiPolygon extends PaletteMixin(EventMixin(L.Class)) {
+export default class MultiPolygon extends PaletteMixin(CoverageMixin(EventMixin(L.Class))) {
   
   constructor (cov, options) {
     super()
@@ -34,50 +34,15 @@ export default class MultiPolygon extends PaletteMixin(EventMixin(L.Class)) {
     this.param = options.keys ? cov.parameters.get(options.keys[0]) : null
     this.defaultColor = options.color || DEFAULT_COLOR
   }
-  
-  load () {
-    this.fire('dataLoading') // for supporting loading spinners
     
-    function checkWGS84 (domain) {
-      let srs = referencingutil.getRefSystem(domain, ['x', 'y'])
-      if (!referencingutil.isGeodeticWGS84CRS(srs)) {
-        throw new Error('Unsupported CRS, must be WGS84')
-      }
-    }
-    
-    let promise    
-    if (this.param) {
-      promise = Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)])
-        .then(([domain, range]) => {
-          this.domain = domain
-          checkWGS84(domain)
-          this.range = range
-          this.initializePalette()
-          this.fire('dataLoad')
-        })
-    } else {
-      promise = this.cov.loadDomain().then(domain => {
-        this.domain = domain
-        checkWGS84(domain)
-        this.fire('dataLoad')
-      })
-    }
-    
-    promise.catch(e => {
-      console.error(e)
-      this.fire('error', e)
-      this.fire('dataLoad')
-    })
-    
-    return promise
-  }
-  
   onAdd (map) {
     this._map = map
     
-    this.load().then(() => {
-      this._addPolygons()
-      this.fire('add')
+    this.load()
+      .then(() => this.initializePalette())
+      .then(() => {
+        this._addPolygons()
+        this.fire('add')
     })
   }
   

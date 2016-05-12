@@ -1,5 +1,6 @@
 import L from 'leaflet'
 import {enlargeExtentIfEqual} from './palettes.js'
+import CoverageMixin from './CoverageMixin.js'
 import PaletteMixin from './PaletteMixin.js'
 import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
@@ -25,7 +26,7 @@ import {DEFAULT_COLOR} from './Point.js'
  * "paletteExtentChange" - Palette extent has changed
  * 
  */
-export default class Trajectory extends PaletteMixin(L.FeatureGroup) {
+export default class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGroup)) {
   
   // TODO FeatureGroup is not ideal since click events etc should not be blindly propagated
   //    (we use it for now to have getBounds() which LayerGroup misses)
@@ -49,48 +50,15 @@ export default class Trajectory extends PaletteMixin(L.FeatureGroup) {
     this.defaultColor = options.color || DEFAULT_COLOR
   }
   
-  load () {
-    this.fire('dataLoading') // for supporting loading spinners
-    
-    function checkWGS84 (domain) {
-      let srs = referencingutil.getRefSystem(domain, ['x', 'y'])
-      if (!referencingutil.isGeodeticWGS84CRS(srs)) {
-        throw new Error('Unsupported CRS, must be WGS84')
-      }
-    }
-    
-    let promise    
-    if (this.param) {
-      promise = Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)])
-        .then(([domain, range]) => {
-          this.domain = domain
-          checkWGS84(domain)
-          this.range = range
-          this.initializePalette()
-          this.fire('dataLoad')
-        })
-    } else {
-      promise = this.cov.loadDomain().then(domain => {
-        this.domain = domain
-        checkWGS84(domain)
-        this.fire('dataLoad')
-      })
-    }
-    
-    promise.catch(e => {
-      console.error(e)
-      this.fire('error', e)
-      this.fire('dataLoad')
-    })     
-  }
-  
   onAdd (map) {
     this._map = map
     
-    this.load().then(() => {
-      this._addTrajectoryLayers()
-      this.fire('add')
-    })
+    this.load()
+      .then(() => this.initializePalette())
+      .then(() => {
+        this._addTrajectoryLayers()
+        this.fire('add')
+      })
   }
   
   onRemove (map) {

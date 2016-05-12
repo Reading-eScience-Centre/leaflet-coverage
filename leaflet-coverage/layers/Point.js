@@ -1,6 +1,7 @@
 import L from 'leaflet'
 import {enlargeExtentIfEqual} from './palettes.js'
-import * as referencingutil from '../util/referencing.js'
+
+import CoverageMixin from './CoverageMixin.js'
 import CircleMarkerMixin from './CircleMarkerMixin.js'
 import PaletteMixin from './PaletteMixin.js'
 import EventMixin from '../util/EventMixin.js'
@@ -19,7 +20,7 @@ export const DEFAULT_COLOR = 'black'
  * The dot either has a defined standard color, or it uses
  * a palette if a parameter is chosen.
  */
-export default class Point extends PaletteMixin(CircleMarkerMixin(EventMixin(L.Class))) {
+export default class Point extends PaletteMixin(CircleMarkerMixin(CoverageMixin(EventMixin(L.Class)))) {
   
   constructor (cov, options) {
     super()
@@ -44,50 +45,12 @@ export default class Point extends PaletteMixin(CircleMarkerMixin(EventMixin(L.C
   onAdd (map) {
     this._map = map
 
-    this.load().then(() => {
-      this._addMarker()
-      this.fire('add')
-    })
-  }
-  
-  /**
-   * Load all data without adding anything to the map.
-   * After loading is done, all functions and properties can be accessed (like getLatLng()).
-   */
-  load () {    
-    this.fire('dataLoading') // for supporting loading spinners
-    
-    function checkWGS84 (domain) {
-      let srs = referencingutil.getRefSystem(domain, ['x', 'y'])
-      if (!referencingutil.isGeodeticWGS84CRS(srs)) {
-        throw new Error('Unsupported CRS, must be WGS84')
-      }
-    }
-    
-    let promise    
-    if (this.param) {
-      promise = Promise.all([this.cov.loadDomain(), this.cov.loadRange(this.param.key)])
-        .then(([domain, range]) => {
-          this.domain = domain
-          checkWGS84(domain)
-          this.range = range
-          this.initializePalette()
-          this.fire('dataLoad')
-        })
-    } else {
-      promise = this.cov.loadDomain().then(domain => {
-        this.domain = domain
-        checkWGS84(domain)
-        this.fire('dataLoad')
+    this.load()
+      .then(() => this.initializePalette())
+      .then(() => {
+        this._addMarker()
+        this.fire('add')
       })
-    }
-    
-    promise.catch(e => {
-      console.error(e)
-      this.fire('error', e)
-      this.fire('dataLoad')
-    })
-    return promise
   }
   
   onRemove () {
