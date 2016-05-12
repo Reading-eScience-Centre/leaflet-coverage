@@ -59,7 +59,7 @@ export default class PointSeries extends PaletteMixin(CircleMarkerMixin(Coverage
       })
   }
   
-  _subsetByCoordinatePreference () {
+  _loadCoverageSubset () {
     // adapted from Grid.js
     let t = this._axesSubset.t
     if (t.coordPref == undefined) {
@@ -105,7 +105,7 @@ export default class PointSeries extends PaletteMixin(CircleMarkerMixin(Coverage
     let old = this.time
     this._axesSubset.t.coordPref = val.toISOString()
     
-    this._subsetByCoordinatePreference().then(() => {
+    this._loadCoverageSubset().then(() => {
       if (old === this.time) return
       this.redraw()
       this.fire('axisChange', {axis: 'time'})

@@ -7,12 +7,12 @@ import * as referencingutil from '../util/referencing.js'
  * 
  * .coverage
  * .parameter (optional)
- * ._subsetByCoordinatePreference() (optional)
+ * ._loadCoverageSubset() (optional)
  * 
  * The following functions/properties are supplied:
  * 
  * .domain (after calling load())
- * .range (after calling load(); only if .parameter is set and ._subsetByCoordinatePreference is undefined)
+ * .range (after calling load(); only if .parameter is set and ._loadCoverageSubset is undefined)
  * 
  * @param {class} base The base class.
  * @return {class} The base class with CoverageMixin.
@@ -37,8 +37,8 @@ export default function CoverageMixin (base) {
         checkWGS84(domain)
         this.domain = domain
       })
-      if (this._subsetByCoordinatePreference) {
-        promise = promise.then(() => this._subsetByCoordinatePreference())
+      if (this._loadCoverageSubset) {
+        promise = promise.then(() => this._loadCoverageSubset())
       } else if (this.parameter) {
         promise = promise.then(() => this.coverage.loadRange(this.parameter.key)).then(range => {
           this.range = range
