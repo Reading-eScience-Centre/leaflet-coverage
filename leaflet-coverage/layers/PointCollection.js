@@ -72,8 +72,26 @@ export default class PointCollection extends PaletteMixin(EventMixin(L.Class)) {
   }
   
   onRemove (map) {
-    this._map.removeLayer(this._layerGroup)
+    map.removeLayer(this._layerGroup)
     this._layerGroup = L.layerGroup()
+    this.fire('remove')
+  }
+  
+  bindPopupEach (fn) {
+    if (this._clickListenerPopup) {
+      this.off('click', this._clickListenerPopup)
+      this.off('remove', this._removeListenerPopup)
+    }
+    this._clickListenerPopup = e => {
+      let popup = fn(e.coverage)
+      this._map.openPopup(popup)
+      this._popup = popup
+    }
+    this._removeListenerPopup = () => {
+      this._map.closePopup(this._popup)
+    }
+    this.on('click', this._clickListenerPopup)
+    this.on('remove', this._removeListenerPopup)
   }
   
   _attachListeners (layer, cov) {
@@ -112,11 +130,6 @@ export default class PointCollection extends PaletteMixin(EventMixin(L.Class)) {
     let distance = (point1, point2) => point1.distanceTo(point2)
     let dimensions = ['lat', 'lng']
     this._kdtree = new kdTree(points, distance, dimensions)
-  }
-  
-  onRemove (map) {
-    map.removeLayer(this._layerGroup)
-    this.fire('remove')
   }
   
   getBounds () {
