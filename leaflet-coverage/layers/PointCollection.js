@@ -63,10 +63,10 @@ export default class PointCollection extends PaletteMixin(EventMixin(L.Class)) {
     }
     for (let cov of this.covcoll.coverages) {
       let layer = new this.pointClass(cov, options)
-      layer.load()
       this._attachListeners(layer, cov)
       this._layerGroup.addLayer(layer)
       this._layers.push(layer)
+      layer.load()
     }
     
   }
@@ -74,6 +74,7 @@ export default class PointCollection extends PaletteMixin(EventMixin(L.Class)) {
   onRemove (map) {
     map.removeLayer(this._layerGroup)
     this._layerGroup = L.layerGroup()
+    this._layers = []
     this.fire('remove')
   }
   
@@ -112,11 +113,10 @@ export default class PointCollection extends PaletteMixin(EventMixin(L.Class)) {
         this.fire('error', {errors: this._layerErrors})
       } else {
         this._initKdtree()
-        if (this.param) {
-          this.initializePalette()
-        }
-        this._layerGroup.addTo(this._map)
-        this.fire('add')
+        this.initializePalette().then(() => {
+          this._layerGroup.addTo(this._map)
+          this.fire('add')
+        })
       }
     }
   }
@@ -133,7 +133,7 @@ export default class PointCollection extends PaletteMixin(EventMixin(L.Class)) {
   }
   
   getBounds () {
-    return this._layerGroup.getBounds()
+    return L.latLngBounds(this._layers.map(layer => layer.getLatLng()))
   }
   
   /**
