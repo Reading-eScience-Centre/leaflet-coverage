@@ -132,6 +132,8 @@ export default function PaletteMixin (base) {
       }
       let res = Array.isArray(extent) ? Promise.resolve(extent) : this.computePaletteExtent(extent)
       return res.then(newExtent => {
+        // ignore invalid extents (may come from using ParameterSync)
+        if (Array.isArray(newExtent) && isNaN(newExtent[0])) return
         if (!hasChanged(newExtent)) return
         this._paletteExtent = newExtent
         this._updatePaletteIndexFn()
