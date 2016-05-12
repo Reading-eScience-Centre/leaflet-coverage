@@ -80,8 +80,9 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
         super.onAdd(map)
         this.fire('add')
       })
-      .catch(() => {
+      .catch(e => {
         this.errored = true
+        console.log(e)
         super.onAdd(map)
       })
   }
