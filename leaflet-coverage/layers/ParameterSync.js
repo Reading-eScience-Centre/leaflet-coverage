@@ -5,6 +5,9 @@ import L from 'leaflet'
  * the same thing. No magic is applied here. Exact match or nothing.
  */
 function defaultMatch (p1, p2) {
+  if (p1.id && p2.id && p1.id === p2.id) {
+    return true
+  }
   if (!p1.observedProperty.id || !p2.observedProperty.id) {
     return false
   }
