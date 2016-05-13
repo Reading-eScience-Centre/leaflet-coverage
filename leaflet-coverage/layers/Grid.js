@@ -80,8 +80,9 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
         super.onAdd(map)
         this.fire('add')
       })
-      .catch(() => {
+      .catch(e => {
         this.errored = true
+        console.log(e)
         super.onAdd(map)
       })
   }
@@ -120,7 +121,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
    * After calling this method, _axesSubset.*.idx and _axesSubset.*.coord have
    * values from the actual axes.
    */
-  _subsetByCoordinatePreference () {        
+  _loadCoverageSubset () {        
     let spec = {}
     for (let axis of Object.keys(this._axesSubset)) {
       let ax = this._axesSubset[axis]
@@ -173,7 +174,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     }
     let old = this.time
     this._axesSubset.t.coordPref = val.toISOString()
-    this._subsetByCoordinatePreference().then(() => {
+    this._loadCoverageSubset().then(() => {
       if (old === this.time) return
       this._redraw()
       this.fire('axisChange', {axis: 'time'})
@@ -206,7 +207,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     }
     let old = this.vertical
     this._axesSubset.z.coordPref = val
-    this._subsetByCoordinatePreference().then(() => {
+    this._loadCoverageSubset().then(() => {
       if (old === this.vertical) return
       this._redraw()
       this.fire('axisChange', {axis: 'vertical'}) 

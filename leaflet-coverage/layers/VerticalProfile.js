@@ -57,7 +57,7 @@ export default class VerticalProfile extends PaletteMixin(CircleMarkerMixin(Cove
       })
   }
     
-  _subsetByCoordinatePreference () {
+  _loadCoverageSubset () {
     // adapted from Grid.js
     let z = this._axesSubset.z
     if (z.coordPref == undefined) {
@@ -101,7 +101,7 @@ export default class VerticalProfile extends PaletteMixin(CircleMarkerMixin(Cove
   
   set vertical (val) {
     this._axesSubset.z.coordPref = val
-    this._subsetByCoordinatePreference()
+    this._loadCoverageSubset()
     this.redraw()
     this.fire('axisChange', {axis: 'vertical'}) 
   }

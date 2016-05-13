@@ -44,12 +44,17 @@ export default function PaletteMixin (base) {
       }
       let categories = parameter.observedProperty.categories
       
-      if (options.palette) {
+      if (categories) {
+        this._initCategoryIdxMap()
+      }
+      
+      if (this._palette) {
+        // do nothing, already set
+      } else if (options.palette) {
         this._palette = options.palette
       } else if (parameter.preferredPalette) {
         this._palette = createPalette(parameter.preferredPalette)
       } else if (categories) {
-        this._initCategoryIdxMap()
         if (categories.every(cat => cat.preferredColor)) {
           this._palette = directPalette(categories.map(cat => cat.preferredColor))
         } else {
@@ -63,7 +68,7 @@ export default function PaletteMixin (base) {
         throw new Error('Categorical palettes must match the number of categories of the parameter')
       }
             
-      this._paletteExtent = options.paletteExtent
+      this._paletteExtent = this._paletteExtent || options.paletteExtent
       
       if (this.parameter.categoryEncoding) {
         // categorical parameter, does not depend on palette extent

@@ -57,7 +57,7 @@ export default class PolygonSeries extends PaletteMixin(CoverageMixin(EventMixin
       })
   }
     
-  _subsetByCoordinatePreference () {
+  _loadCoverageSubset () {
     // adapted from Grid.js
     let t = this._axesSubset.t
     if (t.coordPref == undefined) {
@@ -118,7 +118,7 @@ export default class PolygonSeries extends PaletteMixin(CoverageMixin(EventMixin
     let old = this.time
     this._axesSubset.t.coordPref = val.toISOString()
     
-    this._subsetByCoordinatePreference().then(() => {
+    this._loadCoverageSubset().then(() => {
       if (old === this.time) return
       this.redraw()
       this.fire('axisChange', {axis: 'time'})
