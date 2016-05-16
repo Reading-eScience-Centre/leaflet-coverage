@@ -244,7 +244,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
       let ylen = this.subsetRange.shape.get('y')
 
       // check if subsetted size is manageable
-      if (xlen * ylen < 10000) {
+      if (xlen * ylen < 1000*1000) {
         extent = rangeutil.minMax(this.subsetRange)
         extent = enlargeExtentIfEqual(extent)
         return Promise.resolve(extent)
@@ -252,8 +252,8 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
         // subset x and y to get a fast estimate of the palette extent
         // since it is an estimate, the lower and upper bound needs a small buffer
         // (to prevent out-of-bounds colours)
-        let xconstraint = {start: 0, stop: xlen, step: Math.max(Math.round(xlen/100), 1)}
-        let yconstraint = {start: 0, stop: ylen, step: Math.max(Math.round(ylen/100), 1)}
+        let xconstraint = {start: 0, stop: xlen, step: Math.max(Math.round(xlen/1000), 1)}
+        let yconstraint = {start: 0, stop: ylen, step: Math.max(Math.round(ylen/1000), 1)}
         
         return this.subsetCov.subsetByIndex({x: xconstraint, y: yconstraint})        
           .then(subsetCov => {
