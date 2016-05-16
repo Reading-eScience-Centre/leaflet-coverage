@@ -98,7 +98,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     let bbox
     if (this.cov.bbox) {
       bbox = this.cov.bbox
-    } else if (this._isDomainUsingGeodeticWGS84CRS()) {
+    } else if (this._isDomainUsingEllipsoidalCRS()) {
       bbox = this._getDomainBbox()
     } else {
       return
@@ -342,7 +342,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     
     // TODO check if the domain and map CRS datum match
     // -> if not, then at least a warning should be shown
-    if (this._isDomainUsingGeodeticWGS84CRS()) {
+    if (this._isDomainUsingEllipsoidalCRS()) {
       if (this._isRectilinearGeodeticMap()) {
         // here we can apply heavy optimizations
         this._drawRectilinearGeodeticMapProjection(setPixel, tileSize, startX, startY, vals)
@@ -534,9 +534,9 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
   /**
    * Return whether the coverage domain is using a geodetic CRS with WGS84 datum.
    */
-  _isDomainUsingGeodeticWGS84CRS () {
+  _isDomainUsingEllipsoidalCRS () {
     let srs = referencingutil.getRefSystem(this.domain, ['x','y'])
-    return referencingutil.isGeodeticWGS84CRS(srs)
+    return referencingutil.isEllipsoidalCRS(srs)
   }
   
   _isGeodeticTransformAvailableForDomain () {

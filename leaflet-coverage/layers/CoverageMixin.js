@@ -28,7 +28,7 @@ export default function CoverageMixin (base) {
       
       function checkWGS84 (domain) {
         let srs = referencingutil.getRefSystem(domain, ['x', 'y'])
-        if (!referencingutil.isGeodeticWGS84CRS(srs)) {
+        if (!referencingutil.isEllipsoidalCRS(srs)) {
           throw new Error('Unsupported CRS, must be WGS84')
         }
       }
