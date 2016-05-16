@@ -42,7 +42,7 @@ export default class TimeSeriesPlot extends L.Popup {
     options.maxWidth = options.maxWidth || 350
     super(options)
     this._covs = Array.isArray(coverage) ? coverage : [coverage]
-    this._language = options.language || i18n.DEFAULT_LANGUAGE
+    this._language = options.language
     this._precision = options.precision || 4
     
     this._labels = options.labels ? options.labels : new Array(this._covs.length)

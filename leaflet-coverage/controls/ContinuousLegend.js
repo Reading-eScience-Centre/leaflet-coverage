@@ -91,7 +91,7 @@ export default class ContinuousLegend extends L.Control {
     super({position: options.position || 'bottomright'})
     this._covLayer = covLayer
     this._id = options.id || DEFAULT_TEMPLATE_ID
-    this._language = options.language || i18n.DEFAULT_LANGUAGE
+    this._language = options.language
     
     if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
       inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS)
