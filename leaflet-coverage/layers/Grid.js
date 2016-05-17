@@ -176,7 +176,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     this._axesSubset.t.coordPref = val.toISOString()
     this._loadCoverageSubset().then(() => {
       if (old === this.time) return
-      this._redraw()
+      this.redraw()
       this.fire('axisChange', {axis: 'time'})
     })
   }
@@ -209,7 +209,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     this._axesSubset.z.coordPref = val
     this._loadCoverageSubset().then(() => {
       if (old === this.vertical) return
-      this._redraw()
+      this.redraw()
       this.fire('axisChange', {axis: 'vertical'}) 
     })  
   }
