@@ -7,7 +7,7 @@ import PaletteMixin from './PaletteMixin.js'
 import EventMixin from '../util/EventMixin.js'
 
 import {isDomain} from 'covutils/lib/validate.js'
-import {toCoverage} from 'covutils/lib/transform.js'
+import {fromDomain} from 'covutils/lib/coverage/create.js'
 
 /** @ignore */
 export const DEFAULT_COLOR = 'black'
@@ -26,7 +26,7 @@ export default class Point extends PaletteMixin(CircleMarkerMixin(CoverageMixin(
     super()
     
     if (isDomain(cov)) {
-      cov = toCoverage(cov)
+      cov = fromDomain(cov)
       delete options.keys
     }
     

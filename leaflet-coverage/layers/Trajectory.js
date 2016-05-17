@@ -3,10 +3,9 @@ import {enlargeExtentIfEqual} from './palettes.js'
 import CoverageMixin from './CoverageMixin.js'
 import PaletteMixin from './PaletteMixin.js'
 import * as rangeutil from '../util/range.js'
-import * as referencingutil from '../util/referencing.js'
 
 import {isDomain} from 'covutils/lib/validate.js'
-import {toCoverage} from 'covutils/lib/transform.js'
+import {fromDomain} from 'covutils/lib/coverage/create.js'
 
 import {DEFAULT_COLOR} from './Point.js'
   
@@ -35,7 +34,7 @@ export default class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGrou
     super()
     
     if (isDomain(cov)) {
-      cov = toCoverage(cov)
+      cov = fromDomain(cov)
       options.keys = [cov.parameters.keys().next.value]
     }
     

@@ -1,4 +1,4 @@
-import * as referencingutil from '../util/referencing.js'
+import {isEllipsoidalCRS} from '../util/referencing.js'
 
 /**
  * A mixin that encapsulates loading of a single coverage for use in layers.
@@ -27,8 +27,7 @@ export default function CoverageMixin (base) {
       this.fire('dataLoading') // for supporting loading spinners
       
       function checkWGS84 (domain) {
-        let srs = referencingutil.getRefSystem(domain, ['x', 'y'])
-        if (!referencingutil.isEllipsoidalCRS(srs)) {
+        if (!domain.referencing.some(ref => isEllipsoidalCRS(ref.system))) {
           throw new Error('Unsupported CRS, must be WGS84')
         }
       }

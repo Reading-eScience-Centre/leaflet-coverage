@@ -6,7 +6,7 @@ import * as rangeutil from '../util/range.js'
 import EventMixin from '../util/EventMixin.js'
 
 import {isDomain} from 'covutils/lib/validate.js'
-import {toCoverage} from 'covutils/lib/transform.js'
+import {fromDomain} from 'covutils/lib/coverage/create.js'
   
 /** @ignore */
 export const DEFAULT_COLOR = 'black'
@@ -20,7 +20,7 @@ export default class MultiPolygon extends PaletteMixin(CoverageMixin(EventMixin(
     super()
     
     if (isDomain(cov)) {
-      cov = toCoverage(cov)
+      cov = fromDomain(cov)
       options.keys = [cov.parameters.keys().next.value]
     }
     

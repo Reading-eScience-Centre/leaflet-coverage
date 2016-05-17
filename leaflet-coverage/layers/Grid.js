@@ -8,7 +8,7 @@ import * as rangeutil from '../util/range.js'
 import * as referencingutil from '../util/referencing.js'
 
 import {isDomain} from 'covutils/lib/validate.js'
-import {toCoverage} from 'covutils/lib/transform.js'
+import {fromDomain} from 'covutils/lib/coverage/create.js'
   
 /**
  * Renderer for Coverages and Domains with (domain) profile Grid.
@@ -51,7 +51,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     super()
     
     if (isDomain(cov)) {
-      cov = toCoverage(cov)
+      cov = fromDomain(cov)
       options.keys = [cov.parameters.keys().next.value]
     }
     
@@ -535,12 +535,11 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
    * Return whether the coverage domain is using a geodetic CRS with WGS84 datum.
    */
   _isDomainUsingEllipsoidalCRS () {
-    let srs = referencingutil.getRefSystem(this.domain, ['x','y'])
-    return referencingutil.isEllipsoidalCRS(srs)
+    return this.domain.referencing.some(ref => referencingutil.isEllipsoidalCRS(ref.system))
   }
   
   _isGeodeticTransformAvailableForDomain () {
-    let srs = referencingutil.getRefSystem(this.domain, ['x','y'])
+    let ref = this.domain.referencing.find(ref => referencingutil.isEllipsoidalCRS(ref.system))
     // TODO implement
     return false
   }
