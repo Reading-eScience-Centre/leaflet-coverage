@@ -3,7 +3,7 @@ import c3 from 'c3'
 import 'c3/c3.css!'
 
 import * as i18n from '../util/i18n.js'
-import * as referencingUtil from '../util/referencing.js'
+import {getReferenceObject} from '../util/referencing.js'
 
 /**
  * Displays a popup with an interactive plot showing the data
@@ -181,7 +181,7 @@ export default class VerticalProfilePlot extends L.Popup {
     let zName = 'Vertical'
     let zUnit = ''
     
-    let vertRef = referencingUtil.getReferenceObject(refDomain, 'z')
+    let vertRef = getReferenceObject(refDomain, 'z')
     if (vertRef && vertRef.components.length === 1) {
       let vertSrs = vertRef.system
       if (vertSrs.cs && vertSrs.cs.axes) {
