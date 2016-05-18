@@ -127,7 +127,7 @@ export default class PointCollection extends PaletteMixin(EventMixin(L.Class)) {
       point.layer = layer
       return point
     })
-    let distance = (point1, point2) => point1.distanceTo(point2)
+    let distance = (point1, point2) => L.LatLng.prototype.distanceTo.call(point1, point2)
     let dimensions = ['lat', 'lng']
     this._kdtree = new kdTree(points, distance, dimensions)
   }
