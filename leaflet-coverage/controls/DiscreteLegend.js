@@ -9,7 +9,7 @@ const DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-discrete-legend'
 const DEFAULT_TEMPLATE = `
 <template id="${DEFAULT_TEMPLATE_ID}">
   <div class="info legend discrete-legend">
-    <strong class="legend-title"></strong><br>
+    <div class="legend-title-container"><strong class="legend-title"></strong></div>
     <div class="legend-palette discrete-legend-palette"></div>
   </div>
 </template>
@@ -17,6 +17,12 @@ const DEFAULT_TEMPLATE = `
 const DEFAULT_TEMPLATE_CSS = `
 .legend {
   color: #555;
+}
+.legend-title-container {
+  max-width: 120px;
+}
+.legend-title {
+  word-wrap: break-word;
 }
 .discrete-legend-palette {
   padding: 2px 1px;

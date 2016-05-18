@@ -9,7 +9,7 @@ const DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-continuous-legend'
 const DEFAULT_TEMPLATE = `
 <template id="${DEFAULT_TEMPLATE_ID}">
   <div class="info legend continuous-legend">
-    <div style="margin-bottom:3px">
+    <div style="margin-bottom:3px" class="legend-title-container">
       <strong class="legend-title"></strong>
     </div>
     <div style="display: inline-block; height: 144px; float:left">
@@ -28,6 +28,12 @@ const DEFAULT_TEMPLATE = `
 const DEFAULT_TEMPLATE_CSS = `
 .legend {
   color: #555;
+}
+.legend-title {
+  word-wrap: break-word;
+}
+.legend-title-container {
+  max-width: 120px;
 }
 `
 
