@@ -288,7 +288,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     let y = this.domain.axes.get('y').values
     let bbox = this._getDomainBbox()
     let lonRange = [bbox[0], bbox[0] + 360]
-    let {lat, lon} = latlng
+    let {lat, lng: lon} = latlng
     
     // we first check whether the tile pixel is outside the domain bounding box
     // in that case we skip it as we do not want to extrapolate
