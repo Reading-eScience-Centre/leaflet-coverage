@@ -42,6 +42,7 @@
   },
   "jspm": {
     "main": "LayerFactory",
+    "files": null,
     "directories": {
       "lib": "leaflet-coverage"
     },
