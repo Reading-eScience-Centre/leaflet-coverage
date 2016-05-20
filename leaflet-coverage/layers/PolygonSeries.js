@@ -194,7 +194,7 @@ export default class PolygonSeries extends PaletteMixin(CoverageMixin(EventMixin
         stroke: false
       }),
       onEachFeature: (feature, layer) => {
-        layer.on('click', () => this.fire('click'))
+        layer.on('click', e => this.fire('click', e))
       }
     })
     

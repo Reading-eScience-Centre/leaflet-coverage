@@ -119,8 +119,9 @@ export default class MultiPolygon extends PaletteMixin(CoverageMixin(EventMixin(
         stroke: false
       }),
       onEachFeature: (feature, layer) => {
-        layer.on('click', () => {
-          this.fire('click', {index: feature.properties.index})
+        layer.on('click', e => {
+          e.index = feature.properties.index
+          this.fire('click', e)
         })
       }
     })
