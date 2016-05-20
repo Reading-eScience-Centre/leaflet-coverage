@@ -9,6 +9,7 @@ import PaletteMixin from './PaletteMixin.js'
 
 import {isDomain} from 'covutils/lib/validate.js'
 import {fromDomain} from 'covutils/lib/coverage/create.js'
+import {ensureClockwisePolygon, getPointInPolygonsFn} from 'covutils/lib/domain/polygon.js'
 
 import {DEFAULT_COLOR} from './Point.js'
 
@@ -53,6 +54,7 @@ export default class PolygonSeries extends PaletteMixin(CoverageMixin(EventMixin
       .then(() => this.initializePalette())
       .then(() => {
         this._addPolygon()
+        this._pointInPolygonPreprocess()
         this.fire('add')
       })
   }
@@ -159,6 +161,16 @@ export default class PolygonSeries extends PaletteMixin(CoverageMixin(EventMixin
     }
   }
   
+  _pointInPolygonPreprocess () {
+    let polygon = this.domain.axes.get('composite').values[0]
+    // TODO we assume spherical coordinates for now
+    let isCartesian = false
+    // A bit evil since this modifies in-place, but nothing bad should happen.
+    ensureClockwisePolygon(polygon, isCartesian)
+    let pointInPolygons = getPointInPolygonsFn([polygon])
+    this._pointInPolygon = point => pointInPolygons(point) !== -1
+  }
+  
   _addPolygon () {
     // TODO do coordinate transformation to lat/lon if necessary
     
@@ -207,6 +219,15 @@ export default class PolygonSeries extends PaletteMixin(CoverageMixin(EventMixin
       let val = this.range.get({t: this._axesSubset.t.idx})
       return val
     }    
+  }
+  
+  getValueAt (latlng) {
+    if (!latlng) throw new Error('latlng parameter missing')
+    
+    // TODO longitude wrapping
+    if (this._pointInPolygon([latlng.lng, latlng.lat])) {
+      return this.getValue()
+    }   
   }
   
   // NOTE: this returns a string, not an {r,g,b} object as in other classes!

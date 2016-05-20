@@ -72,15 +72,6 @@ export default class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGrou
   get parameter () {
     return this.param
   }
-    
-  /**
-   * Return the displayed value closest to the circle centre.
-   * If no point exists within the circle, undefined is returned,
-   * otherwise a number or null (for no-data).
-   */
-  getValueAt (latlng, radius) {
-    // TODO implement    
-  }
   
   computePaletteExtent (extent) {
     let range = this.range
@@ -105,18 +96,9 @@ export default class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGrou
   
   _addTrajectoryLayers () {
     // add a Polyline in black, and coloured CircleMarker's for each domain point
-    let composite = this.domain.axes.get('composite').values
-    
-    // TODO do coordinate transformation to lat/lon if necessary
-        
-    let coords = []
-    for (let i=0; i < composite.length; i++) {
-      // this always has to be lat/lon, no matter which map projection is used
-      let x = composite[i][1]
-      let y = composite[i][2]
-      let coord = new L.LatLng(y, x)
-      coords.push(coord)
-      let marker = new L.CircleMarker(coord, {
+    let points = this.getLatLngs()
+    for (let i=0; i < points.length; i++) {
+      let marker = new L.CircleMarker(points[i], {
         color: this._getColor(this._getValue(i)),
         opacity: 1,
         fillOpacity: 1
@@ -124,12 +106,50 @@ export default class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGrou
       this.addLayer(marker)
     }
     
-    let polyline = L.polyline(coords, {
+    let polyline = L.polyline(points, {
       color: 'black',
       weight: 3
     })
     
     this.addLayer(polyline)
+  }
+  
+  /**
+   * Returns the trajectory points as LatLng objects in the order they appear in the composite domain axis.
+   */
+  getLatLngs () {
+    let composite = this.domain.axes.get('composite').values
+    let coords = []
+    for (let i=0; i < composite.length; i++) {
+      // this always has to be lat/lon, no matter which map projection is used
+      let x = composite[i][1]
+      let y = composite[i][2]
+      let coord = new L.LatLng(y, x)
+      coords.push(coord)
+    }
+    return coords
+  }
+  
+  /**
+   * Return the displayed value closest to the circle centre.
+   * If no point exists within the circle, undefined is returned,
+   * otherwise a number or null (for no-data).
+   */
+  getValueAt (latlng, maxDistance) {
+    let points = this.getLatLngs()
+    let distances = points.map(p => p.distanceTo(latlng))
+    let minDistance = Infinity
+    let minIdx
+    for (let i=0; i < points.length; i++) {
+      let distance = distances[i]
+      if (distance <= maxDistance && distance < minDistance) {
+        minDistance = distance
+        minIdx = i
+      }
+    }
+    if (minIdx !== undefined) {
+      return this._getValue(minIdx)
+    }
   }
   
   _getValue (index) {

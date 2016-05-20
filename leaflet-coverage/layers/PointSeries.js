@@ -157,6 +157,13 @@ export default class PointSeries extends PaletteMixin(CircleMarkerMixin(Coverage
     }    
   }
   
+  getValueAt (latlng, maxDistance) {
+    let point = this.getLatLng()
+    if (point.distanceTo(latlng) <= maxDistance) {
+      return this.getValue()
+    }
+  }
+  
   _getColor () {
     let val = this.getValue()
     if (val === null) {

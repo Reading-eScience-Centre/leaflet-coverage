@@ -7,6 +7,7 @@ import EventMixin from '../util/EventMixin.js'
 
 import {isDomain} from 'covutils/lib/validate.js'
 import {fromDomain} from 'covutils/lib/coverage/create.js'
+import {ensureClockwisePolygon, getPointInPolygonsFn} from 'covutils/lib/domain/polygon.js'
   
 /** @ignore */
 export const DEFAULT_COLOR = 'black'
@@ -42,6 +43,7 @@ export default class MultiPolygon extends PaletteMixin(CoverageMixin(EventMixin(
       .then(() => this.initializePalette())
       .then(() => {
         this._addPolygons()
+        this._pointInPolygonPreprocess()
         this.fire('add')
     })
   }
@@ -79,6 +81,15 @@ export default class MultiPolygon extends PaletteMixin(CoverageMixin(EventMixin(
     } else {
       throw new Error('Unknown extent specification: ' + extent)
     }
+  }
+  
+  _pointInPolygonPreprocess () {
+    let polygons = this.domain.axes.get('composite').values
+    // TODO we assume spherical coordinates for now
+    let isCartesian = false
+    // A bit evil since this modifies in-place, but nothing bad should happen.
+    polygons.forEach(p => ensureClockwisePolygon(p, isCartesian))
+    this._pointInPolygons = getPointInPolygonsFn(polygons)
   }
   
   _addPolygons () {
@@ -126,6 +137,14 @@ export default class MultiPolygon extends PaletteMixin(CoverageMixin(EventMixin(
     if (this.param) {
       return this.range.get({composite: index})
     }
+  }
+  
+  getValueAt (latlng) {
+    // TODO longitude wrapping
+    let i = this._pointInPolygons([latlng.lng, latlng.lat])
+    if (i >= 0) {
+      return this._getValue(i)
+    }    
   }
   
   // NOTE: this returns a string, not an {r,g,b} object as in other classes!
