@@ -24,6 +24,7 @@ import ParameterSync from './layers/ParameterSync.js'
 
 import VerticalProfilePlot from './popups/VerticalProfilePlot.js'
 import TimeSeriesPlot from './popups/TimeSeriesPlot.js'
+import DraggableValuePopup from './popups/DraggableValuePopup.js'
 
 import * as transform from './util/transform.js'
 
@@ -55,6 +56,7 @@ c.layer.PointCollection = PointCollection
 c.layer.VerticalProfileCollection = VerticalProfileCollection
 c.popup.VerticalProfilePlot = VerticalProfilePlot
 c.popup.TimeSeriesPlot = TimeSeriesPlot
+c.popup.DraggableValuePopup = DraggableValuePopup
 c.palette = palettes
 c.transform = transform
 
