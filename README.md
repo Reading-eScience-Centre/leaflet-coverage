@@ -1,7 +1,7 @@
 # leaflet-coverage [![Build Status](https://travis-ci.org/Reading-eScience-Centre/leaflet-coverage.svg?branch=master)](https://travis-ci.org/Reading-eScience-Centre/leaflet-coverage)
 
 A [Leaflet](http://leafletjs.com/) plugin for visualizing [coverage data](https://en.wikipedia.org/wiki/Coverage_data) (numerical or categorical data varying in space and time) with the help of the [JavaScript Coverage Data API](https://github.com/Reading-eScience-Centre/coverage-jsapi). Currently, it supports most domain types defined within [CoverageJSON](https://github.com/Reading-eScience-Centre/coveragejson):
-Grid, Point, Trajectory, VerticalProfile, MultiPolygon. Additionally, it supports Point and VerticalProfile collections for a more convenient handling of such coverage collections.
+Grid, Point, PointSeries, Trajectory, VerticalProfile, PolygonSeries, MultiPolygon. Additionally, it supports Point and VerticalProfile collections for a more convenient handling of such coverage collections.
 
 Note that to *load* a coverage you have to use another library, depending on which formats you want to support. The only currently known coverage loader that can be used is the [covjson-reader](https://github.com/Reading-eScience-Centre/covjson-reader) for the [CoverageJSON](https://github.com/Reading-eScience-Centre/coveragejson) format.
 
@@ -37,7 +37,7 @@ var layer = LayerFactory(cov, {keys: ['salinity']}).on('add', function(e) {
 ```
 
 The `LayerFactory` selects the right layer class by looking at the 
-["profiles"](https://github.com/Reading-eScience-Centre/coverage-jsapi/blob/master/Coverage.md#profiles)
+["domainType"](https://github.com/Reading-eScience-Centre/coverage-jsapi/blob/master/Coverage.md#domainType)
 that a given coverage or collection conforms to.
 If more control is needed, then the layer classes can also be used manually, or
 a more sophisticated factory class may be implemented.
