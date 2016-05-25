@@ -15,11 +15,12 @@ import {
   COVJSON_TRAJECTORY, 
   COVJSON_MULTIPOLYGON,
   COVJSON_POLYGONSERIES,
-  COVJSON_VERTICALPROFILECOLLECTION,
-  COVJSON_POINTCOLLECTION
+  COVERAGE,
+  COVERAGECOLLECTION,
+  DOMAIN
   } from './util/constants.js'
 
-const DEFAULT_DOMAIN_LAYER_CLASSES = {
+const DOMAIN_LAYER_CLASSES = {
   [COVJSON_GRID]: Grid,
   [COVJSON_POINT]: Point,
   [COVJSON_POINTSERIES]: PointSeries,
@@ -29,9 +30,9 @@ const DEFAULT_DOMAIN_LAYER_CLASSES = {
   [COVJSON_POLYGONSERIES]: PolygonSeries
 }
   
-const DEFAULT_COLLECTION_LAYER_CLASSES = {
-  [COVJSON_POINTCOLLECTION]: PointCollection,
-  [COVJSON_VERTICALPROFILECOLLECTION]: VerticalProfileCollection 
+const COLLECTION_LAYER_CLASSES = {
+  [COVJSON_POINT]: PointCollection,
+  [COVJSON_VERTICALPROFILE]: VerticalProfileCollection 
 }
 
 /**
@@ -60,7 +61,8 @@ export default function LayerFactory (options={}) {
   return (cov, opts) => {
     let clazz = getLayerClass(cov, options)
     if (!clazz) {
-      throw new Error(`No layer class found for profiles=${cov.profiles} or domainProfiles=${cov.domainProfiles}`)
+      let coll = cov.type === COVERAGECOLLECTION ? 'collection ' : ''
+      throw new Error(`No ${coll}layer class found for domainType=${cov.domainType}`)
     }
     return new clazz(cov, opts)
   }
@@ -79,28 +81,13 @@ export default function LayerFactory (options={}) {
  * }
  * 
  * @param {object} cov The coverage data object.
- * @param {object} [options] Options for influencing the matching algorithm.
- * @param {object} [options.classes] An object that maps profile URIs to layer classes.
- *   Those classes are preferred over the default layer classes.
  * @return {class|undefined} The layer class.
  */
-export function getLayerClass (cov, options={}) {
-  if (options.classes) {
-    if (cov.profiles.some(p => options.classes[p])) {
-      return options.classes[cov.profiles.find(p => options.classes[p])]
-    }
-    // domainProfiles is not defined for collections, hence the check
-    if (cov.domainProfiles && cov.domainProfiles.some(p => options.classes[p])) {
-      return options.classes[cov.domainProfiles.find(p => options.classes[p])]
-    }
+export function getLayerClass (cov) {
+  if ((cov.type === COVERAGE || cov.type === DOMAIN ) && cov.domainType in DOMAIN_LAYER_CLASSES) {
+    return DOMAIN_LAYER_CLASSES[cov.domainType]
   }
-  if (cov.type === 'Coverage' && cov.domainProfiles && cov.domainProfiles.some(p => DEFAULT_DOMAIN_LAYER_CLASSES[p])) {
-    return DEFAULT_DOMAIN_LAYER_CLASSES[cov.domainProfiles.find(p => DEFAULT_DOMAIN_LAYER_CLASSES[p])]
-  }
-  if (cov.type === 'Domain' && cov.profiles && cov.profiles.some(p => DEFAULT_DOMAIN_LAYER_CLASSES[p])) {
-    return DEFAULT_DOMAIN_LAYER_CLASSES[cov.profiles.find(p => DEFAULT_DOMAIN_LAYER_CLASSES[p])]
-  }
-  if (cov.type === 'CoverageCollection' && cov.profiles.some(p => DEFAULT_COLLECTION_LAYER_CLASSES[p])) {
-    return DEFAULT_COLLECTION_LAYER_CLASSES[cov.profiles.find(p => DEFAULT_COLLECTION_LAYER_CLASSES[p])]
+  if (cov.type === COVERAGECOLLECTION && cov.domainType in COLLECTION_LAYER_CLASSES) {
+    return COLLECTION_LAYER_CLASSES[cov.domainType]
   }
 }
