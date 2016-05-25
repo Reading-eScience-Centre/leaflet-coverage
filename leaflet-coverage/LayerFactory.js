@@ -50,16 +50,13 @@ const COLLECTION_LAYER_CLASSES = {
  * @example <caption>Non-module access</caption>
  * L.coverage.LayerFactory
  * 
- * @param {object} [options] Options for influencing the layer class matching algorithm.
- * @param {object} [options.classes] An object that maps profile URIs to layer classes.
- *   Those classes are preferred over the default layer classes.
  * @return {function} A function fn(cov, options) which returns a new layer for
  *   the given coverage data object and which is initialized with the given layer options.
  * @throws {Error} If no layer class could be found.
  */
-export default function LayerFactory (options={}) {
+export default function LayerFactory () {
   return (cov, opts) => {
-    let clazz = getLayerClass(cov, options)
+    let clazz = getLayerClass(cov)
     if (!clazz) {
       let coll = cov.type === COVERAGECOLLECTION ? 'collection ' : ''
       throw new Error(`No ${coll}layer class found for domainType=${cov.domainType}`)

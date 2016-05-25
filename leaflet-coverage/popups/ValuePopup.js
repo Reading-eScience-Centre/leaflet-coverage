@@ -23,7 +23,7 @@ export default class ValuePopup extends L.Popup {
     super(options, source)
     let layers = this.options.layers || []
     this._maxDistanceForPointsInPx = this.options.maxDistanceForPointsInPx || 20
-    this.coverageLayers = new Set(layers)
+    this.coverageLayers = new Set(layers.filter(layer => layer.getValueAt))
   }
   
   addCoverageLayer (layer) {
@@ -95,7 +95,7 @@ export default class ValuePopup extends L.Popup {
 
 // TODO move this to covutils
 function getUnitString (param, language) {
-  if (!param.unit) {
+  if (param.observedProperty.categories || !param.unit) {
     return ''
   }
   if (param.unit.symbol) {
