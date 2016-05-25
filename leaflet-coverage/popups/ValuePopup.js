@@ -95,7 +95,7 @@ export default class ValuePopup extends L.Popup {
 
 // TODO move this to covutils
 function getUnitString (param, language) {
-  if (!param.unit) {
+  if (param.observedProperty.categories || !param.unit) {
     return ''
   }
   if (param.unit.symbol) {
