@@ -184,8 +184,8 @@ export default class VerticalProfilePlot extends L.Popup {
     let vertRef = getReferenceObject(refDomain, 'z')
     if (vertRef && vertRef.components.length === 1) {
       let vertSrs = vertRef.system
-      if (vertSrs.cs && vertSrs.cs.axes) {
-        let ax = vertSrs.cs.axes[0]
+      if (vertSrs.cs && (vertSrs.cs.axes || vertSrs.cs.csAxes)) {
+        let ax = vertSrs.cs.axes ? vertSrs.cs.axes[0] : vertSrs.cs.csAxes[0]
         zUnit = this._getUnitString(ax, this._language)
         if (ax.name) {
           zName = i18n.getLanguageString(ax.name, this._language)
