@@ -9,6 +9,7 @@ import * as referencingutil from '../util/referencing.js'
 
 import {isDomain} from 'covutils/lib/validate.js'
 import {fromDomain} from 'covutils/lib/coverage/create.js'
+import {getReferenceObject} from 'covutils/lib/domain/referencing.js'
   
 /**
  * Renderer for Coverages and Domains with (domain) profile Grid.
@@ -75,6 +76,12 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
 
     this.load()
       .then(() => this.initializePalette())
+      .then(() => {
+        // used in controls/VerticalAxis.js
+        // TODO handle vertical axis part of 3D CRS
+        let vertRefSys = getReferenceObject(this.domain, 'z').system
+        this.crsVerticalAxis = vertRefSys.cs.csAxes ? vertRefSys.cs.csAxes[0] : vertRefSys.cs.axes[0]
+      })
       .then(() => {
         this.errored = false
         super.onAdd(map)

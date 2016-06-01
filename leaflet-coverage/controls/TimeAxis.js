@@ -46,7 +46,7 @@ export default class TimeAxis extends EventMixin(L.Control) {
    *   If the object has <code>on</code>/<code>off</code> methods, then the control will
    *   listen for <code>"axisChange"</code> events with <code>{axis: 'time'}</code>
    *   and update itself automatically.
-   *   If the layer fires a <code>"remove"</code> event, then the legend will remove itself
+   *   If the layer fires a <code>"remove"</code> event, then the control will remove itself
    *   from the map.
    * @param {object} [options] Control options.
    * @param {string} [options.position='topleft'] The initial position of the control (see Leaflet docs).
