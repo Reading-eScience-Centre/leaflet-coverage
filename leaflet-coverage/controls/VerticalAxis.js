@@ -103,8 +103,12 @@ export default class VerticalAxis extends EventMixin(L.Class) {
       position: this._position,
       title,
       value: this._getVerticalIndex().toString()
-    }).on('change', () => this.update())
-      .addTo(map)
+    }).on('change', event => {
+      let i = parseInt(event.value)
+      let val = this._covLayer.verticalSlices[i]
+      this._covLayer.vertical = val
+      this.fire('change', {vertical: val})
+    }).addTo(map)
   }
   
   /**
