@@ -19,6 +19,8 @@ export default class Dropdown extends EventMixin(L.Control) {
   
   onAdd (map) {
     let el = HTML(TEMPLATE)[0]
+    this._el = el
+    
     L.DomEvent.disableClickPropagation(el)
     
     $('.select-title', el).fill(this._title)
@@ -26,6 +28,7 @@ export default class Dropdown extends EventMixin(L.Control) {
     for (let {value, label} of this._choices) {
       $('select', el).add(HTML(`<option value="${value}">${label}</option>`))
     }
+    $('select', el)[0].disabled = this._choices.length <= 1
     this.value = this._value
     
     $('select', el).on('change', event => {
@@ -41,7 +44,7 @@ export default class Dropdown extends EventMixin(L.Control) {
   }
   
   set value (val) {
-    $('select', this.getContainer())[0].value = val
+    $('select', this._el)[0].value = val
   }
     
 }

@@ -123,6 +123,11 @@ export default class VerticalAxis extends EventMixin(L.Class) {
     return this
   }
   
+  removeFrom (map) {
+    this.onRemove(map)
+    return this
+  }
+  
   _getVerticalIndex () {
     let vals = this._covLayer.verticalSlices
     let i = vals.indexOf(this._covLayer.vertical)

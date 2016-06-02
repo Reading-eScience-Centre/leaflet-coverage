@@ -79,9 +79,9 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
       .then(() => {
         // used in controls/VerticalAxis.js
         let vertRef = getReferenceObject(this.domain, 'z')
-        if (vertRef.components.length === 1) {
+        if (vertRef && vertRef.components.length === 1) {
           let vertRefSys = vertRef.system
-          if (vertRefSys.cs && (vertRefSys.csAxes || vertRefSys.axes)) {
+          if (vertRefSys.cs && (vertRefSys.cs.csAxes || vertRefSys.cs.axes)) {
             this.crsVerticalAxis = vertRefSys.cs.csAxes ? vertRefSys.cs.csAxes[0] : vertRefSys.cs.axes[0]
           }
         } else {
