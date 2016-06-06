@@ -1,6 +1,6 @@
 import L from 'leaflet'
-import {$,HTML} from 'minified'
 
+import {$$, HTML} from './utils.js'
 import EventMixin from '../util/EventMixin.js'
 
 let TEMPLATE = 
@@ -88,29 +88,29 @@ export default class TimeAxis extends EventMixin(L.Control) {
       this._covLayer.on('axisChange', this._axisListener)
     }
     
-    let el = HTML(TEMPLATE)[0]
+    let el = HTML(TEMPLATE)
     this._el = el
     L.DomEvent.disableClickPropagation(el)
     
     if (this._title) {
-      $('.title', el).fill(this._title)
+      $$('.title', el).innerHTML = this._title
     }
     
     for (let dateTimestamp of this._dateMap.keys()) {
       let dateStr = getUTCDateString(dateTimestamp)
-      $('.date', el).add(HTML(`<option value="${dateStr}">${dateStr}</option>`))
+      $$('.date', el).appendChild(HTML(`<option value="${dateStr}">${dateStr}</option>`))
     }
-    $('.date', el)[0].disabled = this._dateMap.size === 1
+    $$('.date', el).disabled = this._dateMap.size === 1
     
-    $('.date', el).on('change', event => {
+    $$('.date', el).addEventListener('change', event => {
       let dateTimestamp = getUTCTimestampDateOnly(event.target.value)
       let timeSlice = this._dateMap.get(dateTimestamp)[0]
       this._covLayer.time = timeSlice
       this._initTimeSelect(dateTimestamp)
       this.fire('change', {time: timeSlice})
     })
-    $('.time', el).on('change', event => {
-      let dateStr = $('.date', el)[0].value
+    $$('.time', el).addEventListener('change', event => {
+      let dateStr = $$('.date', el).value
       let timeStr = event.target.value
       let time = new Date(dateStr + 'T' + timeStr)
       this._covLayer.time = time
@@ -146,24 +146,24 @@ export default class TimeAxis extends EventMixin(L.Control) {
     // selects the date set in the cov layer, populates the time select, and selects the time
     let dateTimestamp = getUTCTimestampDateOnly(covTime.toISOString())
     let dateStr = getUTCDateString(dateTimestamp)
-    $('.date', el)[0].value = dateStr 
+    $$('.date', el).value = dateStr 
     
     this._initTimeSelect(dateTimestamp)
     
     let timeStr = covTime.toISOString().substr(11)
-    $('.time', el)[0].value = timeStr
+    $$('.time', el).value = timeStr
   }
   
   _initTimeSelect (dateTimestamp) {
     let el = this._el
-    let timeSelect = $('.time', el)
-    timeSelect.fill()
+    let timeSelect = $$('.time', el)
+    timeSelect.innerHTML = ''
     let times = this._dateMap.get(dateTimestamp)
     for (let timeSlice of times) {
       let timeStr = timeSlice.toISOString().substr(11)
-      timeSelect.add(HTML(`<option value="${timeStr}">${timeStr}</option>`))
+      timeSelect.appendChild(HTML(`<option value="${timeStr}">${timeStr}</option>`))
     }
-    timeSelect[0].disabled = times.length === 1
+    timeSelect.disabled = times.length === 1
   }
     
 }

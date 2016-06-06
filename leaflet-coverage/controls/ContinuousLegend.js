@@ -1,13 +1,11 @@
 import L from 'leaflet'
-import {$} from 'minified' 
 
-import {inject, fromTemplate} from './utils.js'
+import {inject, fromTemplate, $$} from './utils.js'
 import * as i18n from '../util/i18n.js'
 
 // TODO the default template should be moved outside this module so that it can be easily skipped
 const DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-continuous-legend'
-const DEFAULT_TEMPLATE = `
-<template id="${DEFAULT_TEMPLATE_ID}">
+const DEFAULT_TEMPLATE = `<template id="${DEFAULT_TEMPLATE_ID}">
   <div class="info legend continuous-legend">
     <div style="margin-bottom:3px" class="legend-title-container">
       <strong class="legend-title"></strong>
@@ -23,8 +21,8 @@ const DEFAULT_TEMPLATE = `
       </table>
     </div>
   </div>
-</template>
-`
+</template>`
+
 const DEFAULT_TEMPLATE_CSS = `
 .legend {
   color: #555;
@@ -150,15 +148,15 @@ export default class ContinuousLegend extends L.Control {
       let language = i18n.getLanguageTag(param.observedProperty.label, this._language) 
       let title = i18n.getLanguageString(param.observedProperty.label, language)
       let unit = this._getUnitString(param, language)
-       $('.legend-title', el).fill(title)
-       $('.legend-uom', el).fill(unit)        
+       $$('.legend-title', el).innerHTML = title
+       $$('.legend-uom', el).innerHTML = unit        
     }
     
     let palette = this._covLayer.palette
     let [low,high] = this._covLayer.paletteExtent
     
-    $('.legend-min', el).fill(low.toFixed(2))
-    $('.legend-max', el).fill(high.toFixed(2))
+    $$('.legend-min', el).innerHTML = low.toFixed(2)
+    $$('.legend-max', el).innerHTML = high.toFixed(2)
 
     let gradient = ''
     for (let i = 0; i < palette.steps; i++) {
@@ -166,8 +164,7 @@ export default class ContinuousLegend extends L.Control {
       gradient += 'rgb(' + palette.red[i] + ',' + palette.green[i] + ',' + palette.blue[i] + ')'
     }
     
-    $('.legend-palette', el).set('$background',
-         'transparent linear-gradient(to top, ' + gradient + ') repeat scroll 0% 0%')
+    $$('.legend-palette', el).style.background = 'transparent linear-gradient(to top, ' + gradient + ') repeat scroll 0% 0%'
   }
   
   /**

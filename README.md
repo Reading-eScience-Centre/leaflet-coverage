@@ -42,6 +42,16 @@ that a given coverage or collection conforms to.
 If more control is needed, then the layer classes can also be used manually, or
 a more sophisticated factory class may be implemented.
 
+## Notes
+
+To use the plotting functionality (for time series or vertical profile plots) you have to include the D3 and C3 libraries in your HTML:
+
+```html
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.js"></script>
+```
+
 ## Acknowledgments
 
 This library is developed within the [MELODIES project](http://www.melodiesproject.eu).

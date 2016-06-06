@@ -1,19 +1,17 @@
 import L from 'leaflet'
-import {$,HTML} from 'minified'
 
-import {inject, fromTemplate} from './utils.js'
+import {inject, fromTemplate, $$} from './utils.js'
 import * as i18n from '../util/i18n.js'
 
 // TODO the default template should be moved outside this module so that it can be easily skipped
 const DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-discrete-legend'
-const DEFAULT_TEMPLATE = `
-<template id="${DEFAULT_TEMPLATE_ID}">
+const DEFAULT_TEMPLATE = `<template id="${DEFAULT_TEMPLATE_ID}">
   <div class="info legend discrete-legend">
     <div class="legend-title-container"><strong class="legend-title"></strong></div>
     <div class="legend-palette discrete-legend-palette"></div>
   </div>
-</template>
-`
+</template>`
+
 const DEFAULT_TEMPLATE_CSS = `
 .legend {
   color: #555;
@@ -120,14 +118,13 @@ export default class DiscreteLegend extends L.Control {
       // if requested language doesn't exist, use the returned one for all other labels
       this._language = i18n.getLanguageTag(param.observedProperty.label, this._language) 
       let title = i18n.getLanguageString(param.observedProperty.label, this._language)
-      $('.legend-title', el).fill(title)
+      $$('.legend-title', el).innerHTML = title
     }
     
     let palette = this._covLayer.palette
     let param = this._covLayer.parameter
     
     let html = ''
-    
     for (let i=0; i < palette.steps; i++) {
       let cat = i18n.getLanguageString(param.observedProperty.categories[i].label, this._language)
       html += `
@@ -136,7 +133,7 @@ export default class DiscreteLegend extends L.Control {
         <br>`
     }
     
-    $('.legend-palette', el).fill(HTML(html))
+    $$('.legend-palette', el).innerHTML = html
   }
   
   /**

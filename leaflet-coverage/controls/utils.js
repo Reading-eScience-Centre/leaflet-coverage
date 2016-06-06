@@ -1,9 +1,35 @@
-import {$, HTML} from 'minified'
+/**
+ * Returns the first child element of parent (fall-back to document if not given)
+ * matching the given selector.
+ */
+export function $$ (selector, parent) {
+  if (typeof parent === 'string') {
+    parent = $$(parent)
+  }
+  parent = parent || document
+  return parent.querySelector(selector)
+}
+
+/**
+ * Turns an HTML string into a DOM element.
+ * The HTML markup must have a single root node not prepended by any whitespace.
+ * 
+ * @example 
+ * var s = '<li>text</li>'
+ * var el = HTML(s)
+ * document.body.appendChild(el)
+ */
+export function HTML (html) {
+  let div = document.createElement('div')
+  div.innerHTML = html
+  let element = div.firstChild
+  return element
+}
 
 /**
  * Inject HTML and CSS into the DOM.
  * 
- * @param html The html to inject at the end of the body element.
+ * @param html The html to inject at the end of the body element. Must have a single root node without surrounding whitespace.
  * @param css The CSS styles to inject at the end of the head element.
  * 
  * @ignore
@@ -11,7 +37,7 @@ import {$, HTML} from 'minified'
 export function inject (html, css) {
   // inject default template and CSS into DOM
   if (html) {
-    $('body').add(HTML(html))
+    document.body.appendChild(HTML(html))
   }
   
   if (css) {
@@ -30,7 +56,7 @@ export function inject (html, css) {
  * @ignore
  */
 export function fromTemplate (id) {
-  let node = $('#' + id)[0]
+  let node = $$('#' + id)
   // browsers without <template> support don't wrap everything in .content
   if ('content' in node) {
     node = node.content

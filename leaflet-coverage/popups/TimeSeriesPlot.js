@@ -1,6 +1,5 @@
 import L from 'leaflet'
 import c3 from 'c3'
-import 'c3/c3.css!'
 
 import * as i18n from '../util/i18n.js'
 import * as referencingUtil from '../util/referencing.js'

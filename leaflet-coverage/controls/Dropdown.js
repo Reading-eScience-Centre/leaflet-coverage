@@ -1,6 +1,6 @@
 import L from 'leaflet'
-import {$,HTML} from 'minified'
 
+import {$$, HTML} from './utils.js'
 import EventMixin from '../util/EventMixin.js'
 
 let TEMPLATE = 
@@ -18,20 +18,20 @@ export default class Dropdown extends EventMixin(L.Control) {
   }
   
   onAdd (map) {
-    let el = HTML(TEMPLATE)[0]
+    let el = HTML(TEMPLATE)
     this._el = el
     
     L.DomEvent.disableClickPropagation(el)
     
-    $('.select-title', el).fill(this._title)
+    $$('.select-title', el).innerHTML = this._title
     
     for (let {value, label} of this._choices) {
-      $('select', el).add(HTML(`<option value="${value}">${label}</option>`))
+      $$('select', el).appendChild(HTML(`<option value="${value}">${label}</option>`))
     }
-    $('select', el)[0].disabled = this._choices.length <= 1
+    $$('select', el).disabled = this._choices.length <= 1
     this.value = this._value
     
-    $('select', el).on('change', event => {
+    $$('select', el).addEventListener('change', event => {
       this._value = event.target.value
       this.fire('change', {value: event.target.value})
     })
@@ -44,7 +44,7 @@ export default class Dropdown extends EventMixin(L.Control) {
   }
   
   set value (val) {
-    $('select', this._el)[0].value = val
+    $$('select', this._el).value = val
   }
     
 }
