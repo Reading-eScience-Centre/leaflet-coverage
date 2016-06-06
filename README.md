@@ -44,6 +44,15 @@ a more sophisticated factory class may be implemented.
 
 ## Notes
 
+Using the browser bundle:
+```html
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
+<script src="covutils.min.js"></script>
+<script src="leaflet-coverage.min.js"></script>
+```
+If you don't need support for MultiPolygon and PolygonSeries layer classes, then you can also use the lite variant of covutils.
+
 To use the plotting functionality (for time series or vertical profile plots) you have to include the D3 and C3 libraries in your HTML:
 
 ```html
