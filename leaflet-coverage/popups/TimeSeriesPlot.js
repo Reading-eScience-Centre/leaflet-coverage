@@ -236,6 +236,9 @@ export default class TimeSeriesPlot extends L.Popup {
       axis: {
         x: {
           type: 'timeseries',
+          tick: {
+            format: this.options.timeFormat
+          },
           label: {
             text: xLabel,
             position: 'outer-center'
