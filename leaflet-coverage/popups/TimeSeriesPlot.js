@@ -274,7 +274,7 @@ export default class TimeSeriesPlot extends L.Popup {
       },
       size: {
         height: 300,
-        width: 350
+        width: this.options.maxWidth
       }
     })
     
