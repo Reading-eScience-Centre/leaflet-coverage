@@ -4,10 +4,14 @@ import {$$, HTML} from './utils.js'
 import EventMixin from '../util/EventMixin.js'
 
 let TEMPLATE = 
-`<div class="info" style="clear:none">
+`<div class="info form-inline" style="clear:none">
   <strong class="title">Time</strong><br>
-  <select name="date" class="date"></select>
-  <select name="time" class="time"></select>
+  <div class="form-group">
+    <select name="date" class="date form-control"></select>
+  </div>
+  <div class="form-group">
+    <select name="time" class="time form-control"></select>
+  </div>
 </div>`
 
 /**

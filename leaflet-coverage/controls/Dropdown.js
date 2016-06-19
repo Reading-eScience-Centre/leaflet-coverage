@@ -6,7 +6,7 @@ import EventMixin from '../util/EventMixin.js'
 let TEMPLATE = 
 `<div class="info" style="clear:none">
   <strong class="select-title"></strong><br>
-  <select></select>
+  <select class="form-control"></select>
 </div>`
 
 export default class Dropdown extends EventMixin(L.Control) {
