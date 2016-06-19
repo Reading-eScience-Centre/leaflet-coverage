@@ -11,6 +11,18 @@ export function $$ (selector, parent) {
 }
 
 /**
+ * Returns all child elements of parent (fall-back to document if not given)
+ * matching the given selector as an array.
+ */
+export function $ (selector, parent) {
+  if (typeof parent === 'string') {
+    parent = $$(parent)
+  }
+  parent = parent || document
+  return [...parent.querySelectorAll(selector)]
+}
+
+/**
  * Turns an HTML string into a DOM element.
  * The HTML markup must have a single root node not prepended by any whitespace.
  * 

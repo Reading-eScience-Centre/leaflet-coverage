@@ -1,6 +1,6 @@
 import L from 'leaflet'
 
-import {inject, fromTemplate, $$} from './utils.js'
+import {inject, fromTemplate, $$, $} from './utils.js'
 import * as i18n from '../util/i18n.js'
 
 // TODO the default template should be moved outside this module so that it can be easily skipped
@@ -149,7 +149,7 @@ export default class ContinuousLegend extends L.Control {
       let title = i18n.getLanguageString(param.observedProperty.label, language)
       let unit = this._getUnitString(param, language)
        $$('.legend-title', el).innerHTML = title
-       $$('.legend-uom', el).innerHTML = unit        
+       $('.legend-uom', el).forEach(u => u.innerHTML = unit)        
     }
     
     let palette = this._covLayer.palette
