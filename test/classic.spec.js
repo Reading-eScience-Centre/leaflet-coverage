@@ -1,7 +1,7 @@
 import assert from 'assert'
 
 import L from 'leaflet'
-import 'leaflet-coverage/classic.js'
+import 'src/classic.js'
 
 describe("classic mode", () => {
   it("should expose classes under L.coverage namespace", () => {

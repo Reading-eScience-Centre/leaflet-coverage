@@ -14,14 +14,14 @@
     "name": "Maik Riechert"
   },
   "files": [
-    "lib/",
-    "src/",
-    "leaflet-coverage.*"
+    "leaflet-coverage.src.js",
+    "leaflet-coverage.min.js"
   ],
-  "main": "lib/LayerFactory.js",
+  "registry": "jspm",
+  "format": "esm",
   "scripts": {
     "docs": "esdoc -c esdoc.json",
-    "transpile": "babel -d lib/ src/",
+    "postinstall": "jspm install --yes",
     "style": "standard",
     "test": "karma start --single-run",
     "karma": "karma start",
@@ -40,20 +40,28 @@
       "karma.conf-ci.js"
     ]
   },
-  "dependencies": {
-    "c3": "^0.4.11",
-    "covutils": "^0.2.6",
-    "leaflet": "^0.7.3",
-    "ndarray": "^1.0.18"
+  "jspm": {
+    "main": "LayerFactory",
+    "files": null,
+    "directories": {
+      "lib": "src"
+    },
+    "dependencies": {
+      "c3": "npm:c3@^0.4.11",
+      "covutils": "npm:covutils@^0.2.6",
+      "leaflet": "github:Leaflet/Leaflet@^0.7.3",
+      "ndarray": "npm:ndarray@^1.0.18"
+    },
+    "devDependencies": {
+      "assert": "npm:assert@^1.3.0",
+      "babel": "npm:babel-core@^5.8.24",
+      "babel-runtime": "npm:babel-runtime@^5.8.24",
+      "core-js": "npm:core-js@^1.1.4",
+      "covjson-reader": "npm:covjson-reader@^0.6.0"
+    }
   },
   "devDependencies": {
-    "babel-cli": "^6.3.17",
-    "babel-eslint": "^4.1.3",
-    "babel-preset-es2015": "^6.3.13",
-    "babelify": "^7.2.0",
-    "browserify": "^11.0.1",
-    "core-js": "^2.0.2",
-    "covjson-reader": "^0.6.0",
+    "babel-eslint": "^4.0.10",
     "esdoc": "^0.3.0",
     "esdoc-importpath-plugin": "0.0.1",
     "jspm": "^0.16.32",

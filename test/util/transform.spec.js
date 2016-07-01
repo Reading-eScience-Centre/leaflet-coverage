@@ -4,7 +4,7 @@ import 'core-js/es6/symbol'
 import assert from 'assert'
 import * as CovJSON from 'covjson-reader'
 
-import * as transform from 'leaflet-coverage/util/transform.js'
+import * as transform from 'src/util/transform.js'
 
 describe("util/transform methods", () => {
   describe("#withParameters", () => {

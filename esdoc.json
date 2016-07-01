@@ -1,12 +1,12 @@
 {
-  "source": "./leaflet-coverage",
+  "source": "./src",
   "destination": "./docs",
   "plugins": [
     {
       "name": "esdoc-importpath-plugin",
       "option": {
         "replaces": [
-          {"from": "^leaflet-coverage/", "to": ""},
+          {"from": "^src/", "to": ""},
           {"from": "LayerFactory.js", "to": ""}
         ]
       }

@@ -14,7 +14,7 @@ module.exports = function(config) {
 
     jspm: {
       loadFiles: ['test/**/*.js'],
-      serveFiles: ['leaflet-coverage/**/*.js']
+      serveFiles: ['src/**/*.js']
     },
 
     // list of files / patterns to load in the browser

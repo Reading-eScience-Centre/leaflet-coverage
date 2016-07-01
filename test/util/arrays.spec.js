@@ -1,6 +1,6 @@
 import assert from 'assert'
 
-import * as utils from 'leaflet-coverage/util/arrays.js'
+import * as utils from 'src/util/arrays.js'
 import ndarray from 'ndarray'
 
 describe("util/arrays methods", () => {
