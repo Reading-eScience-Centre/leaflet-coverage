@@ -1,6 +1,0 @@
-import Grid from 'src/layers/Grid.js'
-import VerticalProfile from 'src/layers/VerticalProfile.js'
-import Trajectory from 'src/layers/Trajectory.js'
-import Point from 'src/layers/Point.js'
-import PointCollection from 'src/layers/PointCollection.js'
-import VerticalProfileCollection from 'src/layers/VerticalProfileCollection.js'

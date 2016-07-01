@@ -105,7 +105,7 @@ export function directPalette (colors) {
  *   "colors": ["red", "blue", ..]
  * }
  */
-export function create (paletteSpec) {
+export function paletteFromObject (paletteSpec) {
   if (!paletteSpec) {
     return
   }

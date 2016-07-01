@@ -1,6 +1,6 @@
 import assert from 'assert'
 
-import * as palettes from 'leaflet-coverage/layers/palettes.js'
+import {directPalette, PaletteManager} from 'src/index.js'
 
 describe('renderers/palettes', () => {
   describe('#directPalette', () => {
@@ -12,7 +12,7 @@ describe('renderers/palettes', () => {
       for (let i=0; i < r.length; i++) {
         colors.push(`rgb(${r[i]}, ${g[i]}, ${b[i]})`)
       }
-      let palette = palettes.directPalette(colors)
+      let palette = directPalette(colors)
       for (let i=0; i < r.length; i++) {
         assert.strictEqual(palette.red[i], r[i])
         assert.strictEqual(palette.green[i], g[i])
@@ -23,7 +23,7 @@ describe('renderers/palettes', () => {
   describe('#PaletteManager', () => {
     describe('#addLinear', () => {
       let steps = 10
-      let pm = new palettes.PaletteManager({defaultSteps: steps})
+      let pm = new PaletteManager({defaultSteps: steps})
       pm.addLinear('blues', ['#deebf7', '#3182bd'])
       let blues = pm.get('blues')
       assert.equal(blues.steps, steps)
