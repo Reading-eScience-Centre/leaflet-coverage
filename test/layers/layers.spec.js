@@ -1,6 +1,0 @@
-import Grid from 'leaflet-coverage/layers/Grid.js'
-import VerticalProfile from 'leaflet-coverage/layers/VerticalProfile.js'
-import Trajectory from 'leaflet-coverage/layers/Trajectory.js'
-import Point from 'leaflet-coverage/layers/Point.js'
-import PointCollection from 'leaflet-coverage/layers/PointCollection.js'
-import VerticalProfileCollection from 'leaflet-coverage/layers/VerticalProfileCollection.js'

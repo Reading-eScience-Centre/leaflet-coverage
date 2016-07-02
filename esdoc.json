@@ -1,13 +1,13 @@
 {
-  "source": "./leaflet-coverage",
+  "source": "./src",
   "destination": "./docs",
+  "excludes": ["kdTree"],
   "plugins": [
     {
       "name": "esdoc-importpath-plugin",
       "option": {
         "replaces": [
-          {"from": "^leaflet-coverage/", "to": ""},
-          {"from": "LayerFactory.js", "to": ""}
+          {"from": ".*", "to": ""}
         ]
       }
     }
