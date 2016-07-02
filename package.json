@@ -38,6 +38,11 @@
       "karma.conf-ci.js"
     ]
   },
+  "jspm": {
+    "registry": "npm",
+    "format": "esm",
+    "main": "src/index.js"
+  },
   "dependencies": {
     "c3": "^0.4.11",
     "covutils": "^0.4.1",
