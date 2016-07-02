@@ -21,3 +21,5 @@ export { default as VerticalProfilePlot } from './popups/VerticalProfilePlot.js'
 export { default as TimeSeriesPlot } from './popups/TimeSeriesPlot.js'
 export { default as DraggableValuePopup } from './popups/DraggableValuePopup.js'
 export { default as ValuePopup } from './popups/ValuePopup.js'
+
+export * from './util/constants.js'
