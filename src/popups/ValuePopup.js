@@ -1,6 +1,6 @@
 import L from 'leaflet'
 
-import {getLanguageString as i18n, getCategory} from 'covutils'
+import {getLanguageString as i18n, stringifyUnit, getCategory} from 'covutils'
 
 /**
  * A popup that contains the parameter values of the given coverage layers at the location of the popup.
