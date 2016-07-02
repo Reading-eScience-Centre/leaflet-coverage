@@ -1,15 +1,10 @@
 import L from 'leaflet'
-import {enlargeExtentIfEqual} from './palettes.js'
-import * as arrays from '../util/arrays.js'
-import * as rangeutil from '../util/range.js'
+import {indexOfNearest, minMaxOfRange, isDomain, fromDomain, ensureClockwisePolygon, getPointInPolygonsFn} from 'covutils'
 
+import {enlargeExtentIfEqual} from './palettes.js'
 import CoverageMixin from './CoverageMixin.js'
 import EventMixin from '../util/EventMixin.js'
 import PaletteMixin from './PaletteMixin.js'
-
-import {isDomain} from 'covutils/lib/validate.js'
-import {fromDomain} from 'covutils/lib/coverage/create.js'
-import {ensureClockwisePolygon, getPointInPolygonsFn} from 'covutils/lib/domain/polygon.js'
 
 import {DEFAULT_COLOR} from './Point.js'
 
@@ -66,7 +61,7 @@ export default class PolygonSeries extends PaletteMixin(CoverageMixin(EventMixin
       t.idx = t.coord = undefined
     } else {
       let vals = this.domain.axes.get('t').values.map(v => v.getTime())
-      t.idx = arrays.indexOfNearest(vals, t.coordPref.getTime())
+      t.idx = indexOfNearest(vals, t.coordPref.getTime())
       t.coord = vals[t.idx]
     }
     
@@ -153,7 +148,7 @@ export default class PolygonSeries extends PaletteMixin(CoverageMixin(EventMixin
         throw new Error('palette extent cannot be computed when no parameter has been chosen')
       }
     
-      extent = rangeutil.minMax(this.range)
+      extent = minMaxOfRange(this.range)
       extent = enlargeExtentIfEqual(extent)
       return Promise.resolve(extent)
     } else {

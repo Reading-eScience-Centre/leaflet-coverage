@@ -1,7 +1,6 @@
 import L from 'leaflet'
 
-import {getLanguageString as i18n} from 'covutils/lib/i18n.js'
-import {getCategory} from 'covutils/lib/parameter.js'
+import {getLanguageString as i18n, getCategory} from 'covutils'
 
 /**
  * A popup that contains the parameter values of the given coverage layers at the location of the popup.
@@ -76,7 +75,7 @@ export default class ValuePopup extends L.Popup {
       if (val == null) continue
       let param = layer.parameter
       
-      let unit = getUnitString(param)
+      let unit = !param.observedProperty.categories ? stringifyUnit(param.unit) : ''
       if (param.categoryEncoding) {
         let cat = getCategory(param, val)
         val = i18n(cat.label)
@@ -90,27 +89,6 @@ export default class ValuePopup extends L.Popup {
     this._hasData = true
     this.setContent(html)
     return this
-  }
-}
-
-// TODO move this to covutils
-function getUnitString (param, language) {
-  if (param.observedProperty.categories || !param.unit) {
-    return ''
-  }
-  if (param.unit.symbol) {
-    let unit = param.unit.symbol.value || param.unit.symbol
-    let scheme = param.unit.symbol.type
-    if (scheme === 'http://www.opengis.net/def/uom/UCUM/') {
-      if (unit === 'Cel') {
-        unit = '°C'
-      } else if (unit === '1') {
-        unit = ''
-      }
-    }
-    return unit
-  } else {
-    return i18n.getLanguageString(param.unit.label, language)
   }
 }
 

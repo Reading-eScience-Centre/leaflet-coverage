@@ -1,4 +1,4 @@
-import {isEllipsoidalCRS} from '../util/referencing.js'
+import {isEllipsoidalCRS} from 'covutils'
 
 /**
  * A mixin that encapsulates loading of a single coverage for use in layers.

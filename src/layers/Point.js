@@ -6,8 +6,7 @@ import CircleMarkerMixin from './CircleMarkerMixin.js'
 import PaletteMixin from './PaletteMixin.js'
 import EventMixin from '../util/EventMixin.js'
 
-import {isDomain} from 'covutils/lib/validate.js'
-import {fromDomain} from 'covutils/lib/coverage/create.js'
+import {isDomain, fromDomain} from 'covutils'
 
 /** @ignore */
 export const DEFAULT_COLOR = 'black'

@@ -1,15 +1,12 @@
 import L from 'leaflet'
-import {enlargeExtentIfEqual} from './palettes.js'
-import * as arrays from '../util/arrays.js'
+import {isDomain, fromDomain, indexOfNearest, minMaxOfRange} from 'covutils'
 import * as rangeutil from '../util/range.js'
 
+import {enlargeExtentIfEqual} from './palettes.js'
 import CoverageMixin from './CoverageMixin.js'
 import CircleMarkerMixin from './CircleMarkerMixin.js'
 import PaletteMixin from './PaletteMixin.js'
 import EventMixin from '../util/EventMixin.js'
-
-import {isDomain} from 'covutils/lib/validate.js'
-import {fromDomain} from 'covutils/lib/coverage/create.js'
 
 import {DEFAULT_COLOR} from './Point.js'
 
@@ -64,7 +61,7 @@ export default class VerticalProfile extends PaletteMixin(CircleMarkerMixin(Cove
       z.idx = z.coord = undefined
     } else {
       let vals = this.domain.axes.get('z').values
-      z.idx = arrays.indexOfNearest(vals, z.coordPref)
+      z.idx = indexOfNearest(vals, z.coordPref)
       z.coord = vals[z.idx]
     }
     
@@ -125,7 +122,7 @@ export default class VerticalProfile extends PaletteMixin(CircleMarkerMixin(Cove
         throw new Error('palette extent cannot be set when no parameter has been chosen')
       }
       
-      extent = rangeutil.minMax(this.range)
+      extent = minMaxOfRange(this.range)
       extent = enlargeExtentIfEqual(extent)
       return Promise.resolve(extent)
     } else {

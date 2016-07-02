@@ -1,13 +1,10 @@
 import L from 'leaflet'
+import {isDomain, fromDomain, minMaxOfRange, ensureClockwisePolygon, getPointInPolygonsFn} from 'covutils'
+
 import {enlargeExtentIfEqual} from './palettes.js'
 import PaletteMixin from './PaletteMixin.js'
 import CoverageMixin from './CoverageMixin.js'
-import * as rangeutil from '../util/range.js'
 import EventMixin from '../util/EventMixin.js'
-
-import {isDomain} from 'covutils/lib/validate.js'
-import {fromDomain} from 'covutils/lib/coverage/create.js'
-import {ensureClockwisePolygon, getPointInPolygonsFn} from 'covutils/lib/domain/polygon.js'
   
 /** @ignore */
 export const DEFAULT_COLOR = 'black'
@@ -75,7 +72,7 @@ export default class MultiPolygon extends PaletteMixin(CoverageMixin(EventMixin(
         throw new Error('palette extent cannot be computed when no parameter has been chosen')
       }
     
-      extent = rangeutil.minMax(this.range)
+      extent = minMaxOfRange(this.range)
       extent = enlargeExtentIfEqual(extent)
       return Promise.resolve(extent)
     } else {

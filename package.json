@@ -26,12 +26,9 @@
     "style": "standard",
     "test": "karma start --single-run",
     "karma": "karma start",
-    "saucelabs": "karma start karma.conf-ci.js",
-    "build": "npm run buildsrc && npm run buildmin && npm run transpile",
-    "buildsrc": "jspm bundle-sfx src/index - leaflet - c3 - covutils + ndarray leaflet-coverage.src.js --globals \"{leaflet:'L', c3:'c3', 'covutils/lib/validate.js':'CovUtils.validate', 'covutils/lib/constants.js':'CovUtils.constants', 'covutils/lib/array.js':'CovUtils.array', 'covutils/lib/range.js':'CovUtils.range', 'covutils/lib/i18n.js':'CovUtils.i18n', 'covutils/lib/parameter.js':'CovUtils.parameter', 'covutils/lib/unit.js':'CovUtils.unit', 'covutils/lib/coverage/create.js':'CovUtils.coverage.create', 'covutils/lib/coverage/transform.js':'CovUtils.coverage.transform', 'covutils/lib/coverage/subset.js':'CovUtils.coverage.subset', 'covutils/lib/coverage/referencing.js':'CovUtils.coverage.referencing', 'covutils/lib/domain/referencing.js':'CovUtils.domain.referencing', 'covutils/lib/domain/polygon.js':'CovUtils.domain.polygon'}\" --format global --skip-source-maps",
-    "postbuildsrc": "prepend leaflet-coverage.src.js \"c3 = window.c3 || {};\"",
-    "buildmin": "jspm bundle-sfx src/index - leaflet - c3 - covutils + ndarray leaflet-coverage.min.js --minify --globals \"{leaflet:'L', c3:'c3', 'covutils/lib/validate.js':'CovUtils.validate', 'covutils/lib/constants.js':'CovUtils.constants', 'covutils/lib/array.js':'CovUtils.array', 'covutils/lib/range.js':'CovUtils.range', 'covutils/lib/i18n.js':'CovUtils.i18n', 'covutils/lib/parameter.js':'CovUtils.parameter', 'covutils/lib/unit.js':'CovUtils.unit', 'covutils/lib/coverage/create.js':'CovUtils.coverage.create', 'covutils/lib/coverage/transform.js':'CovUtils.coverage.transform', 'covutils/lib/coverage/subset.js':'CovUtils.coverage.subset', 'covutils/lib/coverage/referencing.js':'CovUtils.coverage.referencing', 'covutils/lib/domain/referencing.js':'CovUtils.domain.referencing', 'covutils/lib/domain/polygon.js':'CovUtils.domain.polygon'}\" --format global --skip-source-maps",
-    "postbuildmin": "prepend leaflet-coverage.min.js \"c3 = window.c3 || {};\"",
+    "saucelabs": "karma start karma.conf-ci.js",    
+    "browserdist": "rollup -c rollup.config.src.js && rollup -c rollup.config.min.js",
+    "build": "npm run transpile && npm run browserdist",    
     "prepublish": "npm run build"
   },
   "standard": {
@@ -43,30 +40,15 @@
   },
   "dependencies": {
     "c3": "^0.4.11",
-    "covutils": "^0.2.6",
+    "covutils": "^0.4.0",
     "leaflet": "^0.7.7",
     "ndarray": "^1.0.18"
-  },
-  "jspm": {
-    "registry": "npm",
-    "dependencies": {
-      "c3": "^0.4.11",
-      "covutils": "^0.2.6",
-      "leaflet": "^0.7.7",
-      "ndarray": "^1.0.18"
-    },
-    "devDependencies": {
-      "assert": "^1.3.0",
-      "babel": "babel-core@^5.8.24",
-      "babel-runtime": "^5.8.24",
-      "core-js": "^1.1.4",
-      "covjson-reader": "^0.6.0"
-    }
   },
   "devDependencies": {
     "babel-cli": "^6.3.17",
     "babel-eslint": "^4.1.3",
     "babel-preset-es2015": "^6.3.13",
+    "babel-preset-es2015-rollup": "^1.1.1",
     "babelify": "^7.2.0",
     "browserify": "^11.0.1",
     "core-js": "^2.0.2",
@@ -79,6 +61,11 @@
     "karma-jspm": "^2.0.1",
     "karma-mocha": "^0.2.0",
     "karma-sauce-launcher": "^0.2.14",
+    "rollup": "^0.30.0",
+    "rollup-plugin-babel": "^2.5.1",
+    "rollup-plugin-commonjs": "^3.1.0",
+    "rollup-plugin-node-resolve": "^1.7.1",
+    "rollup-plugin-uglify": "^1.0.1",
     "mocha": "^2.2.5",
     "standard": "^5.1.0",
     "prepend-file-cli": "^1.0.2"

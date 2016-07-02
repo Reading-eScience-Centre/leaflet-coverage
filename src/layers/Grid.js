@@ -1,15 +1,10 @@
 import L from 'leaflet'
 import ndarray from 'ndarray'
+import {indexOfNearest, isDomain, fromDomain, minMaxOfRange, getReferenceObject, isEllipsoidalCRS} from 'covutils'
+
 import {enlargeExtentIfEqual} from './palettes.js'
 import PaletteMixin from './PaletteMixin.js'
 import CoverageMixin from './CoverageMixin.js'
-import * as arrays from '../util/arrays.js'
-import * as rangeutil from '../util/range.js'
-import * as referencingutil from '../util/referencing.js'
-
-import {isDomain} from 'covutils/lib/validate.js'
-import {fromDomain} from 'covutils/lib/coverage/create.js'
-import {getReferenceObject} from 'covutils/lib/domain/referencing.js'
   
 /**
  * Renderer for Coverages and Domains with (domain) profile Grid.
@@ -258,7 +253,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
 
       // check if subsetted size is manageable
       if (xlen * ylen < 1000*1000) {
-        extent = rangeutil.minMax(this.subsetRange)
+        extent = minMaxOfRange(this.subsetRange)
         extent = enlargeExtentIfEqual(extent)
         return Promise.resolve(extent)
       } else {
@@ -271,7 +266,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
         return this.subsetCov.subsetByIndex({x: xconstraint, y: yconstraint})        
           .then(subsetCov => {
             return subsetCov.loadRange(this.param.key).then(subsetRange => {
-               let [min,max] = rangeutil.minMax(subsetRange)
+               let [min,max] = minMaxOfRange(subsetRange)
                let buffer = (max-min)*0.1 // 10% buffer on each side
                extent = [min-buffer, max+buffer]
                return extent
@@ -313,8 +308,8 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
       return
     }
 
-    let iLat = arrays.indexOfNearest(y, lat)
-    let iLon = arrays.indexOfNearest(x, lon)
+    let iLat = indexOfNearest(y, lat)
+    let iLon = indexOfNearest(x, lon)
 
     return this.subsetRange.get({y: iLat, x: iLon})
   }
@@ -467,8 +462,8 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
         // now we find the closest grid cell using simple binary search
         // for finding the closest latitude/longitude we use a simple binary search
         // (as there is no discontinuity)
-        let iLat = arrays.indexOfNearest(y, lat)
-        let iLon = arrays.indexOfNearest(x, lon)
+        let iLat = indexOfNearest(y, lat)
+        let iLon = indexOfNearest(x, lon)
 
         setPixel(tileY, tileX, vals({y: iLat, x: iLon}))
       }
@@ -495,7 +490,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
       var lat = map.unproject(L.point(startX, startY + tileY)).lat
       latCache[tileY] = lat
       // find the index of the closest latitude in the grid using simple binary search
-      iLatCache[tileY] = arrays.indexOfNearest(y, lat)
+      iLatCache[tileY] = indexOfNearest(y, lat)
     }
 
     for (let tileX = 0; tileX < tileSize; tileX++) {
@@ -507,7 +502,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
 
       // find the index of the closest longitude in the grid using simple binary search
       // (as there is no discontinuity)
-      let iLon = arrays.indexOfNearest(x, lon)
+      let iLon = indexOfNearest(x, lon)
 
       for (let tileY = 0; tileY < tileSize; tileY++) {
         // get geographic coordinates of tile pixel
@@ -547,11 +542,11 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
    * Return whether the coverage domain is using a geodetic CRS with WGS84 datum.
    */
   _isDomainUsingEllipsoidalCRS () {
-    return this.domain.referencing.some(ref => referencingutil.isEllipsoidalCRS(ref.system))
+    return this.domain.referencing.some(ref => isEllipsoidalCRS(ref.system))
   }
   
   _isGeodeticTransformAvailableForDomain () {
-    let ref = this.domain.referencing.find(ref => referencingutil.isEllipsoidalCRS(ref.system))
+    let ref = this.domain.referencing.find(ref => isEllipsoidalCRS(ref.system))
     // TODO implement
     return false
   }

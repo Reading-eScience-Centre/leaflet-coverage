@@ -1,11 +1,9 @@
 import L from 'leaflet'
+import {isDomain, fromDomain, minMaxOfRange} from 'covutils'
+
 import {enlargeExtentIfEqual} from './palettes.js'
 import CoverageMixin from './CoverageMixin.js'
 import PaletteMixin from './PaletteMixin.js'
-import * as rangeutil from '../util/range.js'
-
-import {isDomain} from 'covutils/lib/validate.js'
-import {fromDomain} from 'covutils/lib/coverage/create.js'
 
 import {DEFAULT_COLOR} from './Point.js'
   
@@ -89,7 +87,7 @@ export default class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGrou
       throw new Error('Unknown extent specification: ' + extent)
     }
 
-    extent = rangeutil.minMax(range)
+    extent = minMaxOfRange(range)
     extent = enlargeExtentIfEqual(extent)    
     return Promise.resolve(extent)
   }

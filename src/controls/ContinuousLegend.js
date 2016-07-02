@@ -1,7 +1,7 @@
 import L from 'leaflet'
 
 import {inject, fromTemplate, $$, $} from './utils.js'
-import * as i18n from '../util/i18n.js'
+import {getLanguageTag, getLanguageString} from 'covutils'
 
 // TODO the default template should be moved outside this module so that it can be easily skipped
 const DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-continuous-legend'
@@ -135,7 +135,7 @@ export default class ContinuousLegend extends L.Control {
       }
       return unit
     } else {
-      return i18n.getLanguageString(param.unit.label, language)
+      return getLanguageString(param.unit.label, language)
     }
   }
   
@@ -145,8 +145,8 @@ export default class ContinuousLegend extends L.Control {
     if (fullUpdate) {
       let param = this._covLayer.parameter
       // if requested language doesn't exist, use the returned one for all other labels
-      let language = i18n.getLanguageTag(param.observedProperty.label, this._language) 
-      let title = i18n.getLanguageString(param.observedProperty.label, language)
+      let language = getLanguageTag(param.observedProperty.label, this._language) 
+      let title = getLanguageString(param.observedProperty.label, language)
       let unit = this._getUnitString(param, language)
        $$('.legend-title', el).innerHTML = title
        $('.legend-uom', el).forEach(u => u.innerHTML = unit)        
