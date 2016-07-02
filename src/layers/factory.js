@@ -50,12 +50,12 @@ const COLLECTION_LAYER_CLASSES = {
  * @throws {Error} If no layer class could be found.
  */
 export function dataLayer (cov, options) {
-  let clazz = layerClass(cov)
+  let clazz = dataLayerClass(cov)
   if (!clazz) {
     let coll = cov.type === COVERAGECOLLECTION ? 'collection ' : ''
     throw new Error(`No ${coll}layer class found for domainType=${cov.domainType}`)
   }
-  return new clazz(cov, opts)
+  return new clazz(cov, options)
 }
 
 /**
