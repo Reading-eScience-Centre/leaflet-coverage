@@ -1,25 +1,25 @@
-const COVJSON_PREFIX = 'http://coveragejson.org/def#'
+const COVJSON_PREFIX = 'http://covjson.org/def/'
+const COVJSON_CORE_NS = COVJSON_PREFIX + 'core#'
+const COVJSON_DOMAINTYPES_NS = COVJSON_PREFIX + 'domainTypes#'
 /** @ignore */
-export const COVJSON_POINT = COVJSON_PREFIX + 'Point'
+export const COVJSON_POINT = COVJSON_DOMAINTYPES_NS + 'Point'
 /** @ignore */
-export const COVJSON_POINTSERIES = COVJSON_PREFIX + 'PointSeries'
+export const COVJSON_POINTSERIES = COVJSON_DOMAINTYPES_NS + 'PointSeries'
 /** @ignore */
-export const COVJSON_VERTICALPROFILE = COVJSON_PREFIX + 'VerticalProfile'
+export const COVJSON_VERTICALPROFILE = COVJSON_DOMAINTYPES_NS + 'VerticalProfile'
 /** @ignore */
-export const COVJSON_GRID = COVJSON_PREFIX + 'Grid'
+export const COVJSON_GRID = COVJSON_DOMAINTYPES_NS + 'Grid'
 /** @ignore */
-export const COVJSON_TRAJECTORY = COVJSON_PREFIX + 'Trajectory'
+export const COVJSON_TRAJECTORY = COVJSON_DOMAINTYPES_NS + 'Trajectory'
 /** @ignore */
-export const COVJSON_POLYGONSERIES = COVJSON_PREFIX + 'PolygonSeries'
+export const COVJSON_POLYGONSERIES = COVJSON_DOMAINTYPES_NS + 'PolygonSeries'
 /** @ignore */
-export const COVJSON_MULTIPOLYGON = COVJSON_PREFIX + 'MultiPolygon'
+export const COVJSON_MULTIPOLYGON = COVJSON_DOMAINTYPES_NS + 'MultiPolygon'
 
-// FIXME these should maybe live under a different namespace (Polygon collides with the same-named profile)
-// alternatively, profile URIs should live somewhere else
 /** @ignore */
-export const COVJSON_DATATYPE_TUPLE = COVJSON_PREFIX + 'Tuple'
+export const COVJSON_DATATYPE_TUPLE = COVJSON_CORE_NS + 'tuple'
 /** @ignore */
-export const COVJSON_DATATYPE_POLYGON = COVJSON_PREFIX + 'Polygon'
+export const COVJSON_DATATYPE_POLYGON = COVJSON_CORE_NS + 'polygon'
 
 // JS API object types
 export {COVERAGE, COVERAGECOLLECTION, DOMAIN} from 'covutils'
