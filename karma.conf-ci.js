@@ -17,15 +17,20 @@ module.exports = function(config) {
   var customLaunchers = {
     'SL_Chrome': {
       base: 'SauceLabs',
-      browserName: 'chrome'
+      browserName: 'chrome',
     },
-    'SL_InternetExplorer': {
+    'SL_Firefox': {
       base: 'SauceLabs',
-      browserName: 'internet explorer'
+      browserName: 'firefox',
     },
-    'SL_FireFox': {
+    'SL_Edge': {
       base: 'SauceLabs',
-      browserName: 'firefox'
+      browserName: 'MicrosoftEdge'
+    },
+    'SL_Safari': {
+      base: 'SauceLabs',
+      browserName: 'safari',
+      platform: 'OS X 10.11'
     }
   };
   
