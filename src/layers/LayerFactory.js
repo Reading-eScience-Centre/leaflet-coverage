@@ -1,12 +1,12 @@
-import Grid from './layers/Grid.js'
-import Trajectory from './layers/Trajectory.js'
-import Point from './layers/Point.js'
-import PointSeries from './layers/PointSeries.js'
-import PointCollection from './layers/PointCollection.js'
-import VerticalProfile from './layers/VerticalProfile.js'
-import VerticalProfileCollection from './layers/VerticalProfileCollection.js'
-import MultiPolygon from './layers/MultiPolygon.js'
-import PolygonSeries from './layers/PolygonSeries.js'
+import Grid from './Grid.js'
+import Trajectory from './Trajectory.js'
+import Point from './Point.js'
+import PointSeries from './PointSeries.js'
+import PointCollection from './PointCollection.js'
+import VerticalProfile from './VerticalProfile.js'
+import VerticalProfileCollection from './VerticalProfileCollection.js'
+import MultiPolygon from './MultiPolygon.js'
+import PolygonSeries from './PolygonSeries.js'
 import {
   COVJSON_POINT, 
   COVJSON_POINTSERIES, 
@@ -18,7 +18,7 @@ import {
   COVERAGE,
   COVERAGECOLLECTION,
   DOMAIN
-  } from './util/constants.js'
+  } from '../util/constants.js'
 
 const DOMAIN_LAYER_CLASSES = {
   [COVJSON_GRID]: Grid,

@@ -7,7 +7,7 @@ export default options => {
   return {
     entry: 'src/index.js',
     plugins: [
-      babel({ exclude: 'node_modules/**' }),
+      babel({ babelrc: false, presets: ['es2015-rollup'], exclude: 'node_modules/**' }),
       nodeResolve({ jsnext: true, browser: true }),
       commonjs({ include: 'node_modules/**' })
     ].concat(options.minify ? [uglify()] : []),
@@ -20,7 +20,7 @@ export default options => {
       leaflet: 'L',
       c3: 'c3',
       covutils: 'CovUtils'
-    }
+    },
     sourceMap: true
   }
 }

@@ -1,4 +1,4 @@
-import {linearPalette, directPalette, create as createPalette, scale} from './palettes.js'
+import {linearPalette, directPalette, paletteFromObject, scale} from './palettes.js'
 
 const DEFAULT_CONTINUOUS_PALETTE = () => linearPalette(['#deebf7', '#3182bd']) // blues
 const DEFAULT_CATEGORICAL_PALETTE = n => {
@@ -53,7 +53,7 @@ export default function PaletteMixin (base) {
       } else if (options.palette) {
         this._palette = options.palette
       } else if (parameter.preferredPalette) {
-        this._palette = createPalette(parameter.preferredPalette)
+        this._palette = paletteFromObject(parameter.preferredPalette)
       } else if (categories) {
         if (categories.every(cat => cat.preferredColor)) {
           this._palette = directPalette(categories.map(cat => cat.preferredColor))

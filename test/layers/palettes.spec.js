@@ -1,8 +1,8 @@
 import assert from 'assert'
 
-import {directPalette, PaletteManager} from 'src/index.js'
+import {directPalette, PaletteManager} from '../../src'
 
-describe('renderers/palettes', () => {
+describe('palettes', () => {
   describe('#directPalette', () => {
     it('returns an identical palette', () => {
       let r = [100,23,10]

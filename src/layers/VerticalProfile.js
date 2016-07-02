@@ -1,6 +1,5 @@
 import L from 'leaflet'
 import {isDomain, fromDomain, indexOfNearest, minMaxOfRange} from 'covutils'
-import * as rangeutil from '../util/range.js'
 
 import {enlargeExtentIfEqual} from './palettes.js'
 import CoverageMixin from './CoverageMixin.js'

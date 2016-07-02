@@ -1,6 +1,6 @@
 {
   "name": "leaflet-coverage",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "license": "BSD-3-Clause",
   "description": "A Leaflet plugin for visualizing coverage data",
   "repository": {
@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "c3": "^0.4.11",
-    "covutils": "^0.4.0",
+    "covutils": "^0.4.1",
     "leaflet": "^0.7.7",
     "ndarray": "^1.0.18"
   },
@@ -52,22 +52,20 @@
     "babelify": "^7.2.0",
     "browserify": "^11.0.1",
     "core-js": "^2.0.2",
-    "covjson-reader": "^0.6.0",
+    "covjson-reader": "^0.13.0",
     "esdoc": "^0.3.0",
     "esdoc-importpath-plugin": "0.0.1",
-    "jspm": "^0.16.32",
     "karma": "^0.13.9",
+    "karma-browserify": "^4.4.2",
     "karma-chrome-launcher": "^0.2.0",
-    "karma-jspm": "^2.0.1",
     "karma-mocha": "^0.2.0",
     "karma-sauce-launcher": "^0.2.14",
+    "mocha": "^2.5.3",
     "rollup": "^0.30.0",
     "rollup-plugin-babel": "^2.5.1",
     "rollup-plugin-commonjs": "^3.1.0",
     "rollup-plugin-node-resolve": "^1.7.1",
     "rollup-plugin-uglify": "^1.0.1",
-    "mocha": "^2.2.5",
-    "standard": "^5.1.0",
-    "prepend-file-cli": "^1.0.2"
+    "standard": "^5.1.0"
   }
 }
