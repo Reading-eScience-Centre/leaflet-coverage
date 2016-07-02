@@ -7,10 +7,7 @@ import {getLanguageString, getReferenceObject} from 'covutils'
  * of the vertical profile coverage.
  * 
  * @example
- * layer.bindPopup(new VerticalProfilePlot(coverage))
- * 
- * @example <caption>Non-module access</caption>
- * L.coverage.popup.VerticalProfilePlot
+ * layer.bindPopup(new C.VerticalProfilePlot(coverage))
  */
 export default class VerticalProfilePlot extends L.Popup {
   

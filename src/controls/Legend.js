@@ -12,13 +12,10 @@ import ContinuousLegend from './ContinuousLegend.js'
  * instead. 
  * 
  * @example <caption>Coverage data layer</caption>
- * var legend = Legend(covLayer).addTo(map)
+ * var legend = C.legend(covLayer).addTo(map)
  * 
  * @example <caption>Fake layer</caption>
  * // see DiscreteLegend and ContinuousLegend docs
- * 
- * @example <caption>Non-module access</caption>
- * L.coverage.control.Legend
  * 
  * @param {object} covLayer The coverage data layer.
  * @param {object} [options] Legend options.
@@ -26,7 +23,7 @@ import ContinuousLegend from './ContinuousLegend.js'
  * @param {string} [options.language] A language tag, indicating the preferred language to use for labels.
  * @return {DiscreteLegend|ContinuousLegend}
  */
-export default function (layer, options = {}) {
+export default function legend (layer, options = {}) {
   options.position = options.position || 'bottomright'
   if (layer.parameter.observedProperty.categories) {
     return new DiscreteLegend(layer, options)

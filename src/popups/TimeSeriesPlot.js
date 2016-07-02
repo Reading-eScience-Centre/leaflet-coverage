@@ -12,10 +12,7 @@ import {getLanguageString} from 'covutils'
  * Examples are VerticalProfile or PointSeries coverages.
  * 
  * @example
- * layer.bindPopup(new TimeSeriesPlot(coverage))
- * 
- * @example <caption>Non-module access</caption>
- * L.coverage.popup.TimeSeriesPlot
+ * layer.bindPopup(new C.TimeSeriesPlot(coverage))
  */
 export default class TimeSeriesPlot extends L.Popup {
   

@@ -26,9 +26,9 @@
     "style": "standard",
     "test": "karma start --single-run",
     "karma": "karma start",
-    "saucelabs": "karma start karma.conf-ci.js",    
+    "saucelabs": "karma start karma.conf-ci.js",
     "browserdist": "rollup -c rollup.config.src.js && rollup -c rollup.config.min.js",
-    "build": "npm run transpile && npm run browserdist",    
+    "build": "npm run transpile && npm run browserdist",
     "prepublish": "npm run build"
   },
   "standard": {
@@ -53,7 +53,7 @@
     "browserify": "^11.0.1",
     "core-js": "^2.0.2",
     "covjson-reader": "^0.13.0",
-    "esdoc": "^0.3.0",
+    "esdoc": "^0.4.7",
     "esdoc-importpath-plugin": "0.0.1",
     "karma": "^0.13.9",
     "karma-browserify": "^4.4.2",

@@ -2,8 +2,8 @@
  * Returns a linearly interpolated palette out of CSS colors.
  * 
  * @example
- * var grayscale = linearPalette(['#FFFFFF', '#000000'])
- * var rainbow = linearPalette(['#0000FF', '#00FFFF', '#00FF00', '#FFFF00', '#FF0000'])
+ * var grayscale = C.linearPalette(['#FFFFFF', '#000000'])
+ * var rainbow = C.linearPalette(['#0000FF', '#00FFFF', '#00FF00', '#FFFF00', '#FF0000'])
  * 
  * @param {Array<string>} colors An array of CSS colors.
  * @param {number} [steps=256] The number of palette colors to generate.
@@ -53,7 +53,7 @@ export function linearPalette (colors, steps=256) {
  * Converts an array of CSS colors to a palette of the same size.
  * 
  * @example
- * var bw = directPalette(['#000000', '#FFFFFF'])
+ * var bw = C.directPalette(['#000000', '#FFFFFF'])
  * // bw.steps == 2
  * 
  * @param {Array<string>} colors An array of CSS colors.
@@ -124,8 +124,8 @@ export function paletteFromObject (paletteSpec) {
  * 
  * @example
  * var value = 20
- * var grayscale = linearPalette(['#FFFFFF', '#000000'], 50) // 50 steps
- * var scaled = scale(value, grayscale, [0,100])
+ * var grayscale = C.linearPalette(['#FFFFFF', '#000000'], 50) // 50 steps
+ * var scaled = C.scale(value, grayscale, [0,100])
  * // scaled == 10
  * 
  * @param {number} val The value to scale.
@@ -133,6 +133,8 @@ export function paletteFromObject (paletteSpec) {
  * @param {Array} extent The lower and upper bound within which the value is scaled,
  *   typically the value extent of a legend.
  * @return {number} The scaled value.
+ * 
+ * @private
  */
 export function scale (val, palette, extent) {
   // scale val to [0,paletteSize-1] using the palette extent
@@ -148,6 +150,8 @@ export function scale (val, palette, extent) {
  * @param {Array<number>} extent The extent [min,max] to enlarge.
  * @param {number} [amount] The ratio by which to extend on each side.
  * @return {Array<number>} The enlarged extent.
+ * 
+ * @private
  */
 export function enlargeExtentIfEqual (extent, amount=0.1) {
   if (extent[0] === extent[1]) {
@@ -162,7 +166,7 @@ export function enlargeExtentIfEqual (extent, amount=0.1) {
  * Manages palettes under common names.
  *  
  * @example
- * var palettes = new PaletteManager({defaultSteps: 10})
+ * var palettes = new C.PaletteManager({defaultSteps: 10})
  * palettes.addLinear('grayscale', ['#FFFFFF', '#000000']) // 10 steps
  * palettes.addLinear('grayscalehd', ['#FFFFFF', '#000000'], {steps: 200}) // high-resolution palette
  * palettes.add('breweroranges3', ['#fee6ce', '#fdae6b', '#e6550d']) // palette of those 3 colors
@@ -182,7 +186,7 @@ export class PaletteManager {
    * Store a supplied generic palette under the given name.
    * 
    * @example
-   * var palettes = new PaletteManager()
+   * var palettes = new C.PaletteManager()
    * palettes.add('breweroranges3', ['#fee6ce', '#fdae6b', '#e6550d']) // palette of those 3 colors
    * palettes.add('mycustom', {red: [0,255], green: [0,0], blue: [10,20]}) // different syntax
    * 
@@ -210,7 +214,7 @@ export class PaletteManager {
    * Store a linear palette under the given name created with the given CSS color specifications.
    * 
    * @example
-   * var palettes = new PaletteManager()
+   * var palettes = new C.PaletteManager()
    * palettes.addLinear('grayscale', ['#FFFFFF', '#000000']) // 10 steps
    * palettes.addLinear('grayscalehd', ['#FFFFFF', '#000000'], {steps: 200})
    * 

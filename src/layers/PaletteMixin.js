@@ -32,6 +32,8 @@ const DEFAULT_CATEGORICAL_PALETTE = n => {
  * 
  * @param {class} base The base class.
  * @return {class} The base class with PaletteMixin.
+ * 
+ * @private
  */
 export default function PaletteMixin (base) {
   return class extends base {

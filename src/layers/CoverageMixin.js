@@ -16,6 +16,8 @@ import {isEllipsoidalCRS} from 'covutils'
  * 
  * @param {class} base The base class.
  * @return {class} The base class with CoverageMixin.
+ * 
+ * @private
  */
 export default function CoverageMixin (base) {
   return class extends base {

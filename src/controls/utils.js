@@ -1,6 +1,8 @@
 /**
  * Returns the first child element of parent (fall-back to document if not given)
  * matching the given selector.
+ * 
+ * @private
  */
 export function $$ (selector, parent) {
   if (typeof parent === 'string') {
@@ -13,6 +15,8 @@ export function $$ (selector, parent) {
 /**
  * Returns all child elements of parent (fall-back to document if not given)
  * matching the given selector as an array.
+ * 
+ * @private
  */
 export function $ (selector, parent) {
   if (typeof parent === 'string') {
@@ -28,8 +32,10 @@ export function $ (selector, parent) {
  * 
  * @example 
  * var s = '<li>text</li>'
- * var el = HTML(s)
+ * var el = C.HTML(s)
  * document.body.appendChild(el)
+ * 
+ * @private
  */
 export function HTML (html) {
   let div = document.createElement('div')
@@ -44,7 +50,7 @@ export function HTML (html) {
  * @param html The html to inject at the end of the body element. Must have a single root node without surrounding whitespace.
  * @param css The CSS styles to inject at the end of the head element.
  * 
- * @ignore
+ * @private
  */
 export function inject (html, css) {
   // inject default template and CSS into DOM
@@ -65,7 +71,7 @@ export function inject (html, css) {
 }
 
 /**
- * @ignore
+ * @private
  */
 export function fromTemplate (id) {
   let node = $$('#' + id)

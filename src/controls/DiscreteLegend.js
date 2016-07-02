@@ -39,9 +39,9 @@ const DEFAULT_TEMPLATE_CSS = `
  * Coverage layer. Supports category parameters only at the moment.
  * 
  * @example <caption>Coverage data layer</caption>
- * new DiscreteLegend(covLayer).addTo(map)
+ * new C.DiscreteLegend(covLayer).addTo(map)
  * // changing the palette of the layer automatically updates the legend 
- * covLayer.palette = discretePalette(['red', 'blue'])
+ * covLayer.palette = C.discretePalette(['red', 'blue'])
  * 
  * @example <caption>Fake layer</caption>
  * var fakeLayer = {
@@ -55,16 +55,13 @@ const DEFAULT_TEMPLATE_CSS = `
  *       }]
  *     }
  *   },
- *   palette: directPalette(['gray', 'blue']) // CSS colors in category order
+ *   palette: C.directPalette(['gray', 'blue']) // CSS colors in category order
  * }
- * var legend = new DiscreteLegend(fakeLayer).addTo(map)
+ * var legend = new C.DiscreteLegend(fakeLayer).addTo(map)
  * 
  * // change the palette and trigger a manual update
- * fakeLayer.palette = discretePalette(['red', 'blue'])
+ * fakeLayer.palette = C.discretePalette(['red', 'blue'])
  * legend.update()
- * 
- * @example <caption>Non-module access</caption>
- * L.coverage.control.DiscreteLegend
  */
 export default class DiscreteLegend extends L.Control {
   

@@ -7,6 +7,8 @@ import L from 'leaflet'
  * 
  * @param {class} base The base class.
  * @return {class} The base class with EventMixin.
+ * 
+ * @private
  */
 export default function EventMixin (base) {
   return class extends base {

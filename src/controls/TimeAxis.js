@@ -19,7 +19,7 @@ let TEMPLATE =
  * time steps into dates and times.
  * 
  * @example <caption>Coverage data layer</caption>
- * new TimeAxis(covLayer).addTo(map)
+ * new C.TimeAxis(covLayer).addTo(map)
  * // Selecting a date/time automatically sets the 'time' property in the layer.
  * // Similarly, when the layer fires an 'axisChange' event with {axis: 'time'}
  * // the control reflects that change.
@@ -30,14 +30,11 @@ let TEMPLATE =
  *   timeSlices: times,
  *   time: times[1] // select the second time step initially
  * }
- * var timeAxis = new TimeAxis(fakeLayer).addTo(map)
+ * var timeAxis = new C.TimeAxis(fakeLayer).addTo(map)
  * 
  * // change the time and trigger a manual update
  * fakeLayer.time = times[0]
  * timeAxis.update()
- * 
- * @example <caption>Non-module access</caption>
- * L.coverage.control.TimeAxis
  */
 export default class TimeAxis extends EventMixin(L.Control) {
   

@@ -8,7 +8,7 @@ import {getLanguageTag, getLanguageString, stringifyUnit} from 'covutils'
  * Displays a simple vertical coordinate dropdown selector for a coverage data layer.
  * 
  * @example <caption>Coverage data layer</caption>
- * new VerticalAxis(covLayer).addTo(map)
+ * new C.VerticalAxis(covLayer).addTo(map)
  * // Selecting a vertical coordinate automatically sets the 'vertical' property in the layer.
  * // Similarly, when the layer fires an 'axisChange' event with {axis: 'vertical'}
  * // the control reflects that change.
@@ -27,14 +27,11 @@ import {getLanguageTag, getLanguageString, stringifyUnit} from 'covutils'
  *     }
  *   }
  * }
- * var verticalAxis = new VerticalAxis(fakeLayer).addTo(map)
+ * var verticalAxis = new C.VerticalAxis(fakeLayer).addTo(map)
  * 
  * // change the height and trigger a manual update
  * fakeLayer.vertical = heights[0]
  * verticalAxis.update()
- * 
- * @example <caption>Non-module access</caption>
- * L.coverage.control.VerticalAxis
  */
 export default class VerticalAxis extends EventMixin(L.Class) {
   

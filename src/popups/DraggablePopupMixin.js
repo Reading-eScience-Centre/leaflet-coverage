@@ -6,6 +6,8 @@ import L from 'leaflet'
  * @example
  * let DraggablePopup = DraggablePopupMixin(L.Popup)
  * let popup = new DraggablePopup().setContent('I am draggable!')
+ * 
+ * @private
  */
 export default function DraggablePopupMixin (base) {
   return class extends base {

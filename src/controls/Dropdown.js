@@ -9,6 +9,9 @@ let TEMPLATE =
   <select class="form-control"></select>
 </div>`
 
+/**
+ * @private
+ */
 export default class Dropdown extends EventMixin(L.Control) {
   constructor (choices, options) {
     super(options.position ? {position: options.position} : {position: 'topleft'})

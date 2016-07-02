@@ -8,6 +8,8 @@ import L from 'leaflet'
  * 
  * @param {class} base The base class.
  * @return {class} The base class with CircleMarkerMixin.
+ * 
+ * @private
  */
 export default function CircleMarkerMixin (base) {
   return class extends base {

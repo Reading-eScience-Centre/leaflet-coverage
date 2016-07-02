@@ -31,17 +31,15 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
    * Optional time and vertical axis target values can be defined with the 'time' and
    * 'vertical' options properties. The closest values on the respective axes are chosen.
    * 
-   * Example: 
-   * <pre><code>
+   * @example
    * var cov = ... // get Coverage data
-   * var layer = new GridCoverage(cov, {
+   * var layer = new C.GridCoverage(cov, {
    *   keys: ['salinity'],
    *   time: new Date('2015-01-01T12:00:00Z'),
    *   vertical: 50,
-   *   palette: palettes.get('blues'),
+   *   palette: C.linearPalette(['#FFFFFF', '#000000']),
    *   paletteExtent: 'full' // or 'subset' (time/vertical), 'fov' (map field of view), or specific: [-10,10]
    * })
-   * </code></pre>
    */
   constructor (cov, options) {
     super()

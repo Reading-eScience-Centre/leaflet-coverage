@@ -46,9 +46,9 @@ const DEFAULT_TEMPLATE_CSS = `
  * (CSS gradient based).
  * 
  * @example <caption>Coverage data layer</caption>
- * new ContinuousLegend(covLayer).addTo(map)
+ * new C.ContinuousLegend(covLayer).addTo(map)
  * // changing the palette of the layer automatically updates the legend 
- * covLayer.palette = linearPalette(['blue', 'red'])
+ * covLayer.palette = C.linearPalette(['blue', 'red'])
  * 
  * @example <caption>Fake layer</caption>
  * var fakeLayer = {
@@ -64,14 +64,11 @@ const DEFAULT_TEMPLATE_CSS = `
  *   palette: linearPalette(['#FFFFFF', '#000000']),
  *   paletteExtent: [0, 10]
  * }
- * var legend = new ContinuousLegend(fakeLayer).addTo(map)
+ * var legend = new C.ContinuousLegend(fakeLayer).addTo(map)
  * 
  * // change the palette and trigger a manual update
- * fakeLayer.palette = linearPalette(['blue', 'red'])
+ * fakeLayer.palette = C.linearPalette(['blue', 'red'])
  * legend.update()
- * 
- * @example <caption>Non-module access</caption>
- * L.coverage.control.ContinuousLegend
  */
 export default class ContinuousLegend extends L.Control {
   

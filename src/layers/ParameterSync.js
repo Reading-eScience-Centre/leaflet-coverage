@@ -1,5 +1,7 @@
 import L from 'leaflet'
 
+import EventMixin from '../util/EventMixin.js'
+
 /**
  * Default function that checks if two Parameter objects describe
  * the same thing. No magic is applied here. Exact match or nothing.
@@ -60,8 +62,8 @@ function defaultMatch (p1, p2) {
  * etc. This default algorithm can be replaced with a custom one. Such a custom
  * algorithm could relate different vocabularies with each other or perform other checks.
  * 
- * @example <caption>Common palettes</caption>
- * let paramSync = new ParameterSync({
+ * @example
+ * let paramSync = new C.ParameterSync({
  *   syncProperties: {
  *     palette: (p1, p2) => p1,
  *     paletteExtent: (e1, e2) => e1 && e2 ? [Math.min(e1[0], e2[0]), Math.max(e1[1], e2[1])] : null
@@ -71,18 +73,18 @@ function defaultMatch (p1, p2) {
  *   // The sync layer will fire a 'remove' event once all real layers for that parameter were removed.
  *   let layer = e.syncLayer
  *   if (layer.palette) {
- *     new Legend(layer, {
+ *     C.legend(layer, {
  *       position: 'bottomright'
  *     }).addTo(map)
  *   }
  * })
- * let layer = layerFactory(cov).on('add', e => {
+ * let layer = C.layerFactory()(cov).on('add', e => {
  *   // Only add the layer to the ParameterSync instance once it has initialized.
  *   // We can use the 'add' event for that.
  *   paramSync.addLayer(e.target)
  * })
  */
-class ParameterSync extends L.Class {
+export class ParameterSync extends EventMixin(L.Class) {
   
   /**
    * @param {Object} options
@@ -219,9 +221,7 @@ class ParameterSync extends L.Class {
   }
 }
 
-ParameterSync.include(L.Mixin.Events)
-
-class SyncLayer extends L.Class {
+export class SyncLayer extends EventMixin(L.Class) {
   constructor (param, paramSync) {
     super()
     this._param = param
@@ -256,8 +256,3 @@ class SyncLayer extends L.Class {
     return this._param
   }
 }
-
-SyncLayer.include(L.Mixin.Events)
-
-// work-around for Babel bug, otherwise ParameterSync cannot be referenced above for mixins
-export { ParameterSync as default }

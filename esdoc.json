@@ -1,13 +1,13 @@
 {
   "source": "./src",
   "destination": "./docs",
+  "excludes": ["kdTree"],
   "plugins": [
     {
       "name": "esdoc-importpath-plugin",
       "option": {
         "replaces": [
-          {"from": "^src/", "to": ""},
-          {"from": "LayerFactory.js", "to": ""}
+          {"from": ".*", "to": ""}
         ]
       }
     }

@@ -1,9 +1,9 @@
-export { default as Legend } from './controls/Legend.js'
+export { default as legend } from './controls/Legend.js'
 export { default as DiscreteLegend } from './controls/DiscreteLegend.js'
 export { default as TimeAxis } from './controls/TimeAxis.js'
 export { default as VerticalAxis } from './controls/VerticalAxis.js'
 
-export { default as LayerFactory } from './layers/LayerFactory.js'
+export * from './layers/factory.js'
 export { default as Grid } from './layers/Grid.js'
 export { default as VerticalProfile } from './layers/VerticalProfile.js'
 export { default as Trajectory } from './layers/Trajectory.js'
