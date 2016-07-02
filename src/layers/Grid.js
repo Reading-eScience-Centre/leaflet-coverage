@@ -33,7 +33,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
    * 
    * @example
    * var cov = ... // get Coverage data
-   * var layer = new C.GridCoverage(cov, {
+   * var layer = new C.Grid(cov, {
    *   keys: ['salinity'],
    *   time: new Date('2015-01-01T12:00:00Z'),
    *   vertical: 50,

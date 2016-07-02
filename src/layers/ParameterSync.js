@@ -84,7 +84,7 @@ function defaultMatch (p1, p2) {
  *   paramSync.addLayer(e.target)
  * })
  */
-export class ParameterSync extends EventMixin(L.Class) {
+export default class ParameterSync extends EventMixin(L.Class) {
   
   /**
    * @param {Object} options
@@ -221,7 +221,7 @@ export class ParameterSync extends EventMixin(L.Class) {
   }
 }
 
-export class SyncLayer extends EventMixin(L.Class) {
+class SyncLayer extends EventMixin(L.Class) {
   constructor (param, paramSync) {
     super()
     this._param = param

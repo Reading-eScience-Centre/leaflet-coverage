@@ -17,41 +17,37 @@ L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: 'Map data &copy; <a href="http://www.osm.org">OpenStreetMap</a>'
 }).addTo(map)
 
-var LayerFactory = L.coverage.LayerFactory()
-
 var cov = ... // load Coverage object with another library
 
-var layer = LayerFactory(cov, {keys: ['salinity']}).on('add', function(e) {
-  var covLayer = e.target
-  
-  if (covLayer.palette) {
-    new L.coverage.control.Legend(covLayer).addTo(map)
+var layer = C.dataLayer(cov, {keys: ['salinity']}).on('add', function(e) {
+  if (layer.palette) {
+    C.legend(layer).addTo(map)
   }
   
-  if (covLayer.timeSlices) {
-  	new L.coverage.control.TimeAxis(covLayer).addTo(map)
+  if (layer.timeSlices) {
+  	new C.TimeAxis(layer).addTo(map)
   }
   
-  map.fitBounds(covLayer.getBounds())
+  map.fitBounds(layer.getBounds())
 }).addTo(map)
 ```
 
-The `LayerFactory` selects the right layer class by looking at the 
-["domainType"](https://github.com/Reading-eScience-Centre/coverage-jsapi/blob/master/Coverage.md#domainType)
-that a given coverage or collection conforms to.
-If more control is needed, then the layer classes can also be used manually, or
-a more sophisticated factory class may be implemented.
-
 ## Notes
 
-Using the browser bundle:
+This is how you would typically include leaflet-coverage in a website:
+
 ```html
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
-<script src="covutils.min.js"></script>
-<script src="leaflet-coverage.min.js"></script>
+<script src="https://npmcdn.com/covutils@0.4/covutils.min.js"></script>
+<script src="https://npmcdn.com/leaflet-coverage@0.4/leaflet-coverage.min.js"></script>
 ```
-If you don't need support for MultiPolygon and PolygonSeries layer classes, then you can also use the lite variant of covutils.
+
+If you don't need support for MultiPolygon and PolygonSeries layers, then you can also use the lite variant of [covutils](https://www.npmjs.com/package/covutils):
+
+```html
+<script src="https://npmcdn.com/covutils@0.4/covutils-lite.min.js"></script>
+```
 
 To use the plotting functionality (for time series or vertical profile plots) you have to include the D3 and C3 libraries in your HTML:
 

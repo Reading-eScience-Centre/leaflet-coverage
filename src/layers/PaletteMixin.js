@@ -13,27 +13,25 @@ const DEFAULT_CATEGORICAL_PALETTE = n => {
  * A mixin that encapsulates the palette logic of a coverage layer,
  * supporting categorical and continuous coverage parameters.
  * 
- * The base class must supply the following functions/properties:
- * 
- * options.palette (optional)
- * options.paletteExtent (optional) - initial value that computePaletteExtent is called with
- * parameter
- * redraw()
- * computePaletteExtent(extent) - returns a Promise with the computed extent; gets called when .paletteExtent is set to a string value
- * canUsePalette() (optional) - if this method exists and returns false, then .palette returns undefined
- * 
  * The following functions/properties are supplied:
  * 
- * initializePalette() - to be called once data has been loaded so that computePaletteExtent can be called
- * get/set palette
- * get/set paletteExtent
- * setPaletteExtent(extent) - like set paletteExtent, but returns a Promise to know when calculations etc. are done
- * getPaletteIndex(val) - returns the color index for the given value
+ * - initializePalette() - to be called once data has been loaded so that computePaletteExtent can be called
+ * - get/set palette
+ * - get/set paletteExtent
+ * - setPaletteExtent(extent) - like set paletteExtent, but returns a Promise to know when calculations etc. are done
+ * - getPaletteIndex(val) - returns the color index for the given value
+ * 
+ * The base class must supply the following functions/properties:
+ * 
+ * - options.palette (optional)
+ * - options.paletteExtent (optional) - initial value that computePaletteExtent is called with
+ * - parameter
+ * - redraw()
+ * - computePaletteExtent(extent) - returns a Promise with the computed extent; gets called when .paletteExtent is set to a string value
+ * - canUsePalette() (optional) - if this method exists and returns false, then .palette returns undefined
  * 
  * @param {class} base The base class.
  * @return {class} The base class with PaletteMixin.
- * 
- * @private
  */
 export default function PaletteMixin (base) {
   return class extends base {
