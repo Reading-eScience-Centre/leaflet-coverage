@@ -3,36 +3,13 @@ import L from 'leaflet'
 import {inject, fromTemplate, $$} from './utils.js'
 import {getLanguageTag, getLanguageString} from 'covutils'
 
-// TODO the default template should be moved outside this module so that it can be easily skipped
 const DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-discrete-legend'
 const DEFAULT_TEMPLATE = `<template id="${DEFAULT_TEMPLATE_ID}">
-  <div class="info legend discrete-legend">
+  <div class="leaflet-coverage-control legend discrete-legend">
     <div class="legend-title-container"><strong class="legend-title"></strong></div>
     <div class="legend-palette discrete-legend-palette"></div>
   </div>
 </template>`
-
-const DEFAULT_TEMPLATE_CSS = `
-.legend {
-  color: #555;
-}
-.legend-title-container {
-  max-width: 120px;
-}
-.legend-title {
-  word-wrap: break-word;
-}
-.discrete-legend-palette {
-  padding: 2px 1px;
-  line-height: 18px;
-}
-.discrete-legend-palette i {
-  float: left;
-  height: 18px;
-  margin-right: 8px;
-  width: 18px;
-}
-`
 
 /**
  * Displays a discrete palette legend for the parameter displayed by the given
@@ -87,7 +64,7 @@ export default class DiscreteLegend extends L.Control {
     this._language = options.language
     
     if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
-      inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS)
+      inject(DEFAULT_TEMPLATE)
     }   
 
     if (covLayer.on) {

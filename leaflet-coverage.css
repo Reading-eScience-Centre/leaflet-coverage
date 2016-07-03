@@ -1,0 +1,28 @@
+.leaflet-coverage-control {
+  padding: 6px 8px;
+  background: rgba(255,255,255,0.8);
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  border-radius: 5px;
+}
+.leaflet-coverage-control.legend {
+  color: #555;
+}
+.leaflet-coverage-control.legend .legend-title-container {
+  max-width: 120px;
+}
+.leaflet-coverage-control.legend .legend-title {
+  word-wrap: break-word;
+}
+.leaflet-coverage-control.discrete-legend .discrete-legend-palette {
+  padding: 2px 1px;
+  line-height: 18px;
+}
+.leaflet-coverage-control.discrete-legend .discrete-legend-palette i {
+  float: left;
+  height: 18px;
+  margin-right: 8px;
+  width: 18px;
+}
+.leaflet-popup-draggable .leaflet-popup-content-wrapper {
+  cursor: move;
+}

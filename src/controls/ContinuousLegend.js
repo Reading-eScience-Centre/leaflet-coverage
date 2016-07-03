@@ -3,10 +3,9 @@ import L from 'leaflet'
 import {inject, fromTemplate, $$, $} from './utils.js'
 import {getLanguageTag, getLanguageString} from 'covutils'
 
-// TODO the default template should be moved outside this module so that it can be easily skipped
 const DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-continuous-legend'
 const DEFAULT_TEMPLATE = `<template id="${DEFAULT_TEMPLATE_ID}">
-  <div class="info legend continuous-legend">
+  <div class="leaflet-coverage-control legend continuous-legend">
     <div style="margin-bottom:3px" class="legend-title-container">
       <strong class="legend-title"></strong>
     </div>
@@ -22,18 +21,6 @@ const DEFAULT_TEMPLATE = `<template id="${DEFAULT_TEMPLATE_ID}">
     </div>
   </div>
 </template>`
-
-const DEFAULT_TEMPLATE_CSS = `
-.legend {
-  color: #555;
-}
-.legend-title {
-  word-wrap: break-word;
-}
-.legend-title-container {
-  max-width: 120px;
-}
-`
 
 /**
  * Displays a continuous legend for the parameter displayed by the given
@@ -95,7 +82,7 @@ export default class ContinuousLegend extends L.Control {
     this._language = options.language
     
     if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
-      inject(DEFAULT_TEMPLATE, DEFAULT_TEMPLATE_CSS)
+      inject(DEFAULT_TEMPLATE)
     }   
 
     if (covLayer.on) {

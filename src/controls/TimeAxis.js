@@ -4,7 +4,7 @@ import {$$, HTML} from './utils.js'
 import EventMixin from '../util/EventMixin.js'
 
 let TEMPLATE = 
-`<div class="info form-inline" style="clear:none">
+`<div class="leaflet-coverage-control form-inline" style="clear:none">
   <strong class="title">Time</strong><br>
   <div class="form-group">
     <select name="date" class="date form-control"></select>

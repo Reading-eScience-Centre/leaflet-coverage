@@ -11,6 +11,11 @@ import L from 'leaflet'
  */
 export default function DraggablePopupMixin (base) {
   return class extends base {
+    constructor (options={}, source) {
+      options.className = options.className || 'leaflet-popup-draggable'
+      super(options, source)
+    }
+    
     onAdd (map) {
       super.onAdd(map)
       this._draggable = new L.Draggable(this._container, this._wrapper)

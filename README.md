@@ -38,6 +38,7 @@ This is how you would typically include leaflet-coverage in a website:
 
 ```html
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css">
+<link rel="stylesheet" type="text/css" href="https://npmcdn.com/leaflet-coverage@0.4/leaflet-coverage.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
 <script src="https://npmcdn.com/covutils@0.4/covutils.min.js"></script>
 <script src="https://npmcdn.com/leaflet-coverage@0.4/leaflet-coverage.min.js"></script>
