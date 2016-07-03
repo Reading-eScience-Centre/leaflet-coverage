@@ -383,41 +383,34 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
    * @returns {Array} [xmin,ymin,xmax,ymax]
    */
   _getDomainBbox () {
+    let extent = (x, xBounds) => {
+      let xend = x.length - 1
+      let xmin, xmax
+      if (xBounds) {
+        [xmin,xmax] = [xBounds.get(0)[0], xBounds.get(xend)[1]]
+      } else {
+        [xmin,xmax] = [x[0], x[xend]]
+      }
+      let xDescending = xmin > xmax
+      if (xDescending) {
+        [xmin,xmax] = [xmax,xmin]
+      }
+      if (!xBounds && x.length > 1) {
+        if (xDescending) {
+          xmin -= (x[xend - 1] - x[xend]) / 2
+          xmax += (x[0] - x[1]) / 2
+        } else {
+          xmin -= (x[1] - x[0]) / 2
+          xmax += (x[xend] - x[xend - 1]) / 2 
+        }
+      }
+      return [xmin, xmax]
+    }
+    
     let xAxis = this.domain.axes.get('x')
     let yAxis = this.domain.axes.get('y')
-    let x = xAxis.values
-    let y = yAxis.values
-    let xBounds = xAxis.bounds
-    let yBounds = yAxis.bounds
-    
-    let xend = x.length - 1
-    let yend = y.length - 1
-    let xmin, xmax
-    if (xBounds) {
-      [xmin,xmax] = [xBounds.get(0)[0], xBounds.get(xend)[1]]
-    } else {
-      [xmin,xmax] = [x[0], x[xend]]
-    }
-    let ymin, ymax
-    if (yBounds) {
-      [ymin,ymax] = [yBounds.get(0)[0], yBounds.get(yend)[1]]
-    } else {
-      [ymin,ymax] = [y[0], y[yend]]
-    }
-    if (xmin > xmax) {
-      [xmin,xmax] = [xmax,xmin]
-    }
-    if (ymin > ymax) {
-      [ymin,ymax] = [ymax,ymin]
-    }
-    if (!xBounds && x.length > 1) {
-      xmin -= Math.abs(x[0] - x[1]) / 2
-      xmax += Math.abs(x[xend] - x[xend - 1]) / 2
-    }
-    if (!yBounds && y.length > 1) {
-      ymin -= Math.abs(y[0] - y[1]) / 2
-      ymax += Math.abs(y[yend] - y[yend - 1]) / 2
-    }
+    let [xmin, xmax] = extent(xAxis.values, xAxis.bounds)
+    let [ymin, ymax] = extent(yAxis.values, yAxis.bounds)
 
     return [xmin,ymin,xmax,ymax]
   }
