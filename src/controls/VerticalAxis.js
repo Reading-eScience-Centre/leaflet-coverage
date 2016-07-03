@@ -2,7 +2,7 @@ import L from 'leaflet'
 
 import Dropdown from './Dropdown.js'
 import EventMixin from '../util/EventMixin.js'
-import {getLanguageTag, getLanguageString, stringifyUnit} from 'covutils'
+import {getLanguageString, stringifyUnit} from 'covutils'
 
 /**
  * Displays a simple vertical coordinate dropdown selector for a coverage data layer.
@@ -79,7 +79,7 @@ export default class VerticalAxis extends EventMixin(L.Class) {
     }
     
     let crsVertAxis = this._covLayer.crsVerticalAxis || {}
-    let title = crsVertAxis.name ? i18n.getLanguageString(crsVertAxis.name) : this._title
+    let title = crsVertAxis.name ? getLanguageString(crsVertAxis.name) : this._title
     let unit = stringifyUnit(crsVertAxis.unit)
     if (unit) {
       unit = ' ' + unit
