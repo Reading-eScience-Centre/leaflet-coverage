@@ -16,10 +16,12 @@ export default options => {
     dest: 'leaflet-coverage.' + (options.minify ? 'min' : 'src') + '.js',
     format: 'iife',
     moduleName: 'C',
-    globals: {
-      leaflet: 'L',
-      c3: 'c3',
-      covutils: 'CovUtils'
+    globals: id => {
+      switch (id) {
+        case 'leaflet': return 'L'
+        case 'covutils': return 'CovUtils'
+        case 'c3': return 'this.c3 || {}' // optional dependency
+      }
     },
     sourceMap: true
   }
