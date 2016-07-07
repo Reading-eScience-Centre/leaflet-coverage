@@ -1,4 +1,4 @@
-import {isEllipsoidalCRS} from 'covutils'
+import {isEllipsoidalCRS, loadProjection} from 'covutils'
 
 /**
  * A mixin that encapsulates loading of a single coverage for use in layers.
@@ -28,15 +28,11 @@ export default function CoverageMixin (base) {
     load () {
       this.fire('dataLoading') // for supporting loading spinners
       
-      function checkWGS84 (domain) {
-        if (!domain.referencing.some(ref => isEllipsoidalCRS(ref.system))) {
-          throw new Error('Unsupported CRS, must be WGS84')
-        }
-      }
-      
       let promise = this.coverage.loadDomain().then(domain => {
-        checkWGS84(domain)
         this.domain = domain
+        return loadProjection(domain)
+      }).then(proj => {
+        this.projection = proj
       })
       if (this._loadCoverageSubset) {
         promise = promise.then(() => this._loadCoverageSubset())

@@ -107,11 +107,18 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     } else if (this._isDomainUsingEllipsoidalCRS()) {
       bbox = this._getDomainBbox()
     } else {
-      return
+      // approximate geographic bbox by unprojecting the projected bbox corners
+      bbox = this._getDomainBbox()
+      let proj = this.projection
+      let p1 = proj.unproject({x: bbox[0], y: bbox[0]})
+      let p2 = proj.unproject({x: bbox[0], y: bbox[1]})
+      let p3 = proj.unproject({x: bbox[1], y: bbox[0]})
+      let p4 = proj.unproject({x: bbox[1], y: bbox[1]})
+      return L.latLngBounds([p1, p2, p3, p4])
     }
     let southWest = L.latLng(bbox[1], bbox[0])
     let northEast = L.latLng(bbox[3], bbox[2])
-    let bounds = new L.LatLngBounds(southWest, northEast)
+    let bounds = L.latLngBounds(southWest, northEast)
     return bounds
   }
   
@@ -322,7 +329,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     // Uint8ClampedArray, 1-dimensional, in order R,G,B,A,R,G,B,A,... row-major
     let rgba = ndarray(imgData.data, [tileSize, tileSize, 4])
     
-    // projection coordinates of top left tile pixel
+    // window projection coordinates of top left tile pixel
     let start = tilePoint.multiplyBy(tileSize)
     let startX = start.x
     let startY = start.y
@@ -379,7 +386,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
   }
   
   /**
-   * Derives the bounding box of the x,y axes in CRS coordinates.
+   * Derives the bounding box of the x,y axes in domain CRS coordinates.
    * @returns {Array} [xmin,ymin,xmax,ymax]
    */
   _getDomainBbox () {
