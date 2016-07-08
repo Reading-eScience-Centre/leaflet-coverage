@@ -253,8 +253,8 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     if (extent === 'subset') {
       // scan the current subset for min/max values
       
-      let xlen = this.subsetRange.shape.get('x')
-      let ylen = this.subsetRange.shape.get('y')
+      let xlen = this.subsetRange.shape.get(this._projX)
+      let ylen = this.subsetRange.shape.get(this._projY)
 
       // check if subsetted size is manageable
       if (xlen * ylen < 1000*1000) {
@@ -268,7 +268,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
         let xconstraint = {start: 0, stop: xlen, step: Math.max(Math.round(xlen/1000), 1)}
         let yconstraint = {start: 0, stop: ylen, step: Math.max(Math.round(ylen/1000), 1)}
         
-        return this.subsetCov.subsetByIndex({x: xconstraint, y: yconstraint})        
+        return this.subsetCov.subsetByIndex({[this._projX]: xconstraint, [this._projY]: yconstraint})        
           .then(subsetCov => {
             return subsetCov.loadRange(this.param.key).then(subsetRange => {
                let [min,max] = minMaxOfRange(subsetRange)
@@ -363,7 +363,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
   }
   
   /**
-   * Derives the bounding box of the x,y axes in domain CRS coordinates.
+   * Derives the bounding box of the x,y CRS axes in domain CRS coordinates.
    * @returns {Array} [xmin,ymin,xmax,ymax]
    */
   _getDomainBbox () {
@@ -391,8 +391,8 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
       return [xmin, xmax]
     }
     
-    let xAxis = this.domain.axes.get('x')
-    let yAxis = this.domain.axes.get('y')
+    let xAxis = this.domain.axes.get(this._projX)
+    let yAxis = this.domain.axes.get(this._projY)
     let [xmin, xmax] = extent(xAxis.values, xAxis.bounds)
     let [ymin, ymax] = extent(yAxis.values, yAxis.bounds)
 
@@ -421,6 +421,12 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     let x = this.domain.axes.get('x').values
     let y = this.domain.axes.get('y').values
     let bbox = this._getDomainBbox()
+    
+    // a bit hacky
+    if (this._projX === 'y') {
+      bbox = [bbox[1], bbox[0], bbox[3], bbox[2]]
+    }
+    
     let lonRange = [bbox[0], bbox[0] + 360]
     
     for (let tileX = 0; tileX < tileSize; tileX++) {
@@ -461,8 +467,8 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
    */
   _drawProjectedCRSWithAnyMapProjection (setPixel, tileSize, startX, startY, vals) {
     let map = this._map
-    let X = this.domain.axes.get('x').values
-    let Y = this.domain.axes.get('y').values
+    let X = this.domain.axes.get(this._projX).values
+    let Y = this.domain.axes.get(this._projY).values
     let bbox = this._getDomainBbox()
     
     let proj = this.projection
@@ -499,6 +505,12 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     let x = this.domain.axes.get('x').values
     let y = this.domain.axes.get('y').values
     let bbox = this._getDomainBbox()
+    
+    // a bit hacky
+    if (this._projX === 'y') {
+      bbox = [bbox[1], bbox[0], bbox[3], bbox[2]]
+    }
+      
     let lonRange = [bbox[0], bbox[0] + 360]
     
     var latCache = new Float64Array(tileSize)
@@ -561,13 +573,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
   _isDomainUsingEllipsoidalCRS () {
     return this.domain.referencing.some(ref => isEllipsoidalCRS(ref.system))
   }
-  
-  _isGeodeticTransformAvailableForDomain () {
-    let ref = this.domain.referencing.find(ref => isEllipsoidalCRS(ref.system))
-    // TODO implement
-    return false
-  }
-    
+      
   redraw () {
     // we check getContainer() to prevent errors when trying to redraw when the layer has not
     // fully initialized yet
