@@ -104,12 +104,11 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     let bbox
     if (this.cov.bbox) {
       bbox = this.cov.bbox
-    } else if (this._isDomainUsingEllipsoidalCRS()) {
-      bbox = this._getDomainBbox()
     } else {
-      // approximate geographic bbox by unprojecting the projected bbox corners
       bbox = this._getDomainBbox()
       let proj = this.projection
+      // for projected CRSs this approximates the geographic bbox by unprojecting the projected bbox corners
+      // for geographic CRSs the result will be identical 
       let p1 = proj.unproject({x: bbox[0], y: bbox[1]})
       let p2 = proj.unproject({x: bbox[0], y: bbox[3]})
       let p3 = proj.unproject({x: bbox[2], y: bbox[1]})
@@ -311,7 +310,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     let iy = indexOfNearest(Y, y)
     let ix = indexOfNearest(X, x)
 
-    return this.subsetRange.get({y: iy, x: ix})
+    return this.subsetRange.get({[this._projY]: iy, [this._projX]: ix})
   }
     
   drawTile (canvas, tilePoint, zoom) {
