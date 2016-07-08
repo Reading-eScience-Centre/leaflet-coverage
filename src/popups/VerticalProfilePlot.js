@@ -1,6 +1,6 @@
 import L from 'leaflet'
 import c3 from 'c3'
-import {getLanguageString, stringifyUnit, getReferenceObject, loadProjection} from 'covutils'
+import {getLanguageString, stringifyUnit, getReferenceObject, loadProjection, getHorizontalCRSComponents} from 'covutils'
 
 /**
  * Displays a popup with an interactive plot showing the data
@@ -84,6 +84,7 @@ export default class VerticalProfilePlot extends L.Popup {
       this._domains = domains
       this._ranges = ranges
       this._addPlotToPopup()
+      [this._projX, this._projY] = getHorizontalCRSComponents(domain)
       return loadProjection(domains[0])
     }).then(proj => {
       this.projection = proj
@@ -100,8 +101,8 @@ export default class VerticalProfilePlot extends L.Popup {
   _addPlotToPopup () {
     if (!this.getLatLng()) {
       // in case bindPopup is not used and the caller did not set a position
-      let x = this._domains[0].axes.get('x')
-      let y = this._domains[0].axes.get('y')
+      let x = this._domains[0].axes.get(this._projX)
+      let y = this._domains[0].axes.get(this._projY)
       let latlng = this.projection.unproject({x, y})
       this.setLatLng(L.latLng(latlng))
     }

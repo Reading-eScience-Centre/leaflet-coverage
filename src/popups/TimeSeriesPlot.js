@@ -88,6 +88,7 @@ export default class TimeSeriesPlot extends L.Popup {
     Promise.all([domainPromise, rangePromise]).then(([domains, ranges]) => {
       this._domains = domains
       this._ranges = ranges
+      [this._projX, this._projY] = getHorizontalCRSComponents(domain)
       return loadProjection(domains[0])
     }).then(proj => {
       this.projection = proj
@@ -105,8 +106,8 @@ export default class TimeSeriesPlot extends L.Popup {
   _addPlotToPopup () {
     if (!this.getLatLng()) {
       // in case bindPopup is not used and the caller did not set a position
-      let x = this._domains[0].axes.get('x')
-      let y = this._domains[0].axes.get('y')
+      let x = this._domains[0].axes.get(this._projX)
+      let y = this._domains[0].axes.get(this._projY)
       let latlng = this.projection.unproject({x, y})
       this.setLatLng(L.latLng(latlng))
     }

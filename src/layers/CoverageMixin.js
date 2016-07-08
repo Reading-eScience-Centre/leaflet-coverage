@@ -1,4 +1,4 @@
-import {loadProjection} from 'covutils'
+import {loadProjection, getHorizontalCRSComponents} from 'covutils'
 
 /**
  * A mixin that encapsulates loading of a single coverage for use in layers.
@@ -30,6 +30,8 @@ export default function CoverageMixin (base) {
       
       let promise = this.coverage.loadDomain().then(domain => {
         this.domain = domain
+        
+        [this._projX, this._projY] = getHorizontalCRSComponents(domain)
         return loadProjection(domain)
       }).then(proj => {
         this.projection = proj

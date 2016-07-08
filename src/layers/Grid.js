@@ -295,8 +295,8 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
    * If out of bounds, then undefined is returned, otherwise a number or null (for no data).
    */
   getValueAt (latlng) {
-    let X = this.domain.axes.get('x').values
-    let Y = this.domain.axes.get('y').values
+    let X = this.domain.axes.get(this._projX).values
+    let Y = this.domain.axes.get(this._projY).values
     let bbox = this._getDomainBbox()
 
     let {lat, lng} = latlng

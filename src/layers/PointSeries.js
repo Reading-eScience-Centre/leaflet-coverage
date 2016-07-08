@@ -79,8 +79,8 @@ export default class PointSeries extends PaletteMixin(CircleMarkerMixin(Coverage
   }
   
   getLatLng () {
-    let x = this.domain.axes.get('x').values[0]
-    let y = this.domain.axes.get('y').values[0]
+    let x = this.domain.axes.get(this._projX).values[0]
+    let y = this.domain.axes.get(this._projY).values[0]
     let latlng = this.projection.unproject({x,y})
     return L.latLng(latlng)
   }
