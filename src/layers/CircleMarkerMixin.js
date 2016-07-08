@@ -25,8 +25,6 @@ export default function CircleMarkerMixin (base) {
      */
   
     _addMarker () {
-      // TODO do coordinate transformation to lat/lon if necessary
-      
       let val = this.getValue()
       if (val === null && !this.showNoData) {
         return

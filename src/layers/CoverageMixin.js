@@ -1,4 +1,4 @@
-import {isEllipsoidalCRS, loadProjection} from 'covutils'
+import {loadProjection} from 'covutils'
 
 /**
  * A mixin that encapsulates loading of a single coverage for use in layers.

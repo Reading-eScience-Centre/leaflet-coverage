@@ -1,7 +1,7 @@
 import L from 'leaflet'
 import c3 from 'c3'
 
-import {getLanguageString} from 'covutils'
+import {getLanguageString, stringifyUnit, loadProjection} from 'covutils'
 
 // TODO DRY: nearly identical to VerticalProfilePlot
 
@@ -88,6 +88,9 @@ export default class TimeSeriesPlot extends L.Popup {
     Promise.all([domainPromise, rangePromise]).then(([domains, ranges]) => {
       this._domains = domains
       this._ranges = ranges
+      return loadProjection(domains[0])
+    }).then(proj => {
+      this.projection = proj
       this._addPlotToPopup()
       super.onAdd(map)
       this.fire('add')
@@ -100,12 +103,12 @@ export default class TimeSeriesPlot extends L.Popup {
   }
   
   _addPlotToPopup () {
-    // TODO transform if necessary
     if (!this.getLatLng()) {
       // in case bindPopup is not used and the caller did not set a position
       let x = this._domains[0].axes.get('x')
       let y = this._domains[0].axes.get('y')
-      this.setLatLng(L.latLng(y.values[0], x.values[0]))
+      let latlng = this.projection.unproject({x, y})
+      this.setLatLng(L.latLng(latlng))
     }
     
     // display first parameter group
@@ -148,28 +151,6 @@ export default class TimeSeriesPlot extends L.Popup {
     return refParam
   }
   
-  // TODO move this into a reusable unit-formatting module
-  // TODO code duplication with ContinuousLegend
-  _getUnitString (param, language) {
-    if (!param.unit) {
-      return ''
-    }
-    if (param.unit.symbol) {
-      let unit = param.unit.symbol.value || param.unit.symbol
-      let scheme = param.unit.symbol.type
-      if (scheme === 'http://www.opengis.net/def/uom/UCUM/') {
-        if (unit === 'Cel') {
-          unit = '°C'
-        } else if (unit === '1') {
-          unit = ''
-        }
-      }
-      return unit
-    } else {
-      return getLanguageString(param.unit.label, language)
-    }
-  }
-  
   _getPlotElement (paramKeyGroup) {    
     let refDomain = this._domains[0]
     let covsWithParamKey = zip(this._covs, paramKeyGroup)
@@ -179,7 +160,7 @@ export default class TimeSeriesPlot extends L.Popup {
     // axis labels
     let xLabel = 'Time'
     
-    let unit = this._getUnitString(refParam, this._language)
+    let unit = stringifyUnit(refParam.unit, this._language)
     let obsPropLabel = getLanguageString(refParam.observedProperty.label, this._language)
     
     // http://c3js.org/samples/simple_xy_multiple.html

@@ -1,7 +1,7 @@
 import L from 'leaflet'
 
 import {inject, fromTemplate, $$, $} from './utils.js'
-import {getLanguageTag, getLanguageString} from 'covutils'
+import {getLanguageTag, getLanguageString, stringifyUnit} from 'covutils'
 
 const DEFAULT_TEMPLATE_ID = 'template-coverage-parameter-continuous-legend'
 const DEFAULT_TEMPLATE = `<template id="${DEFAULT_TEMPLATE_ID}">
@@ -102,27 +102,6 @@ export default class ContinuousLegend extends L.Control {
     this._doUpdate(true)
   }
   
-  // TODO move this into a reusable unit-formatting module
-  _getUnitString (param, language) {
-    if (!param.unit) {
-      return ''
-    }
-    if (param.unit.symbol) {
-      let unit = param.unit.symbol.value || param.unit.symbol
-      let scheme = param.unit.symbol.type
-      if (scheme === 'http://www.opengis.net/def/uom/UCUM/') {
-        if (unit === 'Cel') {
-          unit = '°C'
-        } else if (unit === '1') {
-          unit = ''
-        }
-      }
-      return unit
-    } else {
-      return getLanguageString(param.unit.label, language)
-    }
-  }
-  
   _doUpdate (fullUpdate) {
     let el = this._el
     
@@ -131,7 +110,7 @@ export default class ContinuousLegend extends L.Control {
       // if requested language doesn't exist, use the returned one for all other labels
       let language = getLanguageTag(param.observedProperty.label, this._language) 
       let title = getLanguageString(param.observedProperty.label, language)
-      let unit = this._getUnitString(param, language)
+      let unit = stringifyUnit(param.unit, language)
        $$('.legend-title', el).innerHTML = title
        $('.legend-uom', el).forEach(u => u.innerHTML = unit)        
     }

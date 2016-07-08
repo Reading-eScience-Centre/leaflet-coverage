@@ -1,6 +1,6 @@
 import L from 'leaflet'
 import c3 from 'c3'
-import {getLanguageString, getReferenceObject} from 'covutils'
+import {getLanguageString, stringifyUnit, getReferenceObject, loadProjection} from 'covutils'
 
 /**
  * Displays a popup with an interactive plot showing the data
@@ -84,6 +84,9 @@ export default class VerticalProfilePlot extends L.Popup {
       this._domains = domains
       this._ranges = ranges
       this._addPlotToPopup()
+      return loadProjection(domains[0])
+    }).then(proj => {
+      this.projection = proj
       super.onAdd(map)
       this.fire('add')
       map.fire('dataload')
@@ -95,12 +98,12 @@ export default class VerticalProfilePlot extends L.Popup {
   }
   
   _addPlotToPopup () {
-    // TODO transform if necessary
     if (!this.getLatLng()) {
       // in case bindPopup is not used and the caller did not set a position
       let x = this._domains[0].axes.get('x')
       let y = this._domains[0].axes.get('y')
-      this.setLatLng(L.latLng(y.values[0], x.values[0]))
+      let latlng = this.projection.unproject({x, y})
+      this.setLatLng(L.latLng(latlng))
     }
     
     // display first parameter group
@@ -143,28 +146,6 @@ export default class VerticalProfilePlot extends L.Popup {
     return refParam
   }
   
-  // TODO move this into a reusable unit-formatting module
-  // TODO code duplication with ContinuousLegend
-  _getUnitString (param, language) {
-    if (!param.unit) {
-      return ''
-    }
-    if (param.unit.symbol) {
-      let unit = param.unit.symbol.value || param.unit.symbol
-      let scheme = param.unit.symbol.type
-      if (scheme === 'http://www.opengis.net/def/uom/UCUM/') {
-        if (unit === 'Cel') {
-          unit = '°C'
-        } else if (unit === '1') {
-          unit = ''
-        }
-      }
-      return unit
-    } else {
-      return getLanguageString(param.unit.label, language)
-    }
-  }
-  
   _getPlotElement (paramKeyGroup) {    
     let refDomain = this._domains[0]
     let covsWithParamKey = zip(this._covs, paramKeyGroup)
@@ -180,7 +161,7 @@ export default class VerticalProfilePlot extends L.Popup {
       let vertSrs = vertRef.system
       if (vertSrs.cs && (vertSrs.cs.axes || vertSrs.cs.csAxes)) {
         let ax = vertSrs.cs.axes ? vertSrs.cs.axes[0] : vertSrs.cs.csAxes[0]
-        zUnit = this._getUnitString(ax, this._language)
+        zUnit = stringifyUnit(ax.unit, this._language)
         if (ax.name) {
           zName = getLanguageString(ax.name, this._language)
         }
@@ -192,7 +173,7 @@ export default class VerticalProfilePlot extends L.Popup {
       xLabel += ' (' + zUnit + ')'
     }
     
-    let unit = this._getUnitString(refParam, this._language)
+    let unit = stringifyUnit(refParam.unit, this._language)
     let obsPropLabel = getLanguageString(refParam.observedProperty.label, this._language)
     
     // http://c3js.org/samples/simple_xy_multiple.html
