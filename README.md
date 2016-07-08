@@ -7,7 +7,7 @@ Note that to *load* a coverage you have to use another library, depending on whi
 
 NOTE: This plugin is in active development, does not support all CoverageJSON domain types, contains bugs, and will change.
 
-[API docs](https://doc.esdoc.org/github.com/reading-escience-centre/leaflet-coverage/)
+[API docs](https://doc.esdoc.org/github.com/Reading-eScience-Centre/leaflet-coverage/)
 
 ## Example
 
