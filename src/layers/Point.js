@@ -62,10 +62,10 @@ export default class Point extends PaletteMixin(CircleMarkerMixin(CoverageMixin(
   }
   
   getLatLng () {
-    // TODO convert coordinates to lat/lon if necessary
     let x = this.domain.axes.get('x').values[0]
     let y = this.domain.axes.get('y').values[0]
-    return L.latLng(y, x)
+    let latlng = this.projection.unproject({x,y})
+    return L.latLng(latlng)
   }
   
   get coverage () {

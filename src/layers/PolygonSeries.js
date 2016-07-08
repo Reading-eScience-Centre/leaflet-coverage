@@ -48,10 +48,20 @@ export default class PolygonSeries extends PaletteMixin(CoverageMixin(EventMixin
     this.load()
       .then(() => this.initializePalette())
       .then(() => {
+        this._unproject()
         this._addPolygon()
         this._pointInPolygonPreprocess()
         this.fire('add')
       })
+  }
+  
+  _unproject () {
+    let unproject = this.projection.unproject
+    let polygon = this.domain.axes.get('composite').values[0]
+    this._polygonLonLat = polygon.map(ring => ring.map(([x,y]) => {
+      let {lat,lon} = unproject({x,y})
+      return [lon,lat]
+    }))
   }
     
   _loadCoverageSubset () {
@@ -157,7 +167,7 @@ export default class PolygonSeries extends PaletteMixin(CoverageMixin(EventMixin
   }
   
   _pointInPolygonPreprocess () {
-    let polygon = this.domain.axes.get('composite').values[0]
+    let polygon = this._polygonLonLat
     // TODO we assume spherical coordinates for now
     let isCartesian = false
     // A bit evil since this modifies in-place, but nothing bad should happen.
@@ -167,9 +177,7 @@ export default class PolygonSeries extends PaletteMixin(CoverageMixin(EventMixin
   }
   
   _addPolygon () {
-    // TODO do coordinate transformation to lat/lon if necessary
-    
-    let polygon = this.domain.axes.get('composite').values[0]
+    let polygon = this._polygonLonLat
     
     let geojson = {
       "type": "Feature",

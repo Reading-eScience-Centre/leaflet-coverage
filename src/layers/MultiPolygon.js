@@ -39,10 +39,20 @@ export default class MultiPolygon extends PaletteMixin(CoverageMixin(EventMixin(
     this.load()
       .then(() => this.initializePalette())
       .then(() => {
+        this._unproject()
         this._addPolygons()
         this._pointInPolygonPreprocess()
         this.fire('add')
     })
+  }
+  
+  _unproject () {
+    let unproject = this.projection.unproject
+    let polygons = this.domain.axes.get('composite').values
+    this._polygonsLonLat = polygons.map(polygon => polygon.map(ring => ring.map(([x,y]) => {
+      let {lat,lon} = unproject({x,y})
+      return [lon,lat]
+    })))
   }
   
   onRemove (map) {
@@ -81,7 +91,7 @@ export default class MultiPolygon extends PaletteMixin(CoverageMixin(EventMixin(
   }
   
   _pointInPolygonPreprocess () {
-    let polygons = this.domain.axes.get('composite').values
+    let polygons = this._polygonsLonLat
     // TODO we assume spherical coordinates for now
     let isCartesian = false
     // A bit evil since this modifies in-place, but nothing bad should happen.
@@ -90,9 +100,7 @@ export default class MultiPolygon extends PaletteMixin(CoverageMixin(EventMixin(
   }
   
   _addPolygons () {
-    // TODO do coordinate transformation to lat/lon if necessary
-    
-    let polygons = this.domain.axes.get('composite').values
+    let polygons = this._polygonsLonLat
     
     let geojson = []
     for (let i=0; i < polygons.length; i++) {

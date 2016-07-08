@@ -119,10 +119,10 @@ export default class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGrou
     let composite = this.domain.axes.get('composite').values
     let coords = []
     for (let i=0; i < composite.length; i++) {
-      // this always has to be lat/lon, no matter which map projection is used
       let x = composite[i][1]
       let y = composite[i][2]
-      let coord = new L.LatLng(y, x)
+      let latlng = this.projection.unproject({x,y})
+      let coord = L.latLng(latlng)
       coords.push(coord)
     }
     return coords
