@@ -110,10 +110,10 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
       // approximate geographic bbox by unprojecting the projected bbox corners
       bbox = this._getDomainBbox()
       let proj = this.projection
-      let p1 = proj.unproject({x: bbox[0], y: bbox[0]})
-      let p2 = proj.unproject({x: bbox[0], y: bbox[1]})
-      let p3 = proj.unproject({x: bbox[1], y: bbox[0]})
-      let p4 = proj.unproject({x: bbox[1], y: bbox[1]})
+      let p1 = proj.unproject({x: bbox[0], y: bbox[1]})
+      let p2 = proj.unproject({x: bbox[0], y: bbox[3]})
+      let p3 = proj.unproject({x: bbox[2], y: bbox[1]})
+      let p4 = proj.unproject({x: bbox[2], y: bbox[3]})
       return L.latLngBounds([p1, p2, p3, p4])
     }
     let southWest = L.latLng(bbox[1], bbox[0])
@@ -295,28 +295,23 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
    * If out of bounds, then undefined is returned, otherwise a number or null (for no data).
    */
   getValueAt (latlng) {
-    // TODO see drawTile(), domain must be lat/lon for now
-    let x = this.domain.axes.get('x').values
-    let y = this.domain.axes.get('y').values
+    let X = this.domain.axes.get('x').values
+    let Y = this.domain.axes.get('y').values
     let bbox = this._getDomainBbox()
-    let lonRange = [bbox[0], bbox[0] + 360]
-    let {lat, lng: lon} = latlng
-    
+
+    let {lat, lng} = latlng
+    let {x,y} = this.projection.project({lat, lon: lng})
+
     // we first check whether the tile pixel is outside the domain bounding box
     // in that case we skip it as we do not want to extrapolate
-    if (lat < bbox[1] || lat > bbox[3]) {
+    if (x < bbox[0] || x > bbox[2] || y < bbox[1] || y > bbox[3]) {
       return
     }
+    
+    let iy = indexOfNearest(Y, y)
+    let ix = indexOfNearest(X, x)
 
-    lon = wrapLongitude(lon, lonRange)
-    if (lon < bbox[0] || lon > bbox[2]) {
-      return
-    }
-
-    let iLat = indexOfNearest(y, lat)
-    let iLon = indexOfNearest(x, lon)
-
-    return this.subsetRange.get({y: iLat, x: iLon})
+    return this.subsetRange.get({y: iy, x: ix})
   }
     
   drawTile (canvas, tilePoint, zoom) {
@@ -349,37 +344,19 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     
     let vals = this.subsetRange.get
     
-    // FIXME check if "Geodetic WGS84 CRS" as term is enough to describe WGS84 angular
-    //          what about cartesian??
-    
-    // TODO check if the domain and map CRS datum match
-    // -> if not, then at least a warning should be shown
     if (this._isDomainUsingEllipsoidalCRS()) {
       if (this._isRectilinearGeodeticMap()) {
         // here we can apply heavy optimizations
         this._drawRectilinearGeodeticMapProjection(setPixel, tileSize, startX, startY, vals)
       } else {
         // this is for any random map projection
-        // here we have to unproject each map pixel individually and find the matching domain coordinates
+        // here we have to unproject each map pixel individually and find the matching domain index coordinates
         this._drawAnyMapProjection(setPixel, tileSize, startX, startY, vals)
       }
     } else {
-      // here we either have a projected CRS with base CRS = CRS84, or
-      // a projected CRS with non-CRS84 base CRS (like British National Grid), or
-      // a geodetic CRS not using a WGS84 datum
-       // FIXME check this, what does geodetic CRS really mean? = lat/lon? = ellipsoid?
-      
-      if (this._isGeodeticTransformAvailableForDomain()) {
-        throw new Error('NOT IMPLEMENTED YET')
-        // TODO implement, use 2D coordinate arrays and/or proj4 transforms
-      } else {
-        // TODO if the map projection base CRS matches the CRS of the domain,
-        //      could we still draw the grid in projected coordinates?
-        // -> e.g. UK domain CRS and UK basemap in that CRS
-        
-        throw new Error('Cannot draw grid, spatial CRS is not geodetic ' + 
-            'and no geodetic transform data is available')
-      }
+      // here we have to unproject each map pixel individually, 
+      // project it into domain projection coordinates, and find the domain index coordinates
+      this._drawProjectedCRSWithAnyMapProjection(setPixel, tileSize, startX, startY, vals)
     }
     
     ctx.putImageData(imgData, 0, 0)    
@@ -435,6 +412,10 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
   _drawAnyMapProjection (setPixel, tileSize, startX, startY, vals) {
     // usable for any map projection, but computationally more intensive
     // there are two hotspots in the loops: map.unproject and indexOfNearest
+    
+    // Note that this function is slightly more specialized and optimized than _drawProjectedCRSWithAnyMapProjection().
+    // It targets the case when the domain is lat/lon, whereas _drawProjectedCRSWithAnyMapProjection() works
+    // with any projected CRS in the grid domain.
 
     let map = this._map
     let x = this.domain.axes.get('x').values
@@ -444,7 +425,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     
     for (let tileX = 0; tileX < tileSize; tileX++) {
       for (let tileY = 0; tileY < tileSize; tileY++) {
-        let {lat,lon} = map.unproject(L.point(startX + tileX, startY + tileY))
+        let {lat,lng} = map.unproject(L.point(startX + tileX, startY + tileY))
 
         // we first check whether the tile pixel is outside the domain bounding box
         // in that case we skip it as we do not want to extrapolate
@@ -452,8 +433,8 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
           continue
         }
 
-        lon = wrapLongitude(lon, lonRange)
-        if (lon < bbox[0] || lon > bbox[2]) {
+        lng = wrapLongitude(lng, lonRange)
+        if (lng < bbox[0] || lng > bbox[2]) {
           continue
         }
 
@@ -461,9 +442,47 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
         // for finding the closest latitude/longitude we use a simple binary search
         // (as there is no discontinuity)
         let iLat = indexOfNearest(y, lat)
-        let iLon = indexOfNearest(x, lon)
+        let iLon = indexOfNearest(x, lng)
 
         setPixel(tileY, tileX, vals({y: iLat, x: iLon}))
+      }
+    }
+  }
+  
+  /**
+   * Draws a domain with projected CRS on a map with arbitrary projection.
+   * 
+   * @param {Function} setPixel A function with parameters (y,x,val) which 
+   *                            sets the color of a pixel on a tile.
+   * @param {Integer} tileSize Size of a tile in pixels.
+   * @param {Integer} startX
+   * @param {Integer} startY
+   * @param {ndarray} vals Range values.
+   */
+  _drawProjectedCRSWithAnyMapProjection (setPixel, tileSize, startX, startY, vals) {
+    let map = this._map
+    let X = this.domain.axes.get('x').values
+    let Y = this.domain.axes.get('y').values
+    let bbox = this._getDomainBbox()
+    
+    let proj = this.projection
+    
+    for (let tileX = 0; tileX < tileSize; tileX++) {
+      for (let tileY = 0; tileY < tileSize; tileY++) {
+        let {lat,lng} = map.unproject(L.point(startX + tileX, startY + tileY))
+        let {x,y} = proj.project({lat, lon: lng})
+
+        // we first check whether the tile pixel is outside the domain bounding box
+        // in that case we skip it as we do not want to extrapolate
+        if (x < bbox[0] || x > bbox[2] || y < bbox[1] || y > bbox[3]) {
+          continue
+        }
+
+        // now we find the closest grid cell using simple binary search
+        let iy = indexOfNearest(Y, y)
+        let ix = indexOfNearest(X, x)
+
+        setPixel(tileY, tileX, vals({y: iy, x: ix}))
       }
     }
   }
