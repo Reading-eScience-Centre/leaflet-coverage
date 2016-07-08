@@ -31,7 +31,7 @@ export default function CoverageMixin (base) {
       let promise = this.coverage.loadDomain().then(domain => {
         this.domain = domain
         
-        [this._projX, this._projY] = getHorizontalCRSComponents(domain)
+        ;[this._projX, this._projY] = getHorizontalCRSComponents(domain)
         return loadProjection(domain)
       }).then(proj => {
         this.projection = proj
