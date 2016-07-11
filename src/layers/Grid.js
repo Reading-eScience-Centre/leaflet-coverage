@@ -345,17 +345,21 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     
     if (this._isDomainUsingEllipsoidalCRS()) {
       if (this._isRectilinearGeodeticMap()) {
-        // here we can apply heavy optimizations
-        this._drawRectilinearGeodeticMapProjection(setPixel, tileSize, startX, startY, vals)
+        // here we can apply heavy optimizations as the map CRS matches the domain CRS 
+        this._drawGeodeticCRSWithRectilinearMapProjection(setPixel, tileSize, startX, startY, vals)
       } else {
         // this is for any random map projection
         // here we have to unproject each map pixel individually and find the matching domain index coordinates
-        this._drawAnyMapProjection(setPixel, tileSize, startX, startY, vals)
+        this._drawGeodeticCRSWithAnyMapProjection(setPixel, tileSize, startX, startY, vals)
       }
     } else {
       // here we have to unproject each map pixel individually, 
       // project it into domain projection coordinates, and find the domain index coordinates
-      this._drawProjectedCRSWithAnyMapProjection(setPixel, tileSize, startX, startY, vals)
+      if (this._isRectilinearGeodeticMap()) {
+        this._drawProjectedCRSWithRectilinearMapProjection(setPixel, tileSize, startX, startY, vals)
+      } else {
+        this._drawProjectedCRSWithAnyMapProjection(setPixel, tileSize, startX, startY, vals)
+      }
     }
     
     ctx.putImageData(imgData, 0, 0)    
@@ -408,7 +412,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
    * @param {Integer} startY
    * @param {ndarray} vals Range values.
    */
-  _drawAnyMapProjection (setPixel, tileSize, startX, startY, vals) {
+  _drawGeodeticCRSWithAnyMapProjection (setPixel, tileSize, startX, startY, vals) {
     // usable for any map projection, but computationally more intensive
     // there are two hotspots in the loops: map.unproject and indexOfNearest
     
@@ -493,10 +497,62 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
   }
   
   /**
+   * Draws a domain with projected CRS on a map with rectilinear lon/lat projection.
+   * 
+   * @param {Function} setPixel A function with parameters (y,x,val) which 
+   *                            sets the color of a pixel on a tile.
+   * @param {Integer} tileSize Size of a tile in pixels.
+   * @param {Integer} startX
+   * @param {Integer} startY
+   * @param {ndarray} vals Range values.
+   */
+  _drawProjectedCRSWithRectilinearMapProjection (setPixel, tileSize, startX, startY, vals) {
+    let map = this._map
+    let X = this.domain.axes.get(this._projX).values
+    let Y = this.domain.axes.get(this._projY).values
+    let bbox = this._getDomainBbox()
+    
+    let proj = this.projection
+    
+    // since the map projection is a rectilinear lat/lon grid,
+    // we only have to unproject the the first row and column to get the lat/lon coordinates of all tile pixels
+    let lons = new Float64Array(tileSize)
+    for (let tileX = 0; tileX < tileSize; tileX++) {
+      let {lng} = map.unproject(L.point(startX + tileX, startY))
+      lons[tileX] = lng
+    }
+    let lats = new Float64Array(tileSize)
+    for (let tileY = 0; tileY < tileSize; tileY++) {
+      let {lat} = map.unproject(L.point(startX, startY + tileY))
+      lats[tileY] = lat
+    }    
+    
+    for (let tileX = 0; tileX < tileSize; tileX++) {
+      for (let tileY = 0; tileY < tileSize; tileY++) {
+        let lat = lats[tileY]
+        let lon = lons[tileX]
+        let {x,y} = proj.project({lat, lon})
+
+        // we first check whether the tile pixel is outside the domain bounding box
+        // in that case we skip it as we do not want to extrapolate
+        if (x < bbox[0] || x > bbox[2] || y < bbox[1] || y > bbox[3]) {
+          continue
+        }
+
+        // now we find the closest grid cell using simple binary search
+        let iy = indexOfNearest(Y, y)
+        let ix = indexOfNearest(X, x)
+
+        setPixel(tileY, tileX, vals({y: iy, x: ix}))
+      }
+    }
+  }
+  
+  /**
    * Draws a geodetic rectilinear domain grid on a map whose grid is, or can be directly
    * mapped to, a geodetic rectilinear grid.
    */
-  _drawRectilinearGeodeticMapProjection (setPixel, tileSize, startX, startY, vals) {
+  _drawGeodeticCRSWithRectilinearMapProjection (setPixel, tileSize, startX, startY, vals) {
     // optimized version for map projections that are equal to a rectilinear geodetic grid
     // this can be used when lat and lon can be computed independently for a given pixel
 
