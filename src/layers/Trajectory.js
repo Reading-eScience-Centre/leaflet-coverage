@@ -33,7 +33,7 @@ export default class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGrou
     
     if (isDomain(cov)) {
       cov = fromDomain(cov)
-      options.keys = [cov.parameters.keys().next.value]
+      options.keys = [cov.parameters.keys().next().value]
     }
     
     if (!options.paletteExtent) {

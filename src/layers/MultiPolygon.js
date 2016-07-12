@@ -19,7 +19,7 @@ export default class MultiPolygon extends PaletteMixin(CoverageMixin(EventMixin(
     
     if (isDomain(cov)) {
       cov = fromDomain(cov)
-      options.keys = [cov.parameters.keys().next.value]
+      options.keys = [cov.parameters.keys().next().value]
     }
     
     if (!options.paletteExtent) {

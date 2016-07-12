@@ -46,7 +46,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     
     if (isDomain(cov)) {
       cov = fromDomain(cov)
-      options.keys = [cov.parameters.keys().next.value]
+      options.keys = [cov.parameters.keys().next().value]
     }
     
     if (!options.paletteExtent) {
