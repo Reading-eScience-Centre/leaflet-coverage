@@ -1,11 +1,11 @@
 # leaflet-coverage [![Build Status](https://travis-ci.org/Reading-eScience-Centre/leaflet-coverage.svg?branch=master)](https://travis-ci.org/Reading-eScience-Centre/leaflet-coverage)
 
-A [Leaflet](http://leafletjs.com/) plugin for visualizing [coverage data](https://en.wikipedia.org/wiki/Coverage_data) (numerical or categorical data varying in space and time) with the help of the [JavaScript Coverage Data API](https://github.com/Reading-eScience-Centre/coverage-jsapi). Currently, it supports most domain types defined within [CoverageJSON](https://github.com/Reading-eScience-Centre/coveragejson):
+A [Leaflet](http://leafletjs.com/) plugin for visualizing [coverage data](https://en.wikipedia.org/wiki/Coverage_data) (numerical or categorical data varying in space and time) with the help of the [JavaScript Coverage Data API](https://github.com/Reading-eScience-Centre/coverage-jsapi). Currently, it supports most domain types defined within [CoverageJSON](http://covjson.org):
 Grid, Point, PointSeries, Trajectory, VerticalProfile, PolygonSeries, MultiPolygon. Additionally, it supports Point and VerticalProfile collections for a more convenient handling of such coverage collections.
 
 Note that to *load* a coverage you have to use another library, depending on which formats you want to support. The only currently known coverage loader that can be used is the [covjson-reader](https://github.com/Reading-eScience-Centre/covjson-reader) for the [CoverageJSON](https://github.com/Reading-eScience-Centre/coveragejson) format.
 
-NOTE: This plugin is in active development, does not support all CoverageJSON domain types, contains bugs, and will change.
+NOTE: This plugin is in active development, does not support all CoverageJSON domain types, may contain bugs, and will change.
 
 [API docs](https://doc.esdoc.org/github.com/Reading-eScience-Centre/leaflet-coverage/)
 
@@ -32,22 +32,24 @@ var layer = C.dataLayer(cov, {keys: ['salinity']}).on('add', function(e) {
 }).addTo(map)
 ```
 
+Have a look [this codepen](http://codepen.io/letmaik/pen/OXgPXQ) for a full example that uses a [CoverageJSON](http://covjson.org) temperature grid as a data source.
+
 ## Notes
 
 This is how you would typically include leaflet-coverage in a website:
 
 ```html
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css">
-<link rel="stylesheet" type="text/css" href="https://npmcdn.com/leaflet-coverage@0.5/leaflet-coverage.css">
+<link rel="stylesheet" type="text/css" href="https://npmcdn.com/leaflet-coverage@0.6/leaflet-coverage.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
-<script src="https://npmcdn.com/covutils@0.4/covutils.min.js"></script>
-<script src="https://npmcdn.com/leaflet-coverage@0.5/leaflet-coverage.min.js"></script>
+<script src="https://npmcdn.com/covutils@0.5/covutils.min.js"></script>
+<script src="https://npmcdn.com/leaflet-coverage@0.6/leaflet-coverage.min.js"></script>
 ```
 
 If you don't need support for MultiPolygon and PolygonSeries layers, then you can also use the lite variant of [covutils](https://www.npmjs.com/package/covutils):
 
 ```html
-<script src="https://npmcdn.com/covutils@0.4/covutils-lite.min.js"></script>
+<script src="https://npmcdn.com/covutils@0.5/covutils-lite.min.js"></script>
 ```
 
 To use the plotting functionality (for time series or vertical profile plots) you have to include the D3 and C3 libraries in your HTML:
