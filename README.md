@@ -32,7 +32,7 @@ var layer = C.dataLayer(cov, {keys: ['salinity']}).on('add', function(e) {
 }).addTo(map)
 ```
 
-Have a look [this codepen](http://codepen.io/letmaik/pen/OXgPXQ) for a full example that uses a [CoverageJSON](http://covjson.org) temperature grid as a data source.
+Have a look at [this codepen](http://codepen.io/letmaik/pen/OXgPXQ) for a full example that uses a [CoverageJSON](http://covjson.org) temperature grid as a data source.
 
 ## Notes
 
