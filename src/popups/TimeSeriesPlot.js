@@ -1,7 +1,7 @@
 import L from 'leaflet'
 import c3 from 'c3'
 
-import {getLanguageString, stringifyUnit, loadProjection} from 'covutils'
+import {getLanguageString, stringifyUnit, loadProjection, getHorizontalCRSComponents} from 'covutils'
 
 // TODO DRY: nearly identical to VerticalProfilePlot
 
@@ -88,7 +88,7 @@ export default class TimeSeriesPlot extends L.Popup {
     Promise.all([domainPromise, rangePromise]).then(([domains, ranges]) => {
       this._domains = domains
       this._ranges = ranges
-      [this._projX, this._projY] = getHorizontalCRSComponents(domain)
+      ;[this._projX, this._projY] = getHorizontalCRSComponents(domains[0])
       return loadProjection(domains[0])
     }).then(proj => {
       this.projection = proj
@@ -106,8 +106,8 @@ export default class TimeSeriesPlot extends L.Popup {
   _addPlotToPopup () {
     if (!this.getLatLng()) {
       // in case bindPopup is not used and the caller did not set a position
-      let x = this._domains[0].axes.get(this._projX)
-      let y = this._domains[0].axes.get(this._projY)
+      let x = this._domains[0].axes.get(this._projX).values[0]
+      let y = this._domains[0].axes.get(this._projY).values[0]
       let latlng = this.projection.unproject({x, y})
       this.setLatLng(L.latLng(latlng))
     }
