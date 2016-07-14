@@ -1,4 +1,4 @@
-const COVJSON_PREFIX = 'http://covjson.org/def/'
+const COVJSON_PREFIX = 'https://covjson.org/def/'
 const COVJSON_CORE_NS = COVJSON_PREFIX + 'core#'
 const COVJSON_DOMAINTYPES_NS = COVJSON_PREFIX + 'domainTypes#'
 /** @ignore */
