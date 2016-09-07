@@ -48,7 +48,7 @@ This will build the leaflet-coverage.{src|min}.js files in the root project fold
 The last two steps build and publish the package to the npm registry,
 which includes the original ES6 source code for modern bundlers like Rollup, a transpiled version
 for browserify-compatible workflows, and the browser bundles which can be accessed
-via https://npmcdn.com/leaflet-coverage/leaflet-coverage.min.js.
+via https://unpkg.com/leaflet-coverage/leaflet-coverage.min.js.
 
 ## Code style
 
