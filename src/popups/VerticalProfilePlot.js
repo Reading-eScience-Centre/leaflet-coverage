@@ -158,7 +158,7 @@ export default class VerticalProfilePlot extends L.Popup {
     let zUnit = ''
     
     let vertRef = getReferenceObject(refDomain, 'z')
-    if (vertRef && vertRef.components.length === 1) {
+    if (vertRef && vertRef.coordinates.length === 1) {
       let vertSrs = vertRef.system
       if (vertSrs.cs && (vertSrs.cs.axes || vertSrs.cs.csAxes)) {
         let ax = vertSrs.cs.axes ? vertSrs.cs.axes[0] : vertSrs.cs.csAxes[0]

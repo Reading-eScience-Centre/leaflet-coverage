@@ -117,8 +117,8 @@ export default class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGrou
    */
   getLatLngs () {
     let axis = this.domain.axes.get('composite')
-    let ix = axis.components.indexOf(this._projX)
-    let iy = axis.components.indexOf(this._projY)
+    let ix = axis.coordinates.indexOf(this._projX)
+    let iy = axis.coordinates.indexOf(this._projY)
     let coords = []
     for (let i=0; i < axis.values.length; i++) {
       let x = axis.values[i][ix]

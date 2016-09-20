@@ -58,8 +58,8 @@ export default class PolygonSeries extends PaletteMixin(CoverageMixin(EventMixin
   _unproject () {
     let unproject = this.projection.unproject
     let axis = this.domain.axes.get('composite')
-    let ix = axis.components.indexOf(this._projX)
-    let iy = axis.components.indexOf(this._projY)
+    let ix = axis.coordinates.indexOf(this._projX)
+    let iy = axis.coordinates.indexOf(this._projY)
     
     this._polygonLonLat = axis.values[0].map(ring => ring.map(coords => {
       let {lat,lon} = unproject({x: coords[ix], y: coords[iy]})
