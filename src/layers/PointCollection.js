@@ -83,22 +83,6 @@ export default class PointCollection extends PaletteMixin(L.Layer) {
   
   bindPopupEach (fn) {
     this._popupFn = fn
-    /*
-    if (this._clickListenerPopup) {
-      this.off('click', this._clickListenerPopup)
-      this.off('remove', this._removeListenerPopup)
-    }
-    this._clickListenerPopup = e => {
-      let popup = fn(e.coverage)
-      this._map.openPopup(popup)
-      this._popup = popup
-    }
-    this._removeListenerPopup = () => {
-      this._map.closePopup(this._popup)
-    }
-    this.on('click', this._clickListenerPopup)
-    this.on('remove', this._removeListenerPopup)
-    */
   }
   
   _attachListeners (layer, cov) {

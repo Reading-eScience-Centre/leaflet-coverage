@@ -210,8 +210,14 @@ export default class TimeSeriesPlot extends L.Popup {
       columns.push(y)
     }
     
+    let height = 300
     
     let el = document.createElement('div')
+    
+    // work-around, otherwise popup is too small
+    el.style.width = this.options.maxWidth
+    el.style.height = height
+
     c3.generate({
       bindto: el,
       data: {
@@ -262,7 +268,7 @@ export default class TimeSeriesPlot extends L.Popup {
         rescale: true
       },
       size: {
-        height: 300,
+        height: height,
         width: this.options.maxWidth
       }
     })

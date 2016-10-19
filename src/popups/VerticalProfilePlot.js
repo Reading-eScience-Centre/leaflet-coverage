@@ -223,8 +223,15 @@ export default class VerticalProfilePlot extends L.Popup {
       columns.push(y)
     }
     
+    let width = 350
+    let height = 300
     
     let el = document.createElement('div')
+    
+    // work-around, otherwise popup is too small
+    el.style.width = width
+    el.style.height = height
+
     c3.generate({
       bindto: el,
       data: {
@@ -277,8 +284,8 @@ export default class VerticalProfilePlot extends L.Popup {
         rescale: true
       },
       size: {
-        height: 300,
-        width: 350
+        height,
+        width
       }
     })
     
