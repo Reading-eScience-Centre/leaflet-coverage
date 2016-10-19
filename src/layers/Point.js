@@ -19,7 +19,7 @@ export const DEFAULT_COLOR = 'black'
  * The dot either has a defined standard color, or it uses
  * a palette if a parameter is chosen.
  */
-export default class Point extends PaletteMixin(CircleMarkerMixin(CoverageMixin(EventMixin(L.Class)))) {
+export default class Point extends PaletteMixin(CircleMarkerMixin(CoverageMixin(L.Layer))) {
   
   constructor (cov, options) {
     super()
@@ -53,7 +53,6 @@ export default class Point extends PaletteMixin(CircleMarkerMixin(CoverageMixin(
   }
   
   onRemove () {
-    this.fire('remove')
     this._removeMarker()
   }
   

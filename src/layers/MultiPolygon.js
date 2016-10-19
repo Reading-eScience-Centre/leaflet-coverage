@@ -12,7 +12,7 @@ export const DEFAULT_COLOR = 'black'
 /**
  * Renderer for Coverages and Domains with (domain) profile MultiPolygon.
  */
-export default class MultiPolygon extends PaletteMixin(CoverageMixin(EventMixin(L.Class))) {
+export default class MultiPolygon extends PaletteMixin(CoverageMixin(L.Layer)) {
   
   constructor (cov, options) {
     super()
@@ -59,7 +59,6 @@ export default class MultiPolygon extends PaletteMixin(CoverageMixin(EventMixin(
   }
   
   onRemove (map) {
-    this.fire('remove')
     this._removePolygons()
   }
   

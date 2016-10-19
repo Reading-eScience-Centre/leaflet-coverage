@@ -10,7 +10,7 @@ import {kdTree} from '../util/kdTree.js'
  * A collection of points sharing the same parameters / referencing.
  * 
  */
-export default class PointCollection extends PaletteMixin(EventMixin(L.Class)) {
+export default class PointCollection extends PaletteMixin(L.Layer) {
   constructor (covcoll, options) {
     super()
     
@@ -75,7 +75,6 @@ export default class PointCollection extends PaletteMixin(EventMixin(L.Class)) {
     map.removeLayer(this._layerGroup)
     this._layerGroup = L.layerGroup()
     this._layers = []
-    this.fire('remove')
   }
   
   bindPopupEach (fn) {

@@ -18,7 +18,7 @@ import {DEFAULT_COLOR} from './Point.js'
  * The dot either has a defined standard color, or it uses
  * a palette together with a target depth if a parameter is chosen.
  */
-export default class PolygonSeries extends PaletteMixin(CoverageMixin(EventMixin(L.Class))) {
+export default class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
   
   constructor (cov, options) {
     super()
@@ -82,7 +82,6 @@ export default class PolygonSeries extends PaletteMixin(CoverageMixin(EventMixin
   }
   
   onRemove () {
-    this.fire('remove')
     this._removePolygon()
   }
   
