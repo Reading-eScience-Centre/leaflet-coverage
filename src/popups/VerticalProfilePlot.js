@@ -103,7 +103,9 @@ export default class VerticalProfilePlot extends L.Popup {
   }
   
   _setPositionIfMissing () {
-    if (!this.getLatLng()) {
+    let pos = this.getLatLng()
+    // hacky
+    if (pos.lat === 0 && pos.lng === 0) {
       // in case bindPopup is not used and the caller did not set a position
       let x = this._domains[0].axes.get(this._projX).values[0]
       let y = this._domains[0].axes.get(this._projY).values[0]
