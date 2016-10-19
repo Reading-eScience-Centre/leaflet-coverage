@@ -77,11 +77,8 @@ export default class TimeSeriesPlot extends L.Popup {
       this._paramKeys.set(this._covs[i], keys)
     }
   }
-  
-  /**
-   * @ignore
-   */
-  onAdd (map) {
+
+  addTo (map) {
     map.fire('dataloading')
     let domainPromise = Promise.all(this._covs.map(cov => cov.loadDomain()))
     let rangePromise = Promise.all(this._covs.map(cov => cov.loadRanges(this._paramKeys.get(cov))))
@@ -93,8 +90,8 @@ export default class TimeSeriesPlot extends L.Popup {
     }).then(proj => {
       this.projection = proj
       this._setPositionIfMissing()
-      super.onAdd(map)
       this._addPlotToPopup()
+      super.addTo(map)
       this.fire('dataLoad', { init: true })
       map.fire('dataload')
     }).catch(e => {
