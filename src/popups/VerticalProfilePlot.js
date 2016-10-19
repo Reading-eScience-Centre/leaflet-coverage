@@ -30,7 +30,10 @@ export default class VerticalProfilePlot extends L.Popup {
    */
   constructor (coverage, options = {}) {
     options.maxWidth = options.maxWidth || 350
+    options.autoPan = false
     super(options)
+    this.setLatLng([0,0])
+    this.setContent('')
     this._covs = Array.isArray(coverage) ? coverage : [coverage]
     this._language = options.language
     this._precision = options.precision || 4
@@ -73,7 +76,10 @@ export default class VerticalProfilePlot extends L.Popup {
     }
   }
   
-  addTo (map) {
+  /**
+   * @ignore
+   */
+  onAdd (map) {
     map.fire('dataloading')
     let domainPromise = Promise.all(this._covs.map(cov => cov.loadDomain()))
     let rangePromise = Promise.all(this._covs.map(cov => cov.loadRanges(this._paramKeys.get(cov))))
@@ -85,8 +91,8 @@ export default class VerticalProfilePlot extends L.Popup {
     }).then(proj => {
       this.projection = proj
       this._setPositionIfMissing()
+      super.onAdd(map)
       this._addPlotToPopup()
-      super.addTo(map)
       this.fire('dataLoad', { init: true })
       map.fire('dataload')
     }).catch(e => {

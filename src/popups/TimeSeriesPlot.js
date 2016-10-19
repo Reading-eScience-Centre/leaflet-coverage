@@ -35,7 +35,10 @@ export default class TimeSeriesPlot extends L.Popup {
    */
   constructor (coverage, options = {}) {
     options.maxWidth = options.maxWidth || 350
+    options.autoPan = false
     super(options)
+    this.setLatLng([0,0])
+    this.setContent('')
     this._covs = Array.isArray(coverage) ? coverage : [coverage]
     this._language = options.language
     this._precision = options.precision || 4
@@ -77,8 +80,11 @@ export default class TimeSeriesPlot extends L.Popup {
       this._paramKeys.set(this._covs[i], keys)
     }
   }
-
-  addTo (map) {
+  
+  /**
+   * @ignore
+   */
+  onAdd (map) {
     map.fire('dataloading')
     let domainPromise = Promise.all(this._covs.map(cov => cov.loadDomain()))
     let rangePromise = Promise.all(this._covs.map(cov => cov.loadRanges(this._paramKeys.get(cov))))
@@ -91,7 +97,7 @@ export default class TimeSeriesPlot extends L.Popup {
       this.projection = proj
       this._setPositionIfMissing()
       this._addPlotToPopup()
-      super.addTo(map)
+      super.onAdd(map)
       this.fire('dataLoad', { init: true })
       map.fire('dataload')
     }).catch(e => {
