@@ -59,7 +59,7 @@ export default class TimeAxis extends EventMixin(L.Control) {
     this._covLayer = covLayer
 
     if (covLayer.on) {
-      this._remove = () => this.removeFrom(this._map)
+      this._remove = () => this.remove()
       covLayer.on('remove', this._remove)
       
       this._axisListener = e => {

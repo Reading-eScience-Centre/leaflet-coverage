@@ -33,7 +33,7 @@ import {getLanguageString, stringifyUnit} from 'covutils'
  * fakeLayer.vertical = heights[0]
  * verticalAxis.update()
  */
-export default class VerticalAxis extends EventMixin(L.Class) {
+export default class VerticalAxis extends L.Layer {
   
   /**
    * Creates a time axis control.
@@ -59,7 +59,7 @@ export default class VerticalAxis extends EventMixin(L.Class) {
     this._position = options.position || 'topleft'
 
     if (covLayer.on) {
-      this._remove = () => this.removeFrom(this._map)
+      this._remove = () => this.remove()
       covLayer.on('remove', this._remove)
       
       this._axisListener = e => {
@@ -110,23 +110,13 @@ export default class VerticalAxis extends EventMixin(L.Class) {
    * @ignore
    */
   onRemove (map) {
-    this._dropdown.removeFrom(map)
+    this._dropdown.remove()
     if (this._covLayer.off) {
       this._covLayer.off('remove', this._remove)
       this._covLayer.off('axisChange', this._axisListener)
     }
   }
-  
-  addTo (map) {
-    map.addLayer(this)
-    return this
-  }
-  
-  removeFrom (map) {
-    this.onRemove(map)
-    return this
-  }
-  
+    
   _getVerticalIndex () {
     let vals = this._covLayer.verticalSlices
     let i = vals.indexOf(this._covLayer.vertical)
