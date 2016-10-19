@@ -80,6 +80,7 @@ export default class VerticalProfilePlot extends L.Popup {
    * @ignore
    */
   onAdd (map) {
+    super.onAdd(map)
     map.fire('dataloading')
     let domainPromise = Promise.all(this._covs.map(cov => cov.loadDomain()))
     let rangePromise = Promise.all(this._covs.map(cov => cov.loadRanges(this._paramKeys.get(cov))))
@@ -91,7 +92,6 @@ export default class VerticalProfilePlot extends L.Popup {
     }).then(proj => {
       this.projection = proj
       this._setPositionIfMissing()
-      super.onAdd(map)
       this._addPlotToPopup()
       this.fire('dataLoad', { init: true })
       map.fire('dataload')
