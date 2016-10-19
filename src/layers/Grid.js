@@ -84,7 +84,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
       .then(() => {
         this.errored = false
         super.onAdd(map)
-        //this.fire('add')
+        this.fire('dataLoad', { init: true })
       })
       .catch(e => {
         this.errored = true
@@ -96,7 +96,6 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
   onRemove (map) {
     delete this._map
     // TODO delete references to domain/range, caching logic should happen elsewhere
-    //this.fire('remove')
     super.onRemove(map)
   }
     

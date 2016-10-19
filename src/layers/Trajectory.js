@@ -54,7 +54,7 @@ export default class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGrou
       .then(() => this.initializePalette())
       .then(() => {
         this._addTrajectoryLayers()
-        this.fire('add')
+        this.fire('dataLoad', { init: true })
       })
   }
   
