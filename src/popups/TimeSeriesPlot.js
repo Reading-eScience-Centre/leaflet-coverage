@@ -82,7 +82,6 @@ export default class TimeSeriesPlot extends L.Popup {
    * @ignore
    */
   onAdd (map) {
-    super.onAdd(map)
     map.fire('dataloading')
     let domainPromise = Promise.all(this._covs.map(cov => cov.loadDomain()))
     let rangePromise = Promise.all(this._covs.map(cov => cov.loadRanges(this._paramKeys.get(cov))))
@@ -93,6 +92,8 @@ export default class TimeSeriesPlot extends L.Popup {
       return loadProjection(domains[0])
     }).then(proj => {
       this.projection = proj
+      this._setPositionIfMissing()
+      super.onAdd(map)
       this._addPlotToPopup()
       this.fire('dataLoad', { init: true })
       map.fire('dataload')
@@ -102,8 +103,8 @@ export default class TimeSeriesPlot extends L.Popup {
       map.fire('dataload')
     })
   }
-  
-  _addPlotToPopup () {
+
+  _setPositionIfMissing () {
     if (!this.getLatLng()) {
       // in case bindPopup is not used and the caller did not set a position
       let x = this._domains[0].axes.get(this._projX).values[0]
@@ -111,12 +112,14 @@ export default class TimeSeriesPlot extends L.Popup {
       let latlng = this.projection.unproject({x, y})
       this.setLatLng(L.latLng(latlng))
     }
-    
+  }
+  
+  _addPlotToPopup () {
     // display first parameter group
     let paramKeyGroup = this._paramKeyGroups[0]    
     let plot = this._getPlotElement(paramKeyGroup)
     
-    let el = document.createElement('span')
+    let el = document.createElement('div')
     
     // display dropdown if multiple parameter groups
     if (this._paramKeyGroups.length > 1) {
