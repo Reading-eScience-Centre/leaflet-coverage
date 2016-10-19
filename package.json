@@ -1,6 +1,6 @@
 {
   "name": "leaflet-coverage",
-  "version": "0.6.4",
+  "version": "0.7.0",
   "license": "BSD-3-Clause",
   "description": "A Leaflet plugin for visualizing coverage data",
   "repository": {
@@ -46,14 +46,14 @@
   "dependencies": {
     "c3": "^0.4.11",
     "covutils": "^0.6.0",
-    "leaflet": "^0.7.7",
+    "leaflet": "^1.0.0",
     "ndarray": "^1.0.18"
   },
   "devDependencies": {
     "babel-cli": "^6.3.17",
     "babel-eslint": "^4.1.3",
+    "babel-plugin-external-helpers": "^6.8.0",
     "babel-preset-es2015": "^6.3.13",
-    "babel-preset-es2015-rollup": "^1.1.1",
     "babelify": "^7.2.0",
     "browserify": "^11.0.1",
     "core-js": "^2.0.2",
