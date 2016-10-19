@@ -67,6 +67,10 @@ export default class PointCollection extends PaletteMixin(L.Layer) {
       this._layerGroup.addLayer(layer)
       this._layers.push(layer)
       layer.load()
+      if (this._popupFn) {
+        let popup = fn(layer.coverage)
+        layer.bindPopup(popup)
+      }
     }
     
   }
@@ -78,6 +82,8 @@ export default class PointCollection extends PaletteMixin(L.Layer) {
   }
   
   bindPopupEach (fn) {
+    this._popupFn = fn
+    /*
     if (this._clickListenerPopup) {
       this.off('click', this._clickListenerPopup)
       this.off('remove', this._removeListenerPopup)
@@ -92,6 +98,7 @@ export default class PointCollection extends PaletteMixin(L.Layer) {
     }
     this.on('click', this._clickListenerPopup)
     this.on('remove', this._removeListenerPopup)
+    */
   }
   
   _attachListeners (layer, cov) {
