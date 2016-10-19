@@ -215,8 +215,8 @@ export default class TimeSeriesPlot extends L.Popup {
     let el = document.createElement('div')
     
     // work-around, otherwise popup is too small
-    el.style.width = this.options.maxWidth
-    el.style.height = height
+    el.style.width = this.options.maxWidth + 'px'
+    el.style.height = height + 'px'
 
     c3.generate({
       bindto: el,

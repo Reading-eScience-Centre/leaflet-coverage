@@ -229,8 +229,8 @@ export default class VerticalProfilePlot extends L.Popup {
     let el = document.createElement('div')
     
     // work-around, otherwise popup is too small
-    el.style.width = width
-    el.style.height = height
+    el.style.width = width + 'px'
+    el.style.height = height + 'px'
 
     c3.generate({
       bindto: el,
