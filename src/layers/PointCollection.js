@@ -68,7 +68,7 @@ export default class PointCollection extends PaletteMixin(L.Layer) {
       this._layers.push(layer)
       layer.load()
       if (this._popupFn) {
-        let popup = fn(layer.coverage)
+        let popup = this._popupFn(layer.coverage)
         layer.bindPopup(popup)
       }
     }
