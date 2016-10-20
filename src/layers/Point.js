@@ -48,7 +48,7 @@ export default class Point extends PaletteMixin(CircleMarkerMixin(CoverageMixin(
       .then(() => this.initializePalette())
       .then(() => {
         this._addMarker()
-        this.fire('dataLoad', { init: true })
+        this.fire('afterAdd')
       })
   }
   

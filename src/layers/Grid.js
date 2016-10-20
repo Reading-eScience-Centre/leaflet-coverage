@@ -11,7 +11,7 @@ import CoverageMixin from './CoverageMixin.js'
  * For Domain objects, a dummy parameter and range data is created.
  * 
  * Events:
- * "add" - Layer is initialized and is about to be added to the map
+ * "afterAdd" - Layer is initialized and was added to the map
  * "remove" - Layer is removed from the map
  * "dataLoading" - Data loading has started
  * "dataLoad" - Data loading has finished (also in case of errors)
@@ -84,7 +84,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
       .then(() => {
         this.errored = false
         super.onAdd(map)
-        this.fire('dataLoad', { init: true })
+        this.fire('afterAdd')
       })
       .catch(e => {
         this.errored = true

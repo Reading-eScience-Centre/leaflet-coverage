@@ -85,7 +85,8 @@ export default class VerticalProfilePlot extends L.Popup {
       this._domains = domains
       this._ranges = ranges
       this._addPlotToPopup()
-      this.fire('dataLoad', { init: true })
+      this.fire('dataLoad')
+      this.fire('afterAdd')
       map.fire('dataload')
     }).catch(e => {
       console.error(e)

@@ -51,7 +51,7 @@ export default class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) 
         this._unproject()
         this._addPolygon()
         this._pointInPolygonPreprocess()
-        this.fire('dataLoad', { init: true })
+        this.fire('afterAdd')
       })
   }
   

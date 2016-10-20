@@ -105,7 +105,7 @@ export default class PointCollection extends PaletteMixin(L.Layer) {
         this._initKdtree()
         this.initializePalette().then(() => {
           this._layerGroup.addTo(this._map)
-          this.fire('dataLoad', { init: true })
+          this.fire('afterAdd')
         })
       }
     }

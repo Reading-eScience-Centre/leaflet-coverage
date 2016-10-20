@@ -42,7 +42,7 @@ export default class MultiPolygon extends PaletteMixin(CoverageMixin(L.Layer)) {
         this._unproject()
         this._addPolygons()
         this._pointInPolygonPreprocess()
-        this.fire('dataLoad', { init: true })
+        this.fire('afterAdd')
     })
   }
   

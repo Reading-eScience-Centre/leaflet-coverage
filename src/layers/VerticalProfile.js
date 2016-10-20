@@ -49,7 +49,7 @@ export default class VerticalProfile extends PaletteMixin(CircleMarkerMixin(Cove
       .then(() => this.initializePalette())
       .then(() => {
         this._addMarker()
-        this.fire('dataLoad', { init: true })
+        this.fire('afterAdd')
       })
   }
     
