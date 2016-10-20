@@ -11,6 +11,12 @@ let Events = L.Evented.prototype
  * @return {class} The base class with Leaflet's {@link L.Evented}.
  */
 export default function EventMixin (base) {
+  let clazz = class extends base {}
+  for (let key in Events) {
+    clazz.prototype[key] = Events[key]
+  }
+  return clazz
+  /*
   return class extends base {
     on (...args) {
       return Events.on.call(this, ...args)
@@ -50,5 +56,5 @@ export default function EventMixin (base) {
     _off (...args) {
       return Events._on.call(this, ...args)
     }
-  }
+  }*/
 }
