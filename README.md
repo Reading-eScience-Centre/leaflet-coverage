@@ -19,7 +19,7 @@ L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 var cov = ... // load Coverage object with another library
 
-var layer = C.dataLayer(cov, {keys: ['salinity']}).on('add', function(e) {
+var layer = C.dataLayer(cov, {keys: ['salinity']}).on('afterAdd', function(e) {
   if (layer.palette) {
     C.legend(layer).addTo(map)
   }
