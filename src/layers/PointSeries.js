@@ -19,7 +19,7 @@ import {DEFAULT_COLOR} from './Point.js'
  * The dot either has a defined standard color, or it uses
  * a palette together with a target depth if a parameter is chosen.
  */
-export default class PointSeries extends PaletteMixin(CircleMarkerMixin(CoverageMixin(EventMixin(L.Class)))) {
+export default class PointSeries extends PaletteMixin(CircleMarkerMixin(CoverageMixin(L.Layer))) {
   
   constructor (cov, options) {
     super()
@@ -51,7 +51,7 @@ export default class PointSeries extends PaletteMixin(CircleMarkerMixin(Coverage
       .then(() => this.initializePalette())
       .then(() => {
         this._addMarker()
-        this.fire('add')
+        this.fire('afterAdd')
       })
   }
   
@@ -70,7 +70,6 @@ export default class PointSeries extends PaletteMixin(CircleMarkerMixin(Coverage
   }
   
   onRemove () {
-    this.fire('remove')
     this._removeMarker()
   }
   

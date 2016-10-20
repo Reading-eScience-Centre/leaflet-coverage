@@ -11,7 +11,7 @@ import CoverageMixin from './CoverageMixin.js'
  * For Domain objects, a dummy parameter and range data is created.
  * 
  * Events:
- * "add" - Layer is initialized and is about to be added to the map
+ * "afterAdd" - Layer is initialized and was added to the map
  * "remove" - Layer is removed from the map
  * "dataLoading" - Data loading has started
  * "dataLoad" - Data loading has finished (also in case of errors)
@@ -22,7 +22,7 @@ import CoverageMixin from './CoverageMixin.js'
  * "remove" - Layer is removed from the map
  * 
  */
-export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)) {
+export default class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
   
   /**
    * The key of the parameter to display must be given in the 'keys' options property,
@@ -84,7 +84,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
       .then(() => {
         this.errored = false
         super.onAdd(map)
-        this.fire('add')
+        this.fire('afterAdd')
       })
       .catch(e => {
         this.errored = true
@@ -96,7 +96,6 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
   onRemove (map) {
     delete this._map
     // TODO delete references to domain/range, caching logic should happen elsewhere
-    this.fire('remove')
     super.onRemove(map)
   }
     
@@ -312,21 +311,29 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
 
     return this.subsetRange.get({[this._projY]: iy, [this._projX]: ix})
   }
+
+  createTile (coords) {
+    let tile = L.DomUtil.create('canvas', 'leaflet-tile')
+
+    // setup tile width and height according to the options
+    var size = this.getTileSize()
+    tile.width = size.x
+    tile.height = size.y
+
+    this.drawTile(tile, coords)
+
+    return tile
+  }
     
-  drawTile (canvas, tilePoint, zoom) {
+  drawTile (canvas, coords) {
     if (this.errored) return
     
     let ctx = canvas.getContext('2d')
-    let tileSize = this.options.tileSize
+    let tileSize = this.getTileSize()
     
-    let imgData = ctx.getImageData(0, 0, tileSize, tileSize)
+    let imgData = ctx.getImageData(0, 0, tileSize.x, tileSize.y)
     // Uint8ClampedArray, 1-dimensional, in order R,G,B,A,R,G,B,A,... row-major
-    let rgba = ndarray(imgData.data, [tileSize, tileSize, 4])
-    
-    // window projection coordinates of top left tile pixel
-    let start = tilePoint.multiplyBy(tileSize)
-    let startX = start.x
-    let startY = start.y
+    let rgba = ndarray(imgData.data, [tileSize.y, tileSize.x, 4])
     
     let {red, green, blue} = this.palette
         
@@ -346,19 +353,19 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     if (this._isDomainUsingEllipsoidalCRS()) {
       if (this._isRectilinearGeodeticMap()) {
         // here we can apply heavy optimizations as the map CRS matches the domain CRS 
-        this._drawGeodeticCRSWithRectilinearMapProjection(setPixel, tileSize, startX, startY, vals)
+        this._drawGeodeticCRSWithRectilinearMapProjection(setPixel, coords, vals)
       } else {
         // this is for any random map projection
         // here we have to unproject each map pixel individually and find the matching domain index coordinates
-        this._drawGeodeticCRSWithAnyMapProjection(setPixel, tileSize, startX, startY, vals)
+        this._drawGeodeticCRSWithAnyMapProjection(setPixel, coords, vals)
       }
     } else {
       // here we have to unproject each map pixel individually, 
       // project it into domain projection coordinates, and find the domain index coordinates
       if (this._isRectilinearGeodeticMap()) {
-        this._drawProjectedCRSWithRectilinearMapProjection(setPixel, tileSize, startX, startY, vals)
+        this._drawProjectedCRSWithRectilinearMapProjection(setPixel, coords, vals)
       } else {
-        this._drawProjectedCRSWithAnyMapProjection(setPixel, tileSize, startX, startY, vals)
+        this._drawProjectedCRSWithAnyMapProjection(setPixel, coords, vals)
       }
     }
     
@@ -412,13 +419,18 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
    * @param {Integer} startY
    * @param {ndarray} vals Range values.
    */
-  _drawGeodeticCRSWithAnyMapProjection (setPixel, tileSize, startX, startY, vals) {
+  _drawGeodeticCRSWithAnyMapProjection (setPixel, coords, vals) {
     // usable for any map projection, but computationally more intensive
     // there are two hotspots in the loops: map.unproject and indexOfNearest
     
     // Note that this function is slightly more specialized and optimized than _drawProjectedCRSWithAnyMapProjection().
     // It targets the case when the domain is lat/lon, whereas _drawProjectedCRSWithAnyMapProjection() works
     // with any projected CRS in the grid domain.
+
+    let tileSize = this.getTileSize()
+    let startX = coords.x * tileSize.x
+    let startY = coords.y * tileSize.y
+    let zoom = coords.z
 
     let map = this._map
     let x = this.domain.axes.get('x').values
@@ -431,10 +443,12 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     }
     
     let lonRange = [bbox[0], bbox[0] + 360]
+
     
-    for (let tileX = 0; tileX < tileSize; tileX++) {
-      for (let tileY = 0; tileY < tileSize; tileY++) {
-        let {lat,lng} = map.unproject(L.point(startX + tileX, startY + tileY))
+    
+    for (let tileX = 0; tileX < tileSize.x; tileX++) {
+      for (let tileY = 0; tileY < tileSize.y; tileY++) {
+        let {lat,lng} = map.unproject(L.point(startX + tileX, startY + tileY), zoom)
 
         // we first check whether the tile pixel is outside the domain bounding box
         // in that case we skip it as we do not want to extrapolate
@@ -468,17 +482,22 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
    * @param {Integer} startY
    * @param {ndarray} vals Range values.
    */
-  _drawProjectedCRSWithAnyMapProjection (setPixel, tileSize, startX, startY, vals) {
+  _drawProjectedCRSWithAnyMapProjection (setPixel, coords, vals) {
     let map = this._map
     let X = this.domain.axes.get(this._projX).values
     let Y = this.domain.axes.get(this._projY).values
     let bbox = this._getDomainBbox()
     
     let proj = this.projection
+
+    let tileSize = this.getTileSize()
+    let startX = coords.x * tileSize.x
+    let startY = coords.y * tileSize.y
+    let zoom = coords.z
     
-    for (let tileX = 0; tileX < tileSize; tileX++) {
-      for (let tileY = 0; tileY < tileSize; tileY++) {
-        let {lat,lng} = map.unproject(L.point(startX + tileX, startY + tileY))
+    for (let tileX = 0; tileX < tileSize.x; tileX++) {
+      for (let tileY = 0; tileY < tileSize.y; tileY++) {
+        let {lat,lng} = map.unproject(L.point(startX + tileX, startY + tileY), zoom)
         let {x,y} = proj.project({lat, lon: lng})
 
         // we first check whether the tile pixel is outside the domain bounding box
@@ -506,29 +525,34 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
    * @param {Integer} startY
    * @param {ndarray} vals Range values.
    */
-  _drawProjectedCRSWithRectilinearMapProjection (setPixel, tileSize, startX, startY, vals) {
+  _drawProjectedCRSWithRectilinearMapProjection (setPixel, coords, vals) {
     let map = this._map
     let X = this.domain.axes.get(this._projX).values
     let Y = this.domain.axes.get(this._projY).values
     let bbox = this._getDomainBbox()
     
     let proj = this.projection
+
+    let tileSize = this.getTileSize()
+    let startX = coords.x * tileSize.x
+    let startY = coords.y * tileSize.y
+    let zoom = coords.z
     
     // since the map projection is a rectilinear lat/lon grid,
     // we only have to unproject the the first row and column to get the lat/lon coordinates of all tile pixels
-    let lons = new Float64Array(tileSize)
-    for (let tileX = 0; tileX < tileSize; tileX++) {
-      let {lng} = map.unproject(L.point(startX + tileX, startY))
+    let lons = new Float64Array(tileSize.x)
+    for (let tileX = 0; tileX < tileSize.x; tileX++) {
+      let {lng} = map.unproject(L.point(startX + tileX, startY), zoom)
       lons[tileX] = lng
     }
-    let lats = new Float64Array(tileSize)
-    for (let tileY = 0; tileY < tileSize; tileY++) {
-      let {lat} = map.unproject(L.point(startX, startY + tileY))
+    let lats = new Float64Array(tileSize.y)
+    for (let tileY = 0; tileY < tileSize.y; tileY++) {
+      let {lat} = map.unproject(L.point(startX, startY + tileY), zoom)
       lats[tileY] = lat
     }    
     
-    for (let tileX = 0; tileX < tileSize; tileX++) {
-      for (let tileY = 0; tileY < tileSize; tileY++) {
+    for (let tileX = 0; tileX < tileSize.x; tileX++) {
+      for (let tileY = 0; tileY < tileSize.y; tileY++) {
         let lat = lats[tileY]
         let lon = lons[tileX]
         let {x,y} = proj.project({lat, lon})
@@ -552,7 +576,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
    * Draws a geodetic rectilinear domain grid on a map whose grid is, or can be directly
    * mapped to, a geodetic rectilinear grid.
    */
-  _drawGeodeticCRSWithRectilinearMapProjection (setPixel, tileSize, startX, startY, vals) {
+  _drawGeodeticCRSWithRectilinearMapProjection (setPixel, coords, vals) {
     // optimized version for map projections that are equal to a rectilinear geodetic grid
     // this can be used when lat and lon can be computed independently for a given pixel
 
@@ -567,18 +591,23 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     }
       
     let lonRange = [bbox[0], bbox[0] + 360]
+
+    let tileSize = this.getTileSize()
+    let startX = coords.x * tileSize.x
+    let startY = coords.y * tileSize.y
+    let zoom = coords.z
     
-    var latCache = new Float64Array(tileSize)
-    var iLatCache = new Uint32Array(tileSize)
-    for (let tileY = 0; tileY < tileSize; tileY++) {
-      var lat = map.unproject(L.point(startX, startY + tileY)).lat
+    var latCache = new Float64Array(tileSize.y)
+    var iLatCache = new Uint32Array(tileSize.y)
+    for (let tileY = 0; tileY < tileSize.y; tileY++) {
+      var lat = map.unproject(L.point(startX, startY + tileY), zoom).lat
       latCache[tileY] = lat
       // find the index of the closest latitude in the grid using simple binary search
       iLatCache[tileY] = indexOfNearest(y, lat)
     }
 
-    for (let tileX = 0; tileX < tileSize; tileX++) {
-      let lon = map.unproject(L.point(startX + tileX, startY)).lng
+    for (let tileX = 0; tileX < tileSize.x; tileX++) {
+      let lon = map.unproject(L.point(startX + tileX, startY), zoom).lng
       lon = wrapLongitude(lon, lonRange)
       if (lon < bbox[0] || lon > bbox[2]) {
         continue
@@ -588,7 +617,7 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
       // (as there is no discontinuity)
       let iLon = indexOfNearest(x, lon)
 
-      for (let tileY = 0; tileY < tileSize; tileY++) {
+      for (let tileY = 0; tileY < tileSize.y; tileY++) {
         // get geographic coordinates of tile pixel
         let lat = latCache[tileY]
 
@@ -633,20 +662,11 @@ export default class Grid extends PaletteMixin(CoverageMixin(L.TileLayer.Canvas)
     // we check getContainer() to prevent errors when trying to redraw when the layer has not
     // fully initialized yet
     if (this.getContainer()) {
-      L.TileLayer.Canvas.prototype.redraw.call(this)
+      L.GridLayer.prototype.redraw.call(this)
     }
   }
 }
 
 function wrapLongitude (lon, range) {
-  return wrapNum(lon, range, true)
-}
-
-//stolen from https://github.com/Leaflet/Leaflet/blob/master/src/core/Util.js
-//doesn't exist in current release (0.7.3)
-function wrapNum (x, range, includeMax) {
-  var max = range[1]
-  var min = range[0]
-  var d = max - min
-  return x === max && includeMax ? x : ((x - min) % d + d) % d + min
+  return L.Util.wrapNum(lon, range, true)
 }

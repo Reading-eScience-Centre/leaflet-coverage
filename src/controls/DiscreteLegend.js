@@ -68,7 +68,7 @@ export default class DiscreteLegend extends L.Control {
     }   
 
     if (covLayer.on) {
-      this._remove = () => this.removeFrom(this._map)
+      this._remove = () => this.remove()
       this._update = () => this._doUpdate(false)
       covLayer.on('remove', this._remove)
     }

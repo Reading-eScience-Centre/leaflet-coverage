@@ -54,15 +54,10 @@ export default class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGrou
       .then(() => this.initializePalette())
       .then(() => {
         this._addTrajectoryLayers()
-        this.fire('add')
+        this.fire('afterAdd')
       })
   }
-  
-  onRemove (map) {
-    this.fire('remove')
-    super.onRemove(map)
-  }
-  
+    
   get coverage () {
     return this.cov
   }

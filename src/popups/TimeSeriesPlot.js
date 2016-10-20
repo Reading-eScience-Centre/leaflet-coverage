@@ -1,7 +1,6 @@
 import L from 'leaflet'
 import c3 from 'c3'
-
-import {getLanguageString, stringifyUnit, loadProjection, getHorizontalCRSComponents} from 'covutils'
+import {getLanguageString, stringifyUnit} from 'covutils'
 
 // TODO DRY: nearly identical to VerticalProfilePlot
 
@@ -82,19 +81,16 @@ export default class TimeSeriesPlot extends L.Popup {
    * @ignore
    */
   onAdd (map) {
+    super.onAdd(map)
     map.fire('dataloading')
     let domainPromise = Promise.all(this._covs.map(cov => cov.loadDomain()))
     let rangePromise = Promise.all(this._covs.map(cov => cov.loadRanges(this._paramKeys.get(cov))))
     Promise.all([domainPromise, rangePromise]).then(([domains, ranges]) => {
       this._domains = domains
       this._ranges = ranges
-      ;[this._projX, this._projY] = getHorizontalCRSComponents(domains[0])
-      return loadProjection(domains[0])
-    }).then(proj => {
-      this.projection = proj
       this._addPlotToPopup()
-      super.onAdd(map)
-      this.fire('add')
+      this.fire('dataLoad')
+      this.fire('afterAdd')
       map.fire('dataload')
     }).catch(e => {
       console.error(e)
@@ -104,19 +100,11 @@ export default class TimeSeriesPlot extends L.Popup {
   }
   
   _addPlotToPopup () {
-    if (!this.getLatLng()) {
-      // in case bindPopup is not used and the caller did not set a position
-      let x = this._domains[0].axes.get(this._projX).values[0]
-      let y = this._domains[0].axes.get(this._projY).values[0]
-      let latlng = this.projection.unproject({x, y})
-      this.setLatLng(L.latLng(latlng))
-    }
-    
     // display first parameter group
     let paramKeyGroup = this._paramKeyGroups[0]    
     let plot = this._getPlotElement(paramKeyGroup)
     
-    let el = document.createElement('span')
+    let el = document.createElement('div')
     
     // display dropdown if multiple parameter groups
     if (this._paramKeyGroups.length > 1) {
@@ -202,8 +190,14 @@ export default class TimeSeriesPlot extends L.Popup {
       columns.push(y)
     }
     
+    let height = 300
     
     let el = document.createElement('div')
+    
+    // work-around, otherwise popup is too small
+    el.style.width = this.options.maxWidth + 'px'
+    el.style.height = height + 'px'
+
     c3.generate({
       bindto: el,
       data: {
@@ -254,7 +248,7 @@ export default class TimeSeriesPlot extends L.Popup {
         rescale: true
       },
       size: {
-        height: 300,
+        height: height,
         width: this.options.maxWidth
       }
     })

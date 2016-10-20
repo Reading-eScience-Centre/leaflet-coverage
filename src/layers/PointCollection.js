@@ -10,7 +10,7 @@ import {kdTree} from '../util/kdTree.js'
  * A collection of points sharing the same parameters / referencing.
  * 
  */
-export default class PointCollection extends PaletteMixin(EventMixin(L.Class)) {
+export default class PointCollection extends PaletteMixin(L.Layer) {
   constructor (covcoll, options) {
     super()
     
@@ -67,6 +67,10 @@ export default class PointCollection extends PaletteMixin(EventMixin(L.Class)) {
       this._layerGroup.addLayer(layer)
       this._layers.push(layer)
       layer.load()
+      if (this._popupFn) {
+        let popup = this._popupFn(layer.coverage)
+        layer.bindPopup(popup)
+      }
     }
     
   }
@@ -75,24 +79,10 @@ export default class PointCollection extends PaletteMixin(EventMixin(L.Class)) {
     map.removeLayer(this._layerGroup)
     this._layerGroup = L.layerGroup()
     this._layers = []
-    this.fire('remove')
   }
   
   bindPopupEach (fn) {
-    if (this._clickListenerPopup) {
-      this.off('click', this._clickListenerPopup)
-      this.off('remove', this._removeListenerPopup)
-    }
-    this._clickListenerPopup = e => {
-      let popup = fn(e.coverage)
-      this._map.openPopup(popup)
-      this._popup = popup
-    }
-    this._removeListenerPopup = () => {
-      this._map.closePopup(this._popup)
-    }
-    this.on('click', this._clickListenerPopup)
-    this.on('remove', this._removeListenerPopup)
+    this._popupFn = fn
   }
   
   _attachListeners (layer, cov) {
@@ -115,7 +105,7 @@ export default class PointCollection extends PaletteMixin(EventMixin(L.Class)) {
         this._initKdtree()
         this.initializePalette().then(() => {
           this._layerGroup.addTo(this._map)
-          this.fire('add')
+          this.fire('afterAdd')
         })
       }
     }
