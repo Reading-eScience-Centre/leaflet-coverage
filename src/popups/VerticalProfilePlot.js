@@ -1,6 +1,6 @@
 import L from 'leaflet'
 import c3 from 'c3'
-import {getLanguageString, stringifyUnit, getReferenceObject, loadProjection, getHorizontalCRSComponents} from 'covutils'
+import {getLanguageString, stringifyUnit, getReferenceObject} from 'covutils'
 
 /**
  * Displays a popup with an interactive plot showing the data
@@ -30,10 +30,7 @@ export default class VerticalProfilePlot extends L.Popup {
    */
   constructor (coverage, options = {}) {
     options.maxWidth = options.maxWidth || 350
-    options.autoPan = false
     super(options)
-    this.setLatLng([0,0])
-    this.setContent('')
     this._covs = Array.isArray(coverage) ? coverage : [coverage]
     this._language = options.language
     this._precision = options.precision || 4
@@ -87,11 +84,6 @@ export default class VerticalProfilePlot extends L.Popup {
     Promise.all([domainPromise, rangePromise]).then(([domains, ranges]) => {
       this._domains = domains
       this._ranges = ranges
-      ;[this._projX, this._projY] = getHorizontalCRSComponents(domains[0])
-      return loadProjection(domains[0])
-    }).then(proj => {
-      this.projection = proj
-      this._setPositionIfMissing()
       this._addPlotToPopup()
       this.fire('dataLoad', { init: true })
       map.fire('dataload')
@@ -102,18 +94,6 @@ export default class VerticalProfilePlot extends L.Popup {
     })
   }
   
-  _setPositionIfMissing () {
-    let pos = this.getLatLng()
-    // hacky
-    if (pos.lat === 0 && pos.lng === 0) {
-      // in case bindPopup is not used and the caller did not set a position
-      let x = this._domains[0].axes.get(this._projX).values[0]
-      let y = this._domains[0].axes.get(this._projY).values[0]
-      let latlng = this.projection.unproject({x, y})
-      this.setLatLng(L.latLng(latlng))
-    }
-  }
-
   _addPlotToPopup () {    
     // display first parameter group
     let paramKeyGroup = this._paramKeyGroups[0]    
