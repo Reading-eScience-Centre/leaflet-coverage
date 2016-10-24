@@ -1,4 +1,10 @@
-# leaflet-coverage [![Build Status](https://travis-ci.org/Reading-eScience-Centre/leaflet-coverage.svg?branch=master)](https://travis-ci.org/Reading-eScience-Centre/leaflet-coverage)
+# leaflet-coverage
+
+[![NPM version](http://img.shields.io/npm/v/leaflet-coverage.svg)](https://npmjs.org/package/leaflet-coverage) 
+[![dependencies Status](https://david-dm.org/Reading-eScience-Centre/leaflet-coverage/status.svg)](https://david-dm.org/Reading-eScience-Centre/leaflet-coverage)
+[![devDependencies Status](https://david-dm.org/Reading-eScience-Centre/leaflet-coverage/dev-status.svg)](https://david-dm.org/reading-escience-centre/leaflet-coverage?type=dev)
+[![Build Status](https://travis-ci.org/Reading-eScience-Centre/leaflet-coverage.svg?branch=master)](https://travis-ci.org/Reading-eScience-Centre/leaflet-coverage)
+[![Inline docs](http://inch-ci.org/github/Reading-eScience-Centre/leaflet-coverage.svg?branch=master)](http://inch-ci.org/github/Reading-eScience-Centre/leaflet-coverage)
 
 A [Leaflet](http://leafletjs.com/) plugin for visualizing [coverage data](https://en.wikipedia.org/wiki/Coverage_data) (numerical or categorical data varying in space and time) with the help of the [JavaScript Coverage Data API](https://github.com/Reading-eScience-Centre/coverage-jsapi). Currently, it supports most domain types defined within [CoverageJSON](https://covjson.org):
 Grid, Point, PointSeries, Trajectory, VerticalProfile, PolygonSeries, MultiPolygon. Additionally, it supports Point and VerticalProfile collections for a more convenient handling of such coverage collections.
