@@ -7,20 +7,20 @@ import {PaletteMixin} from './PaletteMixin.js'
 import {CoverageMixin} from './CoverageMixin.js'
   
 /**
- * Renderer for Coverages and Domains with (domain) profile Grid.
+ * Renderer for Coverages and Domains following the `Grid` domain type of CovJSON.
  * For Domain objects, a dummy parameter and range data is created.
  * 
- * Events:
- * "afterAdd" - Layer is initialized and was added to the map
- * "remove" - Layer is removed from the map
- * "dataLoading" - Data loading has started
- * "dataLoad" - Data loading has finished (also in case of errors)
- * "error" - Error when loading data
- * "paletteChange" - Palette has changed
- * "paletteExtentChange" - Palette extent has changed
- * "axisChange" - Axis coordinate has changed (e.axis === 'time'|'vertical')
- * "remove" - Layer is removed from the map
+ * @emits {DataLayer#afterAdd} Layer is initialized and was added to the map
+ * @emits {DataLayer#dataLoading} Data loading has started
+ * @emits {DataLayer#dataLoad} Data loading has finished (also in case of errors)
+ * @emits {DataLayer#error} Error when loading data
+ * @emits {DataLayer#axisChange} Axis coordinate has changed (e.axis === 'time'|'vertical')
+ * @emits {PaletteMixin#paletteChange} Palette has changed
+ * @emits {PaletteMixin#paletteExtentChange} Palette extent has changed
  * 
+ * @extends {L.GridLayer}
+ * @extends {CoverageMixin}
+ * @extends {PaletteMixin}
  */
 export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
   
@@ -38,10 +38,21 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
    *   time: new Date('2015-01-01T12:00:00Z'),
    *   vertical: 50,
    *   palette: C.linearPalette(['#FFFFFF', '#000000']),
-   *   paletteExtent: 'full' // or 'subset' (time/vertical), 'fov' (map field of view), or specific: [-10,10]
+   *   paletteExtent: 'subset'
    * })
+   * 
+   * @param {Coverage|Domain} cov The coverage or domain object to visualize.
+   * @param {Object} [options] The options object.
+   * @param {Array<string>} [options.keys] The key of the parameter to display, not needed for domain objects.
+   * @param {Date} [options.time] The initial time slice to display, defaults to the first one.
+   * @param {number} [options.vertical] The initial vertical slice to display, defaults to the first one.
+   * @param {Palette} [options.palette] The initial color palette to use, the default depends on the parameter type.
+   * @param {string} [options.paletteExtent='subset'] The initial palette extent, one of 
+   *  `subset` (computed from data of current time/vertical slice),
+   *  `fov` (computed from data in map field of view; not implemented yet),
+   *  or specific: [-10,10].
    */
-  constructor (cov, options) {
+  constructor (cov, options={}) {
     super()
     
     if (isDomain(cov)) {
@@ -55,16 +66,26 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
     
     L.Util.setOptions(this, options)
     
-    this.cov = cov
-    this.param = cov.parameters.get(options.keys[0])
+    this._cov = cov
+    this._param = cov.parameters.get(options.keys[0])
     this._axesSubset = { // x and y are not subsetted
         t: {coordPref: options.time ? options.time.toISOString() : undefined},
         z: {coordPref: options.vertical}
     }
+
+    /**
+     * The vertical reference system object, used by {@link VerticalAxis}.
+     * @type {Object}
+     */
+    this.crsVerticalAxis = undefined
   }
   
+  /**
+   * @ignore
+   * @override
+   */
   onAdd (map) {
-    // "loading" and "load" events are provided by the underlying TileLayer class
+    // "loading" and "load" events are provided by the underlying GridLayer class
     this._map = map
 
     this.load()
@@ -82,27 +103,39 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
         }
       })
       .then(() => {
-        this.errored = false
+        this._errored = false
         super.onAdd(map)
         this.fire('afterAdd')
       })
       .catch(e => {
-        this.errored = true
+        this._errored = true
         console.log(e)
         super.onAdd(map)
       })
   }
-    
+  
+  /**
+   * @ignore
+   * @override
+   */
   onRemove (map) {
     delete this._map
     // TODO delete references to domain/range, caching logic should happen elsewhere
     super.onRemove(map)
   }
-    
+  
+  /**
+   * Returns the geographic bounds of the coverage.
+   * 
+   * For projected coverages this is an approximation based on unprojecting the four bounding box corners
+   * and fitting all four points into a geographic bounding box.
+   * 
+   * @returns {L.LatLngBounds}
+   */
   getBounds () {
     let bbox
-    if (this.cov.bbox) {
-      bbox = this.cov.bbox
+    if (this._cov.bbox) {
+      bbox = this._cov.bbox
     } else {
       bbox = this._getDomainBbox()
       let proj = this.projection
@@ -125,7 +158,7 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
    * which is regarded as a preference and does not have to exactly match a coordinate.
    * 
    * The return value is a promise that succeeds with an empty result and
-   * sets this.subsetCov to the subsetted coverage.
+   * sets this._subsetCov to the subsetted coverage.
    * The subsetting always fixes a single time and vertical slice, choosing the first
    * axis value if no preference was given.
    * 
@@ -147,18 +180,18 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
     }
     
     this.fire('dataLoading') // for supporting loading spinners
-    return this.cov.subsetByValue(spec)
+    return this._cov.subsetByValue(spec)
       .then(subsetCov => {
-        this.subsetCov = subsetCov
+        this._subsetCov = subsetCov
         //  the goal is to avoid reloading data when approximating palette extent via subsetting
         //  but: memory has to be freed when the layer is removed from the map
         //      -> therefore cacheRanges is set on subsetCov whose reference is removed on onRemove
         subsetCov.cacheRanges = true
-        return Promise.all([subsetCov.loadDomain(), subsetCov.loadRange(this.param.key)])
+        return Promise.all([subsetCov.loadDomain(), subsetCov.loadRange(this._param.key)])
       })
       .then(([subsetDomain, subsetRange]) => {
-        this.subsetDomain = subsetDomain
-        this.subsetRange = subsetRange
+        this._subsetDomain = subsetDomain
+        this._subsetRange = subsetRange
         this.fire('dataLoad')
       })
       .catch(e => {
@@ -167,17 +200,29 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
       })
   }
   
+  /**
+   * The coverage object associated to this layer.
+   * 
+   * @type {Coverage}
+   */
   get coverage () {
-    return this.cov
+    return this._cov
   }
   
+  /**
+   * The parameter that is visualized.
+   * 
+   * @type {Parameter}
+   */
   get parameter () {
-    return this.param
+    return this._param
   }
   
   /**
    * Sets the currently active time to the one closest to the given Date object.
    * Throws an exception if there is no time axis.
+   * 
+   * @type {Date}
    */
   set time (val) {
     if (!this.domain.axes.has('t')) {
@@ -195,14 +240,21 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
   /**
    * The currently active time on the temporal axis as Date object, 
    * or undefined if the grid has no time axis.
+   * 
+   * @type {Date}
    */
   get time () {
     if (this.domain.axes.has('t')) {
-      let time = this.subsetDomain.axes.get('t').values[0]
+      let time = this._subsetDomain.axes.get('t').values[0]
       return new Date(time)
     }
   }
   
+  /**
+   * The time slices that make up the coverage, or undefined if the grid has no time axis .
+   * 
+   * @type {Array<Date>|undefined}
+   */
   get timeSlices () {
     if (this.domain.axes.has('t')) {
       return this.domain.axes.get('t').values.map(t => new Date(t))
@@ -211,6 +263,8 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
   
   /**
    * Sets the currently active vertical coordinate to the one closest to the given value.
+   * 
+   * @type {number}
    */
   set vertical (val) {
     if (!this.domain.axes.has('z')) {
@@ -228,14 +282,21 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
   /**
    * The currently active vertical coordinate as a number, 
    * or undefined if the grid has no vertical axis.
+   * 
+   * @type {number|undefined}
    */
   get vertical () {
     if (this.domain.axes.has('z')) {
-      let val = this.subsetDomain.axes.get('z').values[0]
+      let val = this._subsetDomain.axes.get('z').values[0]
       return val
     }
   }
   
+  /**
+   * The vertical slices that make up the coverage, or undefined if the grid has no vertical axis .
+   * 
+   * @type {Array<number>|undefined}
+   */
   get verticalSlices () {
     if (this.domain.axes.has('z')) {
       let vals = this.domain.axes.get('z').values
@@ -247,16 +308,21 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
     }
   }
   
+  /**
+   * See {@link PaletteMixin}.
+   * 
+   * @ignore
+   */
   computePaletteExtent (extent) {
     if (extent === 'subset') {
       // scan the current subset for min/max values
       
-      let xlen = this.subsetRange.shape.get(this._projX)
-      let ylen = this.subsetRange.shape.get(this._projY)
+      let xlen = this._subsetRange.shape.get(this._projX)
+      let ylen = this._subsetRange.shape.get(this._projY)
 
       // check if subsetted size is manageable
       if (xlen * ylen < 1000*1000) {
-        extent = minMaxOfRange(this.subsetRange)
+        extent = minMaxOfRange(this._subsetRange)
         extent = enlargeExtentIfEqual(extent)
         return Promise.resolve(extent)
       } else {
@@ -266,9 +332,9 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
         let xconstraint = {start: 0, stop: xlen, step: Math.max(Math.round(xlen/1000), 1)}
         let yconstraint = {start: 0, stop: ylen, step: Math.max(Math.round(ylen/1000), 1)}
         
-        return this.subsetCov.subsetByIndex({[this._projX]: xconstraint, [this._projY]: yconstraint})        
+        return this._subsetCov.subsetByIndex({[this._projX]: xconstraint, [this._projY]: yconstraint})        
           .then(subsetCov => {
-            return subsetCov.loadRange(this.param.key).then(subsetRange => {
+            return subsetCov.loadRange(this._param.key).then(subsetRange => {
                let [min,max] = minMaxOfRange(subsetRange)
                let buffer = (max-min)*0.1 // 10% buffer on each side
                extent = [min-buffer, max+buffer]
@@ -291,6 +357,9 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
   /**
    * Return the displayed value at a given geographic position.
    * If out of bounds, then undefined is returned, otherwise a number or null (for no data).
+   * 
+   * @param {L.LatLng} latlng
+   * @returns {number|null|undefined}
    */
   getValueAt (latlng) {
     let X = this.domain.axes.get(this._projX).values
@@ -309,9 +378,16 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
     let iy = indexOfNearest(Y, y)
     let ix = indexOfNearest(X, x)
 
-    return this.subsetRange.get({[this._projY]: iy, [this._projX]: ix})
+    return this._subsetRange.get({[this._projY]: iy, [this._projX]: ix})
   }
 
+  /**
+   * @ignore
+   * @override
+   * 
+   * @param {L.Point} coords The tile coordinates (with z being zoom level).
+   * @return {HTMLCanvasElement}
+   */
   createTile (coords) {
     let tile = L.DomUtil.create('canvas', 'leaflet-tile')
 
@@ -324,9 +400,15 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
 
     return tile
   }
-    
+  
+  /**
+   * @ignore
+   * 
+   * @param {HTMLCanvasElement} The canvas to draw on.
+   * @param {L.Point} coords The tile coordinates (with z being zoom level).
+   */
   drawTile (canvas, coords) {
-    if (this.errored) return
+    if (this._errored) return
     
     let ctx = canvas.getContext('2d')
     let tileSize = this.getTileSize()
@@ -348,7 +430,7 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
       }
     }
     
-    let vals = this.subsetRange.get
+    let vals = this._subsetRange.get
     
     if (this._isDomainUsingEllipsoidalCRS()) {
       if (this._isRectilinearGeodeticMap()) {
@@ -374,7 +456,8 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
   
   /**
    * Derives the bounding box of the x,y CRS axes in domain CRS coordinates.
-   * @returns {Array} [xmin,ymin,xmax,ymax]
+   * 
+   * @return {Array} [xmin,ymin,xmax,ymax]
    */
   _getDomainBbox () {
     let extent = (x, xBounds) => {
@@ -414,10 +497,8 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
    * 
    * @param {Function} setPixel A function with parameters (y,x,val) which 
    *                            sets the color of a pixel on a tile.
-   * @param {Integer} tileSize Size of a tile in pixels.
-   * @param {Integer} startX
-   * @param {Integer} startY
-   * @param {ndarray} vals Range values.
+   * @param {L.Point} coords The tile coordinates.
+   * @param {function(idx: Object): number|null} vals Range value function.
    */
   _drawGeodeticCRSWithAnyMapProjection (setPixel, coords, vals) {
     // usable for any map projection, but computationally more intensive
@@ -477,10 +558,8 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
    * 
    * @param {Function} setPixel A function with parameters (y,x,val) which 
    *                            sets the color of a pixel on a tile.
-   * @param {Integer} tileSize Size of a tile in pixels.
-   * @param {Integer} startX
-   * @param {Integer} startY
-   * @param {ndarray} vals Range values.
+   * @param {L.Point} coords The tile coordinates.
+   * @param {function(idx: Object): number|null} vals Range value function.
    */
   _drawProjectedCRSWithAnyMapProjection (setPixel, coords, vals) {
     let map = this._map
@@ -520,10 +599,8 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
    * 
    * @param {Function} setPixel A function with parameters (y,x,val) which 
    *                            sets the color of a pixel on a tile.
-   * @param {Integer} tileSize Size of a tile in pixels.
-   * @param {Integer} startX
-   * @param {Integer} startY
-   * @param {ndarray} vals Range values.
+   * @param {L.Point} coords The tile coordinates.
+   * @param {function(idx: Object): number|null} vals Range value function.
    */
   _drawProjectedCRSWithRectilinearMapProjection (setPixel, coords, vals) {
     let map = this._map
@@ -575,6 +652,11 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
   /**
    * Draws a geodetic rectilinear domain grid on a map whose grid is, or can be directly
    * mapped to, a geodetic rectilinear grid.
+   * 
+   * @param {Function} setPixel A function with parameters (y,x,val) which 
+   *                            sets the color of a pixel on a tile.
+   * @param {L.Point} coords The tile coordinates.
+   * @param {function(idx: Object): number|null} vals Range value function.
    */
   _drawGeodeticCRSWithRectilinearMapProjection (setPixel, coords, vals) {
     // optimized version for map projections that are equal to a rectilinear geodetic grid
@@ -657,7 +739,11 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
   _isDomainUsingEllipsoidalCRS () {
     return this.domain.referencing.some(ref => isEllipsoidalCRS(ref.system))
   }
-      
+  
+  /**
+   * @ignore
+   * @override
+   */
   redraw () {
     // we check getContainer() to prevent errors when trying to redraw when the layer has not
     // fully initialized yet

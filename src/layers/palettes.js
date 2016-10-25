@@ -1,4 +1,14 @@
 /**
+ * The `change` event, signalling that a different vertical coordinate value has been selected.
+ * 
+ * @typedef {Object} Palette
+ * @property {number} steps The number of colors in the palette.
+ * @property {Array<number>} red Array of integers in [0,255] of length `steps`.
+ * @property {Array<number>} green Array of integers in [0,255] of length `steps`.
+ * @property {Array<number>} blue Array of integers in [0,255] of length `steps`.
+ */
+
+/**
  * Returns a linearly interpolated palette out of CSS colors.
  * 
  * @example
@@ -7,9 +17,7 @@
  * 
  * @param {Array<string>} colors An array of CSS colors.
  * @param {number} [steps=256] The number of palette colors to generate.
- * @return {object}
- *   An object with members <code>steps</code>, <code>red</code>,
- *   <code>green</code>, and <code>blue</code>.
+ * @return {Palette}
  */
 export function linearPalette (colors, steps=256) {
   if (steps === 1) {
@@ -57,9 +65,7 @@ export function linearPalette (colors, steps=256) {
  * // bw.steps == 2
  * 
  * @param {Array<string>} colors An array of CSS colors.
- * @return {object}
- *   An object with members <code>steps</code>, <code>red</code>,
- *   <code>green</code>, and <code>blue</code>.
+ * @return {Palette}
  */
 export function directPalette (colors) {
   var canvas = document.createElement('canvas')
@@ -104,6 +110,8 @@ export function directPalette (colors) {
  * {
  *   "colors": ["red", "blue", ..]
  * }
+ * 
+ * @return {Palette}
  */
 export function paletteFromObject (paletteSpec) {
   if (!paletteSpec) {
@@ -191,7 +199,7 @@ export class PaletteManager {
    * palettes.add('mycustom', {red: [0,255], green: [0,0], blue: [10,20]}) // different syntax
    * 
    * @param {string} name The unique name of the palette.
-   * @param {object|Array<string>} palette A palette object or an array of CSS colors.
+   * @param {Palette|Array<string>} palette A palette object or an array of CSS colors.
    */
   add (name, palette) {
     if (Array.isArray(palette)) {
@@ -230,6 +238,9 @@ export class PaletteManager {
    * Return the palette stored under the given name, or throw an error if not found.
    * The palette is an object with properties steps, red, green, and blue.
    * Each of the color arrays is an Uint8Array of length steps.
+   * 
+   * @param {string} name The unique name of the palette
+   * @returns {Palette}
    */
   get (name) {
     var palette = this._palettes.get(name)

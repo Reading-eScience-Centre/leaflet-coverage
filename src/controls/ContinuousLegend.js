@@ -56,6 +56,8 @@ const DEFAULT_TEMPLATE = `<template id="${DEFAULT_TEMPLATE_ID}">
  * // change the palette and trigger a manual update
  * fakeLayer.palette = C.linearPalette(['blue', 'red'])
  * legend.update()
+ * 
+ * @extends {L.Control}
  */
 export class ContinuousLegend extends L.Control {
   
@@ -73,15 +75,15 @@ export class ContinuousLegend extends L.Control {
    * @param {object} [options] Legend options.
    * @param {string} [options.position='bottomright'] The initial position of the control (see Leaflet docs).
    * @param {string} [options.language] A language tag, indicating the preferred language to use for labels.
-   * @param {string} [options.id] Uses the HTML element with the given id as template.
+   * @param {string} [options.templateId] Uses the HTML element with the given id as template.
    */
   constructor (covLayer, options = {}) {
     super({position: options.position || 'bottomright'})
     this._covLayer = covLayer
-    this._id = options.id || DEFAULT_TEMPLATE_ID
+    this._templateId = options.templateId || DEFAULT_TEMPLATE_ID
     this._language = options.language
     
-    if (!options.id && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
+    if (!options.templateId && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
       inject(DEFAULT_TEMPLATE)
     }   
 
@@ -131,6 +133,7 @@ export class ContinuousLegend extends L.Control {
   }
   
   /**
+   * @override
    * @ignore
    */
   onAdd (map) {
@@ -141,12 +144,13 @@ export class ContinuousLegend extends L.Control {
       this._covLayer.on('paletteExtentChange', this._update)
     }
     
-    this._el = fromTemplate(this._id)
+    this._el = fromTemplate(this._templateId)
     this.update()
     return this._el
   }
   
   /**
+   * @override
    * @ignore
    */
   onRemove () {

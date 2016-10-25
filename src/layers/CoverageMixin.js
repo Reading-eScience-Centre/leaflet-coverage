@@ -16,8 +16,6 @@ import {loadProjection, getHorizontalCRSComponents} from 'covutils'
  * 
  * @param {class} base The base class.
  * @return {class} The base class with CoverageMixin.
- * 
- * @private
  */
 export function CoverageMixin (base) {
   return class extends base {

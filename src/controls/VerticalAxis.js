@@ -5,6 +5,13 @@ import {EventMixin} from '../util/EventMixin.js'
 import {getLanguageString, stringifyUnit} from 'covutils'
 
 /**
+ * The `change` event, signalling that a different vertical coordinate value has been selected.
+ * 
+ * @typedef {L.Event} VerticalAxis#change
+ * @property {number} vertical The vertical coordinate value that has been selected.
+ */
+
+/**
  * Displays a simple vertical coordinate dropdown selector for a coverage data layer.
  * 
  * @example <caption>Coverage data layer</caption>
@@ -32,28 +39,33 @@ import {getLanguageString, stringifyUnit} from 'covutils'
  * // change the height and trigger a manual update
  * fakeLayer.vertical = heights[0]
  * verticalAxis.update()
+ * 
+ * @extends {L.Layer}
+ * 
+ * @emits {VerticalAxis#change} when a different entry has been selected
  */
-export default class VerticalAxis extends L.Layer {
+export class VerticalAxis extends L.Layer {
   
   /**
-   * Creates a time axis control.
+   * Creates a vertical axis control.
    * 
    * @param {object} covLayer 
-   *   The coverage data layer, or any object with <code>verticalSlices</code>
-   *   and <code>vertical</code> properties, optionally <code>crsVerticalAxis</code> property.
-   *   If the object has <code>on</code>/<code>off</code> methods, then the control will
-   *   listen for <code>"axisChange"</code> events with <code>{axis: 'vertical'}</code>
+   *   The coverage data layer, or any object with `verticalSlices`
+   *   and `vertical` properties, optionally `crsVerticalAxis` property.
+   *   If the object has `on`/`off` methods, then the control will
+   *   listen for `axisChange` events with `{axis: 'vertical'}`
    *   and update itself automatically.
-   *   If the layer fires a <code>"remove"</code> event, then the control will remove itself
+   *   If the layer fires a `remove` event, then the control will remove itself
    *   from the map.
    * @param {object} [options] Control options.
    * @param {string} [options.position='topleft'] The initial position of the control (see Leaflet docs).
    * @param {string} [options.title='Vertical'] 
-   *   The label to show above the control if <code>covLayer.crsVerticalAxis.name</code> is missing.
-   * 
+   *   The label to show above the control if `covLayer.crsVerticalAxis.name` is missing.
+   * @param {string} [options.templateId] Element ID of an alternative HTML `<template>` element to use. 
    */
   constructor (covLayer, options = {}) {
     super()
+    this._templateId = options.templateId
     this._covLayer = covLayer
     this._title = options.title || 'Vertical'
     this._position = options.position || 'topleft'
@@ -70,6 +82,7 @@ export default class VerticalAxis extends L.Layer {
   
   /**
    * @ignore
+   * @override
    */
   onAdd (map) {
     this._map = map
@@ -95,6 +108,7 @@ export default class VerticalAxis extends L.Layer {
     }
       
     this._dropdown = new Dropdown(choices, {
+      templateId: this._templateId,
       position: this._position,
       title,
       value: this._getVerticalIndex().toString()
@@ -108,6 +122,7 @@ export default class VerticalAxis extends L.Layer {
   
   /**
    * @ignore
+   * @override
    */
   onRemove (map) {
     this._dropdown.remove()
@@ -125,7 +140,7 @@ export default class VerticalAxis extends L.Layer {
   
   /**
    * Triggers a manual update of the vertical axis control based on the
-   * <code>vertical</code> property of the layer.
+   * `vertical` property of the layer.
    * 
    * Useful if the supplied coverage data layer is not a real layer
    * and won't fire the necessary events for automatic updates.

@@ -10,6 +10,18 @@ const DEFAULT_CATEGORICAL_PALETTE = n => {
 }
 
 /**
+ * The `paletteChange` event, signalling that the palette has changed.
+ * 
+ * @typedef {L.Event} PaletteMixin#paletteChange
+ */
+
+/**
+ * The `paletteExtentChange` event, signalling that the palette extent has changed.
+ * 
+ * @typedef {L.Event} PaletteMixin#paletteExtentChange
+ */
+
+/**
  * A mixin that encapsulates the palette logic of a coverage layer,
  * supporting categorical and continuous coverage parameters.
  * 

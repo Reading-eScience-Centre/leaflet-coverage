@@ -1,10 +1,11 @@
 import L from 'leaflet'
 
-import {$$, HTML} from './utils.js'
+import {$$, fromTemplate, HTML} from './utils.js'
 import {EventMixin} from '../util/EventMixin.js'
 
-let TEMPLATE = 
-`<div class="leaflet-coverage-control form-inline" style="clear:none">
+const DEFAULT_TEMPLATE_ID = 'template-coverage-timeaxis'
+const DEFAULT_TEMPLATE = `<template id="${DEFAULT_TEMPLATE_ID}">
+<div class="leaflet-coverage-control form-inline" style="clear:none">
   <strong class="title">Time</strong><br>
   <div class="form-group">
     <select name="date" class="date form-control"></select>
@@ -12,7 +13,15 @@ let TEMPLATE =
   <div class="form-group">
     <select name="time" class="time form-control"></select>
   </div>
-</div>`
+</div>
+</template>`
+
+/**
+ * The `change` event, signalling that a different time entry has been selected.
+ * 
+ * @typedef {L.Event} TimeAxis#change
+ * @property {Date} time The time that has been selected.
+ */
 
 /**
  * Displays a simple date/time picker for a coverage data layer by grouping
@@ -35,6 +44,11 @@ let TEMPLATE =
  * // change the time and trigger a manual update
  * fakeLayer.time = times[0]
  * timeAxis.update()
+ * 
+ * @extends {L.Control}
+ * @extends {EventMixin}
+ * 
+ * @emits {TimeAxis#change} when a different time entry has been selected
  */
 export class TimeAxis extends EventMixin(L.Control) {
   
@@ -42,21 +56,24 @@ export class TimeAxis extends EventMixin(L.Control) {
    * Creates a time axis control.
    * 
    * @param {object} covLayer 
-   *   The coverage data layer, or any object with <code>timeSlices</code>
-   *   and <code>time</code> properties.
-   *   If the object has <code>on</code>/<code>off</code> methods, then the control will
-   *   listen for <code>"axisChange"</code> events with <code>{axis: 'time'}</code>
-   *   and update itself automatically.
-   *   If the layer fires a <code>"remove"</code> event, then the control will remove itself
-   *   from the map.
+   *   The coverage data layer, or any object with `timeSlices` and `time` properties.
+   *   If the object has `on`/`off` methods, then the control will
+   *   listen for `axisChange` events with `{axis: 'time'}` and update itself automatically.
+   *   If the layer fires a `remove` event, then the control will remove itself from the map.
    * @param {object} [options] Control options.
    * @param {string} [options.position='topleft'] The initial position of the control (see Leaflet docs).
    * @param {string} [options.title='Time'] The label to show above the date/time picker.
+   * @param {string} [options.templateId] Element ID of an alternative HTML `<template>` element to use.
    */
   constructor (covLayer, options = {}) {
     super({position: options.position || 'topleft'})
+    this._templateId = options.templateId || DEFAULT_TEMPLATE_ID
     this._title = options.title || 'Time'
     this._covLayer = covLayer
+
+    if (!options.templateId && document.getElementById(DEFAULT_TEMPLATE_ID) === null) {
+      inject(DEFAULT_TEMPLATE)
+    } 
 
     if (covLayer.on) {
       this._remove = () => this.remove()
@@ -89,7 +106,7 @@ export class TimeAxis extends EventMixin(L.Control) {
       this._covLayer.on('axisChange', this._axisListener)
     }
     
-    let el = HTML(TEMPLATE)
+    let el = fromTemplate(this._templateId)
     this._el = el
     L.DomEvent.disableClickPropagation(el)
     
@@ -135,7 +152,7 @@ export class TimeAxis extends EventMixin(L.Control) {
   
   /**
    * Triggers a manual update of the date/time picker based on the
-   * <code>time</code> property of the layer.
+   * `time` property of the layer.
    * 
    * Useful if the supplied coverage data layer is not a real layer
    * and won't fire the necessary events for automatic updates.
