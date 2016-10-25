@@ -46,6 +46,10 @@
  */
 
 /**
+ * @external {L.Draggable} http://leafletjs.com/reference-1.0.0.html#draggable
+ */
+
+/**
  * @external {L.Popup} http://leafletjs.com/reference-1.0.0.html#popup
  */
 

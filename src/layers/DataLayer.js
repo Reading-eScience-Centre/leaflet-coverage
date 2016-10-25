@@ -1,4 +1,10 @@
 /**
+ * A coverage data layer.
+ * 
+ * @typedef {L.Layer} DataLayer
+ */
+
+/**
  * The `afterAdd` event, signalling that the data layer is initialized and was added to the map.
  * Only after this event was fired, other elements like legends or axis controls may be added.
  * The event ensures that the necessary coverage data has been loaded.

@@ -1,13 +1,14 @@
 import L from 'leaflet'
 
 /**
- * Makes L.Popup draggable and proxies all L.Draggable events.
+ * Makes {@link L.Popup} draggable and proxies all {@link L.Draggable} events.
  * 
  * @example
  * let DraggablePopup = DraggablePopupMixin(L.Popup)
  * let popup = new DraggablePopup().setContent('I am draggable!')
  * 
- * @private
+ * @param {class} base The base class.
+ * @return {class} The base class with DraggablePopupMixin.
  */
 export function DraggablePopupMixin (base) {
   return class extends base {

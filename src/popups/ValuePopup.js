@@ -10,21 +10,33 @@ import {getLanguageString as i18n, stringifyUnit, getCategory} from 'covutils'
  * - popup location is changed
  * - coverage layer is added or removed
  * - updateData() is called
+ * 
+ * @extends {L.Popup}
  */
 export class ValuePopup extends L.Popup {
   /**
+   * @param {Object} [options] The options object.
    * @param {number} [options.maxDistanceForPointsInPx=20]
    *   The maximum distance in pixels from the popup location for which point-data values should be included.
-   * @param {Array<CoverageLayer>} [options.layers]
-   *   An initial set of coverage layers.
+   * @param {Array<DataLayer>} [options.layers] An initial set of coverage data layers.
+   * @param {L.Layer} [source] Used to tag the popup with a reference to the Layer to which it refers.
    */
   constructor (options, source) {
     super(options, source)
     let layers = this.options.layers || []
     this._maxDistanceForPointsInPx = this.options.maxDistanceForPointsInPx || 20
+
+    /**
+     * The coverage data layers added to this popup.
+     * 
+     * @type {Set<DataLayer>}
+     */
     this.coverageLayers = new Set(layers.filter(layer => layer.getValueAt))
   }
   
+  /**
+   * @param {DataLayer} layer The data layer to add.
+   */
   addCoverageLayer (layer) {
     if (!layer.getValueAt) return
     this.coverageLayers.add(layer)
@@ -32,23 +44,38 @@ export class ValuePopup extends L.Popup {
     return this
   }
   
+  /**
+   * @param {DataLayer} layer The data layer to remove.
+   */
   removeCoverageLayer (layer) {
     this.coverageLayers.delete(layer)
     this.updateData()
     return this
   }
   
+  /**
+   * @ignore
+   * @override
+   */
   onAdd (map) {
     this._map = map
     super.onAdd(map)
     this.updateData()
   }
   
+  /**
+   * @ignore
+   * @override
+   */
   onRemove (map) {
     super.onRemove(map)
     this._map = null
   }
   
+  /**
+   * @ignore
+   * @override
+   */
   setLatLng (latlng) {
     super.setLatLng(latlng)
     this.updateData()
@@ -58,11 +85,17 @@ export class ValuePopup extends L.Popup {
   /**
    * Returns whether there is any non-missing coverage data at the current popup location.
    * This function only works after the popup has been added to the map.
+   * 
+   * @return {boolean}
    */
   hasData () {
     return this._hasData
   }
-    
+  
+  /**
+   * Updates the popup content from the data layers.
+   * Gets called automatically when `setLatLng` is called.
+   */
   updateData () {
     if (!this._map) return
     let html = ''
