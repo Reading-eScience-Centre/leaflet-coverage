@@ -1,6 +1,6 @@
 import L from 'leaflet'
 
-import EventMixin from '../util/EventMixin.js'
+import {EventMixin} from '../util/EventMixin.js'
 
 /**
  * Default function that checks if two Parameter objects describe
@@ -84,7 +84,7 @@ function defaultMatch (p1, p2) {
  *   paramSync.addLayer(e.target)
  * })
  */
-export default class ParameterSync extends EventMixin(L.Class) {
+export class ParameterSync extends EventMixin(L.Class) {
   
   /**
    * @param {Object} options

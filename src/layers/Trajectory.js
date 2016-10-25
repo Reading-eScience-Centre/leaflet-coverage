@@ -2,8 +2,8 @@ import L from 'leaflet'
 import {isDomain, fromDomain, minMaxOfRange} from 'covutils'
 
 import {enlargeExtentIfEqual} from './palettes.js'
-import CoverageMixin from './CoverageMixin.js'
-import PaletteMixin from './PaletteMixin.js'
+import {CoverageMixin} from './CoverageMixin.js'
+import {PaletteMixin} from './PaletteMixin.js'
 
 import {DEFAULT_COLOR} from './Point.js'
   
@@ -23,7 +23,7 @@ import {DEFAULT_COLOR} from './Point.js'
  * "paletteExtentChange" - Palette extent has changed
  * 
  */
-export default class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGroup)) {
+export class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGroup)) {
   
   // TODO FeatureGroup is not ideal since click events etc should not be blindly propagated
   //    (we use it for now to have getBounds() which LayerGroup misses)

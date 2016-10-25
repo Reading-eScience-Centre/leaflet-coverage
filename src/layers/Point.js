@@ -1,10 +1,10 @@
 import L from 'leaflet'
 import {enlargeExtentIfEqual} from './palettes.js'
 
-import CoverageMixin from './CoverageMixin.js'
-import CircleMarkerMixin from './CircleMarkerMixin.js'
-import PaletteMixin from './PaletteMixin.js'
-import EventMixin from '../util/EventMixin.js'
+import {CoverageMixin} from './CoverageMixin.js'
+import {CircleMarkerMixin} from './CircleMarkerMixin.js'
+import {PaletteMixin} from './PaletteMixin.js'
+import {EventMixin} from '../util/EventMixin.js'
 
 import {isDomain, fromDomain} from 'covutils'
 
@@ -19,7 +19,7 @@ export const DEFAULT_COLOR = 'black'
  * The dot either has a defined standard color, or it uses
  * a palette if a parameter is chosen.
  */
-export default class Point extends PaletteMixin(CircleMarkerMixin(CoverageMixin(L.Layer))) {
+export class Point extends PaletteMixin(CircleMarkerMixin(CoverageMixin(L.Layer))) {
   
   constructor (cov, options) {
     super()

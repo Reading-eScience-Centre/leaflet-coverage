@@ -9,7 +9,7 @@ import {getLanguageString, stringifyUnit, getReferenceObject} from 'covutils'
  * @example
  * layer.bindPopup(new C.VerticalProfilePlot(coverage))
  */
-export default class VerticalProfilePlot extends L.Popup {
+export class VerticalProfilePlot extends L.Popup {
   
   /**
    * Creates a vertical profile plot popup.

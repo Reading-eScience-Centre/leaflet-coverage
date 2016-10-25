@@ -1,11 +1,11 @@
-import PointCollection from './PointCollection.js'
-import VerticalProfile from './VerticalProfile.js'
+import {PointCollection} from './PointCollection.js'
+import {VerticalProfile} from './VerticalProfile.js'
 
 /**
  * A collection of vertical profiles sharing the same parameters / referencing.
  * 
  */
-export default class VerticalProfileCollection extends PointCollection {
+export class VerticalProfileCollection extends PointCollection {
   constructor (covcoll, options) {
     super(covcoll, options)
     

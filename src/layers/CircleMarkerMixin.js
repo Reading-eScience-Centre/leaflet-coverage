@@ -11,7 +11,7 @@ import L from 'leaflet'
  * 
  * @private
  */
-export default function CircleMarkerMixin (base) {
+export function CircleMarkerMixin (base) {
   return class extends base {
   
     /*

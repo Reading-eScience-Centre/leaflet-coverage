@@ -1,7 +1,7 @@
 import L from 'leaflet'
 
 import {$$, HTML} from './utils.js'
-import EventMixin from '../util/EventMixin.js'
+import {EventMixin} from '../util/EventMixin.js'
 
 let TEMPLATE = 
 `<div class="leaflet-coverage-control" style="clear:none">
@@ -12,7 +12,7 @@ let TEMPLATE =
 /**
  * @private
  */
-export default class Dropdown extends EventMixin(L.Control) {
+export class Dropdown extends EventMixin(L.Control) {
   constructor (choices, options) {
     super(options.position ? {position: options.position} : {position: 'topleft'})
     this._title = options.title || ''

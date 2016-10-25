@@ -13,7 +13,7 @@ import {getLanguageString, stringifyUnit} from 'covutils'
  * @example
  * layer.bindPopup(new C.TimeSeriesPlot(coverage))
  */
-export default class TimeSeriesPlot extends L.Popup {
+export class TimeSeriesPlot extends L.Popup {
   
   /**
    * Creates a time series plot popup.

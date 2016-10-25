@@ -1,7 +1,7 @@
 import L from 'leaflet'
 
-import Dropdown from './Dropdown.js'
-import EventMixin from '../util/EventMixin.js'
+import {Dropdown} from './Dropdown.js'
+import {EventMixin} from '../util/EventMixin.js'
 import {getLanguageString, stringifyUnit} from 'covutils'
 
 /**

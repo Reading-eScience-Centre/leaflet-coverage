@@ -57,7 +57,7 @@ const DEFAULT_TEMPLATE = `<template id="${DEFAULT_TEMPLATE_ID}">
  * fakeLayer.palette = C.linearPalette(['blue', 'red'])
  * legend.update()
  */
-export default class ContinuousLegend extends L.Control {
+export class ContinuousLegend extends L.Control {
   
   /**
    * Creates a continuous legend control.

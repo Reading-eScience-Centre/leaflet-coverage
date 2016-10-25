@@ -9,7 +9,7 @@ import L from 'leaflet'
  * 
  * @private
  */
-export default function DraggablePopupMixin (base) {
+export function DraggablePopupMixin (base) {
   return class extends base {
     constructor (options={}, source) {
       options.className = options.className || 'leaflet-popup-draggable'

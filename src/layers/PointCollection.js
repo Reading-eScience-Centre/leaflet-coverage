@@ -1,8 +1,8 @@
 import L from 'leaflet'
 
-import PaletteMixin from './PaletteMixin.js'
-import EventMixin from '../util/EventMixin.js'
-import {default as Point, DEFAULT_COLOR} from './Point.js'
+import {PaletteMixin} from './PaletteMixin.js'
+import {EventMixin} from '../util/EventMixin.js'
+import {Point, DEFAULT_COLOR} from './Point.js'
 import {enlargeExtentIfEqual} from './palettes.js'
 import {kdTree} from '../util/kdTree.js'
 
@@ -10,7 +10,7 @@ import {kdTree} from '../util/kdTree.js'
  * A collection of points sharing the same parameters / referencing.
  * 
  */
-export default class PointCollection extends PaletteMixin(L.Layer) {
+export class PointCollection extends PaletteMixin(L.Layer) {
   constructor (covcoll, options) {
     super()
     
@@ -132,6 +132,7 @@ export default class PointCollection extends PaletteMixin(L.Layer) {
    * If no coverage is found, undefined is returned, otherwise
    * a number or null (no-data).
    * 
+   * @param {L.LatLng} latlng reference position
    * @param {number} maxDistance
    *   Maximum distance in meters that the point coverage may be
    *   apart from the given position.

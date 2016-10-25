@@ -40,7 +40,7 @@ const DEFAULT_TEMPLATE = `<template id="${DEFAULT_TEMPLATE_ID}">
  * fakeLayer.palette = C.discretePalette(['red', 'blue'])
  * legend.update()
  */
-export default class DiscreteLegend extends L.Control {
+export class DiscreteLegend extends L.Control {
   
   /**
    * Creates a discrete legend control.

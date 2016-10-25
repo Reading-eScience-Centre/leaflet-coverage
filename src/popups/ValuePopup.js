@@ -11,7 +11,7 @@ import {getLanguageString as i18n, stringifyUnit, getCategory} from 'covutils'
  * - coverage layer is added or removed
  * - updateData() is called
  */
-export default class ValuePopup extends L.Popup {
+export class ValuePopup extends L.Popup {
   /**
    * @param {number} [options.maxDistanceForPointsInPx=20]
    *   The maximum distance in pixels from the popup location for which point-data values should be included.

@@ -19,7 +19,7 @@ import {loadProjection, getHorizontalCRSComponents} from 'covutils'
  * 
  * @private
  */
-export default function CoverageMixin (base) {
+export function CoverageMixin (base) {
   return class extends base {
     /**
      * Load all data without adding anything to the map.

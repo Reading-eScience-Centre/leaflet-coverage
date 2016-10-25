@@ -3,8 +3,8 @@ import ndarray from 'ndarray'
 import {indexOfNearest, isDomain, fromDomain, minMaxOfRange, getReferenceObject, isEllipsoidalCRS} from 'covutils'
 
 import {enlargeExtentIfEqual} from './palettes.js'
-import PaletteMixin from './PaletteMixin.js'
-import CoverageMixin from './CoverageMixin.js'
+import {PaletteMixin} from './PaletteMixin.js'
+import {CoverageMixin} from './CoverageMixin.js'
   
 /**
  * Renderer for Coverages and Domains with (domain) profile Grid.
@@ -22,7 +22,7 @@ import CoverageMixin from './CoverageMixin.js'
  * "remove" - Layer is removed from the map
  * 
  */
-export default class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
+export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
   
   /**
    * The key of the parameter to display must be given in the 'keys' options property,

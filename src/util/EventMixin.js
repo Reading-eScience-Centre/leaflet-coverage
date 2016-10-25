@@ -10,7 +10,7 @@ let Evented = L.Evented.prototype
  * @param {class} base The base class.
  * @return {class} The base class with Leaflet's {@link L.Evented}.
  */
-export default function EventMixin (base) {
+export function EventMixin (base) {
   let clazz = class extends base {}
   for (let key in Evented) {
     clazz.prototype[key] = Evented[key]

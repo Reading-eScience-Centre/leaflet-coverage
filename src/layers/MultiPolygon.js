@@ -2,9 +2,9 @@ import L from 'leaflet'
 import {isDomain, fromDomain, minMaxOfRange, ensureClockwisePolygon, getPointInPolygonsFn} from 'covutils'
 
 import {enlargeExtentIfEqual} from './palettes.js'
-import PaletteMixin from './PaletteMixin.js'
-import CoverageMixin from './CoverageMixin.js'
-import EventMixin from '../util/EventMixin.js'
+import {PaletteMixin} from './PaletteMixin.js'
+import {CoverageMixin} from './CoverageMixin.js'
+import {EventMixin} from '../util/EventMixin.js'
   
 /** @ignore */
 export const DEFAULT_COLOR = 'black'
@@ -12,7 +12,7 @@ export const DEFAULT_COLOR = 'black'
 /**
  * Renderer for Coverages and Domains with (domain) profile MultiPolygon.
  */
-export default class MultiPolygon extends PaletteMixin(CoverageMixin(L.Layer)) {
+export class MultiPolygon extends PaletteMixin(CoverageMixin(L.Layer)) {
   
   constructor (cov, options) {
     super()

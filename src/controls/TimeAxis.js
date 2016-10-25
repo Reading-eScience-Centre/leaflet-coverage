@@ -1,7 +1,7 @@
 import L from 'leaflet'
 
 import {$$, HTML} from './utils.js'
-import EventMixin from '../util/EventMixin.js'
+import {EventMixin} from '../util/EventMixin.js'
 
 let TEMPLATE = 
 `<div class="leaflet-coverage-control form-inline" style="clear:none">
@@ -36,7 +36,7 @@ let TEMPLATE =
  * fakeLayer.time = times[0]
  * timeAxis.update()
  */
-export default class TimeAxis extends EventMixin(L.Control) {
+export class TimeAxis extends EventMixin(L.Control) {
   
   /**
    * Creates a time axis control.
