@@ -17,6 +17,15 @@ import {DEFAULT_COLOR} from './Point.js'
  * This will simply display a dot on the map and fire a click event when a user clicks on it.
  * The dot either has a defined standard color, or it uses a palette if a parameter is chosen.
  * 
+ * @example
+ * var cov = ... // get Coverage data
+ * var layer = new C.PointSeries(cov, {
+ *   parameter: 'salinity',
+ *   time: new Date('2015-01-01T12:00:00Z'),
+ *   defaultColor: 'black',
+ *   palette: C.linearPalette(['#FFFFFF', '#000000'])
+ * })
+ * 
  * @see https://covjson.org/domain-types/#pointseries
  * 
  * @emits {DataLayer#afterAdd} Layer is initialized and was added to the map
@@ -39,15 +48,6 @@ export class PointSeries extends PaletteMixin(CircleMarkerMixin(CoverageMixin(L.
   /**
    * An optional time axis target value can be defined with the 'time' property.
    * The closest values on the time axis is chosen.
-   * 
-   * @example
-   * var cov = ... // get Coverage data
-   * var layer = new C.PointSeries(cov, {
-   *   parameter: 'salinity',
-   *   time: new Date('2015-01-01T12:00:00Z'),
-   *   defaultColor: 'black',
-   *   palette: C.linearPalette(['#FFFFFF', '#000000'])
-   * })
    * 
    * @param {Coverage|Domain} cov The coverage or domain object to visualize.
    * @param {Object} [options] The options object.

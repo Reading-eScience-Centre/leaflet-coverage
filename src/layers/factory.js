@@ -43,7 +43,7 @@ const COLLECTION_LAYER_CLASSES = {
  * 
  * @example
  * var cov = ...
- * var layer = C.dataLayer(cov, {keys: ['temperature']}).addTo(map)
+ * var layer = C.dataLayer(cov, {parameter: 'temperature'}).addTo(map)
  *  
  * @return {function} A function fn(cov, options) which returns a new layer for
  *   the given coverage data object and which is initialized with the given layer options.
@@ -60,14 +60,14 @@ export function dataLayer (cov, options) {
 
 /**
  * Return a layer class usable for the given coverage data object,
- * or <code>undefined</code> if none was found.
+ * or `undefined` if none was found.
  * If multiple layers match, then an arbitrary one is returned.
  *  
  * @example
  * var cov = ...
  * var clazz = C.dataLayerClass(cov)
  * if (clazz) {
- *   var layer = new clazz(cov, {keys: ['temperature']}).addTo(map)
+ *   var layer = new clazz(cov, {parameter: 'temperature'}).addTo(map)
  * }
  * 
  * @param {object} cov The coverage data object.

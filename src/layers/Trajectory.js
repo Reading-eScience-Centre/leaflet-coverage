@@ -13,6 +13,14 @@ import {DEFAULT_COLOR} from './Point.js'
  * Displays the trajectory as a path with coloured points using
  * a given palette for a given parameter.
  * 
+ * @example
+ * var cov = ... // get Coverage data
+ * var layer = new C.Trajectory(cov, {
+ *   parameter: 'salinity',
+ *   defaultColor: 'black',
+ *   palette: C.linearPalette(['#FFFFFF', '#000000'])
+ * })
+ * 
  * @see https://covjson.org/domain-types/#trajectory
  * 
  * @emits {DataLayer#afterAdd} Layer is initialized and was added to the map
@@ -35,14 +43,6 @@ export class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGroup)) {
   //    (we use it for now to have getBounds() which LayerGroup misses)
   
   /**
-   * @example
-   * var cov = ... // get Coverage data
-   * var layer = new C.Trajectory(cov, {
-   *   parameter: 'salinity',
-   *   defaultColor: 'black',
-   *   palette: C.linearPalette(['#FFFFFF', '#000000'])
-   * })
-   * 
    * @param {Coverage|Domain} cov The coverage or domain object to visualize.
    * @param {Object} [options] The options object.
    * @param {string} [options.parameter] The key of the parameter to display, not needed for domain objects.

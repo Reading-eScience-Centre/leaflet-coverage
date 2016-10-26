@@ -10,6 +10,16 @@ import {CoverageMixin} from './CoverageMixin.js'
  * Renderer for Coverages and Domains conforming to the `Grid` domain type of CovJSON.
  * For Domain objects, a dummy parameter and range data is created.
  * 
+ * @example
+ * var cov = ... // get Coverage data
+ * var layer = new C.Grid(cov, {
+ *   parameter: 'salinity',
+ *   time: new Date('2015-01-01T12:00:00Z'),
+ *   vertical: 50,
+ *   palette: C.linearPalette(['#FFFFFF', '#000000']),
+ *   paletteExtent: 'subset'
+ * })
+ * 
  * @see https://covjson.org/domain-types/#grid
  * 
  * @emits {DataLayer#afterAdd} Layer is initialized and was added to the map
@@ -33,16 +43,6 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
    * 
    * Optional time and vertical axis target values can be defined with the 'time' and
    * 'vertical' options properties. The closest values on the respective axes are chosen.
-   * 
-   * @example
-   * var cov = ... // get Coverage data
-   * var layer = new C.Grid(cov, {
-   *   parameter: 'salinity',
-   *   time: new Date('2015-01-01T12:00:00Z'),
-   *   vertical: 50,
-   *   palette: C.linearPalette(['#FFFFFF', '#000000']),
-   *   paletteExtent: 'subset'
-   * })
    * 
    * @param {Coverage|Domain} cov The coverage or domain object to visualize.
    * @param {Object} [options] The options object.

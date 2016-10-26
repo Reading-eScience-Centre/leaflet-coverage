@@ -16,6 +16,15 @@ import {DEFAULT_COLOR} from './Point.js'
  * The dot either has a defined standard color, or it uses
  * a palette together with a target depth if a parameter is chosen.
  * 
+ * @example
+ * var cov = ... // get Coverage data
+ * var layer = new C.VerticalProfile(cov, {
+ *   parameter: 'salinity',
+ *   vertical: 30,
+ *   defaultColor: 'black',
+ *   palette: C.linearPalette(['#FFFFFF', '#000000'])
+ * })
+ * 
  * @see https://covjson.org/domain-types/#verticalprofile
  * 
  * @emits {DataLayer#afterAdd} Layer is initialized and was added to the map
@@ -39,15 +48,6 @@ export class VerticalProfile extends PaletteMixin(CircleMarkerMixin(CoverageMixi
   /**
    * An optional vertical axis target value can be defined with the 'vertical' property.
    * The closest values on the vertical axis is chosen.
-   * 
-   * @example
-   * var cov = ... // get Coverage data
-   * var layer = new C.VerticalProfile(cov, {
-   *   parameter: 'salinity',
-   *   vertical: 30,
-   *   defaultColor: 'black',
-   *   palette: C.linearPalette(['#FFFFFF', '#000000'])
-   * })
    * 
    * @param {Coverage|Domain} cov The coverage or domain object to visualize.
    * @param {Object} [options] The options object.

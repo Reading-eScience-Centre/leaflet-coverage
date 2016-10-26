@@ -19,6 +19,14 @@ export const DEFAULT_COLOR = 'black'
 /**
  * Renderer for Coverages and Domains conforming to CovJSON domain type `MultiPolygon`.
  *
+ * @example
+ * var cov = ... // get Coverage data
+ * var layer = new C.MultiPolygon(cov, {
+ *   parameter: 'salinity',
+ *   defaultColor: 'black',
+ *   palette: C.linearPalette(['#FFFFFF', '#000000'])
+ * })
+ * 
  * @see https://covjson.org/domain-types/#multipolygon
  * 
  * @emits {DataLayer#afterAdd} Layer is initialized and was added to the map
@@ -39,14 +47,6 @@ export class MultiPolygon extends PaletteMixin(CoverageMixin(L.Layer)) {
   /**
    * The key of the parameter to display can be given in the 'parameter' options property,
    * it will be ignored if the coverage data object is a Domain object.
-   * 
-   * @example
-   * var cov = ... // get Coverage data
-   * var layer = new C.MultiPolygon(cov, {
-   *   parameter: 'salinity',
-   *   defaultColor: 'black',
-   *   palette: C.linearPalette(['#FFFFFF', '#000000'])
-   * })
    * 
    * @param {Coverage|Domain} cov The coverage or domain object to visualize.
    * @param {Object} [options] The options object.

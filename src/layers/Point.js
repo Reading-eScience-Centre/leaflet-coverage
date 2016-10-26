@@ -24,6 +24,14 @@ export const DEFAULT_COLOR = 'black'
  * This will simply display a dot on the map and fire a click event when a user clicks on it.
  * The dot either has a defined standard color, or it uses a palette if a parameter is chosen.
  * 
+ * @example
+ * var cov = ... // get Coverage data
+ * var layer = new C.Point(cov, {
+ *   parameter: 'salinity',
+ *   defaultColor: 'black',
+ *   palette: C.linearPalette(['#FFFFFF', '#000000'])
+ * })
+ * 
  * @see https://covjson.org/domain-types/#point
  * 
  * @emits {DataLayer#afterAdd} Layer is initialized and was added to the map
@@ -44,14 +52,6 @@ export const DEFAULT_COLOR = 'black'
 export class Point extends PaletteMixin(CircleMarkerMixin(CoverageMixin(L.Layer))) {
   
   /**
-   * @example
-   * var cov = ... // get Coverage data
-   * var layer = new C.Point(cov, {
-   *   parameter: 'salinity',
-   *   defaultColor: 'black',
-   *   palette: C.linearPalette(['#FFFFFF', '#000000'])
-   * })
-   * 
    * @param {Coverage|Domain} cov The coverage or domain object to visualize.
    * @param {Object} [options] The options object.
    * @param {string} [options.parameter] The key of the parameter to display, not needed for domain objects.

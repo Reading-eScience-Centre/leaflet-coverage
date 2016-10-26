@@ -13,6 +13,15 @@ import {DEFAULT_COLOR} from './Point.js'
 /**
  * Renderer for Coverages conforming to the CovJSON domain type `PolygonSeries`.
  * 
+ * @example
+ * var cov = ... // get Coverage data
+ * var layer = new C.PolygonSeries(cov, {
+ *   parameter: 'salinity',
+ *   time: new Date('2015-01-01T12:00:00Z'),
+ *   defaultColor: 'black',
+ *   palette: C.linearPalette(['#FFFFFF', '#000000'])
+ * })
+ * 
  * @see https://covjson.org/domain-types/#polygonseries
  * 
  * @emits {DataLayer#afterAdd} Layer is initialized and was added to the map
@@ -34,15 +43,6 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
   /**
    * An optional time axis target value can be defined with the 'time' property.
    * The closest values on the time axis is chosen.
-   * 
-   * @example
-   * var cov = ... // get Coverage data
-   * var layer = new C.PolygonSeries(cov, {
-   *   parameter: 'salinity',
-   *   time: new Date('2015-01-01T12:00:00Z'),
-   *   defaultColor: 'black',
-   *   palette: C.linearPalette(['#FFFFFF', '#000000'])
-   * })
    * 
    * @param {Coverage|Domain} cov The coverage or domain object to visualize.
    * @param {Object} [options] The options object.
