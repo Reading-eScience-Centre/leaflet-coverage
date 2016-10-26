@@ -28,7 +28,7 @@ import {CoverageMixin} from './CoverageMixin.js'
 export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
   
   /**
-   * The key of the parameter to display must be given in the 'keys' options property,
+   * The key of the parameter to display must be given in the 'parameter' options property,
    * except when the coverage data object is a Domain object.
    * 
    * Optional time and vertical axis target values can be defined with the 'time' and
@@ -37,7 +37,7 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
    * @example
    * var cov = ... // get Coverage data
    * var layer = new C.Grid(cov, {
-   *   keys: ['salinity'],
+   *   parameter: 'salinity',
    *   time: new Date('2015-01-01T12:00:00Z'),
    *   vertical: 50,
    *   palette: C.linearPalette(['#FFFFFF', '#000000']),
@@ -46,7 +46,7 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
    * 
    * @param {Coverage|Domain} cov The coverage or domain object to visualize.
    * @param {Object} [options] The options object.
-   * @param {Array<string>} [options.keys] The key of the parameter to display, not needed for domain objects.
+   * @param {string} [options.parameter] The key of the parameter to display, not needed for domain objects.
    * @param {Date} [options.time] The initial time slice to display, defaults to the first one.
    * @param {number} [options.vertical] The initial vertical slice to display, defaults to the first one.
    * @param {Palette} [options.palette] The initial color palette to use, the default depends on the parameter type.
@@ -60,7 +60,8 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
     
     if (isDomain(cov)) {
       cov = fromDomain(cov)
-      options.keys = [cov.parameters.keys().next().value]
+      options.parameter = cov.parameters.keys().next().value
+      delete options.keys
     }
     
     if (!options.paletteExtent) {
@@ -70,7 +71,7 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
     L.Util.setOptions(this, options)
     
     this._cov = cov
-    this._param = cov.parameters.get(options.keys[0])
+    this._param = cov.parameters.get(options.keys ? options.keys[0] :options.parameter)
     this._axesSubset = { // x and y are not subsetted
         t: {coordPref: options.time ? options.time.toISOString() : undefined},
         z: {coordPref: options.vertical}

@@ -17,7 +17,7 @@ export class VerticalProfileCollection extends PointCollection {
   /**
    * @param {CoverageCollection} covcoll The coverage collection to visualize.
    * @param {Object} [options] The options object.
-   * @param {Array<string>} [options.keys] The key of the parameter to display.
+   * @param {string} [options.parameter] The key of the parameter to display.
    * @param {Palette} [options.palette] The initial color palette to use, the default depends on the parameter type.
    * @param {string} [options.paletteExtent='full'] The initial palette extent, either 'full', 'fov', or specific: [-10,10].
    * @param {string} [options.defaultColor='black'] The color to use for missing data or if no parameter is set.  

@@ -18,7 +18,7 @@ export class VerticalProfilePlot extends L.Popup {
    *   If an array of vertical profile coverages is given, then the vertical reference systems
    *   are assumed to be identical.
    * @param {object} [options] Popup options. See also http://leafletjs.com/reference.html#popup-options.
-   * @param {Array|Array<Array>} [options.keys] The parameters to display.
+   * @param {Array|Array<Array>} [options.parameters] The parameters to display.
    *   For a single coverage, an array of parameter keys, each parameter is accessible in a drop down.
    *   The default for a single coverage is to display all parameters.
    *   For multiple coverages, an array of parameter key groups, each group is accessible in a drop down.
@@ -37,6 +37,10 @@ export class VerticalProfilePlot extends L.Popup {
     
     this._labels = options.labels ? options.labels : new Array(this._covs.length)
     
+    if (options.parameters) {
+      options.parameters = options.keys
+    }
+
     let keyGroups = []
     if (!options.keys) {
       // treat all parameters of all coverages as separate

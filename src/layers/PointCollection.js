@@ -24,7 +24,7 @@ export class PointCollection extends PaletteMixin(L.Layer) {
   /**
    * @param {CoverageCollection} covcoll The coverage collection to visualize.
    * @param {Object} [options] The options object.
-   * @param {Array<string>} [options.keys] The key of the parameter to display.
+   * @param {string} [options.parameter] The key of the parameter to display.
    * @param {Palette} [options.palette] The initial color palette to use, the default depends on the parameter type.
    * @param {string} [options.paletteExtent='full'] The initial palette extent, either 'full', 'fov', or specific: [-10,10].
    * @param {string} [options.defaultColor='black'] The color to use for missing data or if no parameter is set.
@@ -43,7 +43,8 @@ export class PointCollection extends PaletteMixin(L.Layer) {
     L.Util.setOptions(this, options)
 
     this._covcoll = covcoll
-    this._param = options.keys ? covcoll.parameters.get(options.keys[0]) : null
+    let paramKey = options.keys ? options.keys[0] : options.parameter
+    this._param = paramKey ? cov.parameters.get(paramKey) : null
     this._defaultColor = options.defaultColor || DEFAULT_COLOR
     this._pointClass = options.pointClass || Point
     this._pointOptionsFn = options.pointOptionsFn

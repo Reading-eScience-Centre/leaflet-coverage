@@ -37,23 +37,20 @@ export const DEFAULT_COLOR = 'black'
 export class MultiPolygon extends PaletteMixin(CoverageMixin(L.Layer)) {
   
   /**
-   * The key of the parameter to display must be given in the 'keys' options property,
-   * except when the coverage data object is a Domain object.
-   * 
-   * Optional time and vertical axis target values can be defined with the 'time' and
-   * 'vertical' options properties. The closest values on the respective axes are chosen.
+   * The key of the parameter to display can be given in the 'parameter' options property,
+   * it will be ignored if the coverage data object is a Domain object.
    * 
    * @example
    * var cov = ... // get Coverage data
    * var layer = new C.MultiPolygon(cov, {
-   *   keys: ['salinity'],
+   *   parameter: 'salinity',
    *   defaultColor: 'black',
    *   palette: C.linearPalette(['#FFFFFF', '#000000'])
    * })
    * 
    * @param {Coverage|Domain} cov The coverage or domain object to visualize.
    * @param {Object} [options] The options object.
-   * @param {Array<string>} [options.keys] The key of the parameter to display, not needed for domain objects.
+   * @param {string} [options.parameter] The key of the parameter to display, not needed for domain objects.
    * @param {Palette} [options.palette] The initial color palette to use, the default depends on the parameter type.
    * @param {string} [options.paletteExtent='full'] The initial palette extent, either 'full' or specific: [-10,10].
    * @param {string} [options.defaultColor='black'] The color to use for missing data or if no parameter is set.
@@ -63,7 +60,8 @@ export class MultiPolygon extends PaletteMixin(CoverageMixin(L.Layer)) {
     
     if (isDomain(cov)) {
       cov = fromDomain(cov)
-      options.keys = [cov.parameters.keys().next().value]
+      options.parameter = cov.parameters.keys().next().value
+      delete options.keys
     }
     
     if (!options.paletteExtent) {
@@ -73,7 +71,8 @@ export class MultiPolygon extends PaletteMixin(CoverageMixin(L.Layer)) {
     L.Util.setOptions(this, options)
     
     this._cov = cov
-    this._param = options.keys ? cov.parameters.get(options.keys[0]) : null
+    let paramKey = options.keys ? options.keys[0] : options.parameter
+    this._param = paramKey ? cov.parameters.get(paramKey) : null
     this._defaultColor = options.defaultColor || DEFAULT_COLOR
   }
   

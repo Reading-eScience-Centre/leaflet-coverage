@@ -43,7 +43,7 @@ export class VerticalProfile extends PaletteMixin(CircleMarkerMixin(CoverageMixi
    * @example
    * var cov = ... // get Coverage data
    * var layer = new C.VerticalProfile(cov, {
-   *   keys: ['salinity'],
+   *   parameter: 'salinity',
    *   vertical: 30,
    *   defaultColor: 'black',
    *   palette: C.linearPalette(['#FFFFFF', '#000000'])
@@ -51,7 +51,7 @@ export class VerticalProfile extends PaletteMixin(CircleMarkerMixin(CoverageMixi
    * 
    * @param {Coverage|Domain} cov The coverage or domain object to visualize.
    * @param {Object} [options] The options object.
-   * @param {Array<string>} [options.keys] The key of the parameter to display, not needed for domain objects.
+   * @param {string} [options.parameter] The key of the parameter to display, not needed for domain objects.
    * @param {number} [options.vertical] The initial vertical slice to display.
    * @param {Palette} [options.palette] The initial color palette to use, the default depends on the parameter type.
    * @param {string} [options.paletteExtent='full'] The initial palette extent, either 'full' or specific: [-10,10].
@@ -64,6 +64,7 @@ export class VerticalProfile extends PaletteMixin(CircleMarkerMixin(CoverageMixi
     if (isDomain(cov)) {
       cov = fromDomain(cov)
       delete options.keys
+      options.parameter = cov.parameters.keys().next().value
     }
     
     if (!options.paletteExtent) {
@@ -73,7 +74,8 @@ export class VerticalProfile extends PaletteMixin(CircleMarkerMixin(CoverageMixi
     L.Util.setOptions(this, options)
 
     this._cov = cov
-    this._param = options.keys ? cov.parameters.get(options.keys[0]) : null
+    let paramKey = options.keys ? options.keys[0] : options.parameter
+    this._param = paramKey ? cov.parameters.get(paramKey) : null
     this._axesSubset = {
       z: {coordPref: options.vertical}
     }

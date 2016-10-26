@@ -38,14 +38,14 @@ export class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGroup)) {
    * @example
    * var cov = ... // get Coverage data
    * var layer = new C.Trajectory(cov, {
-   *   keys: ['salinity'],
+   *   parameter: 'salinity',
    *   defaultColor: 'black',
    *   palette: C.linearPalette(['#FFFFFF', '#000000'])
    * })
    * 
    * @param {Coverage|Domain} cov The coverage or domain object to visualize.
    * @param {Object} [options] The options object.
-   * @param {Array<string>} [options.keys] The key of the parameter to display, not needed for domain objects.
+   * @param {string} [options.parameter] The key of the parameter to display, not needed for domain objects.
    * @param {Palette} [options.palette] The initial color palette to use, the default depends on the parameter type.
    * @param {string} [options.paletteExtent='full'] The initial palette extent, either 'full' or specific: [-10,10].
    * @param {string} [options.defaultColor='black'] The color to use for missing data or if no parameter is set.
@@ -55,7 +55,8 @@ export class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGroup)) {
     
     if (isDomain(cov)) {
       cov = fromDomain(cov)
-      options.keys = [cov.parameters.keys().next().value]
+      delete options.keys
+      options.parameter = cov.parameters.keys().next().value
     }
     
     if (!options.paletteExtent) {
@@ -65,7 +66,8 @@ export class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGroup)) {
     L.Util.setOptions(this, options)
     
     this._cov = cov
-    this._param = options.keys ? cov.parameters.get(options.keys[0]) : null
+    let paramKey = options.keys ? options.keys[0] : options.parameter
+    this._param = paramKey ? cov.parameters.get(paramKey) : null
     this._defaultColor = options.defaultColor || DEFAULT_COLOR
   }
   

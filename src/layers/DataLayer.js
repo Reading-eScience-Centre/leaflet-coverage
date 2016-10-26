@@ -1,6 +1,11 @@
 /**
  * A coverage data layer.
  * 
+ * The `options` object of the constructor supports at a minimum the `parameter` property
+ * which is the key of the coverage parameter to visualize.
+ * All currently implemented classes also support the `palette` and `paletteExtent` properties.
+ * All classes except {@link Grid} support the `defaultColor` property to specify the no-data color.
+ * 
  * @typedef {L.Layer} DataLayer
  * @property {Coverage} coverage
  * @property {Parameter} parameter
