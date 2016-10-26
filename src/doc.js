@@ -78,6 +78,10 @@
  */
 
 /**
+ * @external {CoverageCollection} https://github.com/Reading-eScience-Centre/coverage-jsapi/blob/master/CoverageCollection.md
+ */
+
+/**
  * @external {Domain} https://github.com/Reading-eScience-Centre/coverage-jsapi/blob/master/Domain.md
  */
 

@@ -97,6 +97,24 @@ export function directPalette (colors) {
 }
 
 /**
+ * Converts any CSS color to an `{r,g,b}` object.
+ * 
+ * @param {string} cssColor The CSS color
+ * @return {Object} An object with r,g,b members with each a number in [0,255].
+ * 
+ * @example
+ * let rgb = cssToRGB('white') // {r: 255, g: 255, b: 255}
+ */
+export function cssToRGB (cssColor) {
+  let palette = directPalette([cssColor])
+  return {
+    r: palette.red[0],
+    g: palette.green[0],
+    b: palette.blue[0],
+  }
+}
+
+/**
  * Create a palette from a description object.
  * 
  * Currently, two forms are supported:

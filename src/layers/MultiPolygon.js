@@ -10,10 +10,54 @@ import {EventMixin} from '../util/EventMixin.js'
 export const DEFAULT_COLOR = 'black'
 
 /**
- * Renderer for Coverages and Domains with (domain) profile MultiPolygon.
+ * The `click` event, signalling that a polygon has been clicked.
+ * 
+ * @typedef {L.Event} MultiPolygon#click
+ * @property {number} index The axis index of the polygon that was clicked.
+ */
+
+/**
+ * Renderer for Coverages and Domains conforming to CovJSON domain type `MultiPolygon`.
+ *
+ * @see https://covjson.org/domain-types/#multipolygon
+ * 
+ * @emits {DataLayer#afterAdd} Layer is initialized and was added to the map
+ * @emits {DataLayer#dataLoading} Data loading has started
+ * @emits {DataLayer#dataLoad} Data loading has finished (also in case of errors)
+ * @emits {DataLayer#error} Error when loading data
+ * @emits {PaletteMixin#paletteChange} Palette has changed
+ * @emits {PaletteMixin#paletteExtentChange} Palette extent has changed
+ * @emits {MultiPolygon#click} when a polygon was clicked
+ * 
+ * @extends {L.Layer}
+ * @extends {CoverageMixin}
+ * @extends {PaletteMixin}
+ * @implements {DataLayer}
  */
 export class MultiPolygon extends PaletteMixin(CoverageMixin(L.Layer)) {
   
+  /**
+   * The key of the parameter to display must be given in the 'keys' options property,
+   * except when the coverage data object is a Domain object.
+   * 
+   * Optional time and vertical axis target values can be defined with the 'time' and
+   * 'vertical' options properties. The closest values on the respective axes are chosen.
+   * 
+   * @example
+   * var cov = ... // get Coverage data
+   * var layer = new C.MultiPolygon(cov, {
+   *   keys: ['salinity'],
+   *   defaultColor: 'black',
+   *   palette: C.linearPalette(['#FFFFFF', '#000000'])
+   * })
+   * 
+   * @param {Coverage|Domain} cov The coverage or domain object to visualize.
+   * @param {Object} [options] The options object.
+   * @param {Array<string>} [options.keys] The key of the parameter to display, not needed for domain objects.
+   * @param {Palette} [options.palette] The initial color palette to use, the default depends on the parameter type.
+   * @param {string} [options.paletteExtent='full'] The initial palette extent, either 'full' or specific: [-10,10].
+   * @param {string} [options.defaultColor='black'] The color to use for missing data or if no parameter is set.
+   */
   constructor (cov, options) {
     super()
     
@@ -28,11 +72,15 @@ export class MultiPolygon extends PaletteMixin(CoverageMixin(L.Layer)) {
     
     L.Util.setOptions(this, options)
     
-    this.cov = cov
-    this.param = options.keys ? cov.parameters.get(options.keys[0]) : null
-    this.defaultColor = options.color || DEFAULT_COLOR
+    this._cov = cov
+    this._param = options.keys ? cov.parameters.get(options.keys[0]) : null
+    this._defaultColor = options.defaultColor || DEFAULT_COLOR
   }
-    
+  
+  /**
+   * @ignore
+   * @override
+   */
   onAdd (map) {
     this._map = map
     
@@ -58,26 +106,57 @@ export class MultiPolygon extends PaletteMixin(CoverageMixin(L.Layer)) {
     })))
   }
   
+  /**
+   * @ignore
+   * @override
+   */
   onRemove (map) {
     this._removePolygons()
   }
   
+  
+  /**
+   * Returns the geographic bounds of the coverage.
+   * 
+   * @return {L.LatLngBounds}
+   */
   getBounds () {
     return this._geojson.getBounds()
   }
   
+  /**
+   * Returns the geographical center position of the coverage based on its bounding box.
+   * 
+   * @return {L.LatLng}
+   */
   getLatLng () {
     return this.getBounds().getCenter()
   }
-    
+  
+
+  /**
+   * The coverage object associated to this layer.
+   * 
+   * @type {Coverage}
+   */
   get coverage () {
-    return this.cov
+    return this._cov
   }
   
+  /**
+   * The parameter that is visualized.
+   * 
+   * @type {Parameter}
+   */
   get parameter () {
-    return this.param
+    return this._param
   }
       
+  /**
+   * See {@link PaletteMixin}.
+   * 
+   * @ignore
+   */
   computePaletteExtent (extent) {
     if (extent === 'full') {
       if (!this.parameter) {
@@ -142,11 +221,18 @@ export class MultiPolygon extends PaletteMixin(CoverageMixin(L.Layer)) {
   }
   
   _getValue (index) {
-    if (this.param) {
+    if (this._param) {
       return this.range.get({composite: index})
     }
   }
   
+  /**
+   * Return the displayed value at a given geographic position.
+   * If out of bounds, then undefined is returned, otherwise a number or null (for no data).
+   * 
+   * @param {L.LatLng} latlng
+   * @returns {number|null|undefined}
+   */
   getValueAt (latlng) {
     // TODO longitude wrapping
     let i = this._pointInPolygons([latlng.lng, latlng.lat])
@@ -159,10 +245,10 @@ export class MultiPolygon extends PaletteMixin(CoverageMixin(L.Layer)) {
   _getColor (val) {
     if (val === null) {
       // no-data
-      return this.defaultColor
+      return this._defaultColor
     } else if (val === undefined) {
       // not fixed to a param
-      return this.defaultColor
+      return this._defaultColor
     } else {
       // use a palette
       let idx = this.getPaletteIndex(val)
@@ -176,6 +262,9 @@ export class MultiPolygon extends PaletteMixin(CoverageMixin(L.Layer)) {
     this._addPolygons()
   }
   
+  /**
+   * Redraw the layer.
+   */
   redraw () {
     this._updatePolygons()
     this._geojson.redraw()

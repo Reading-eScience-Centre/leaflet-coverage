@@ -7,8 +7,10 @@ import {PaletteMixin} from './PaletteMixin.js'
 import {CoverageMixin} from './CoverageMixin.js'
   
 /**
- * Renderer for Coverages and Domains following the `Grid` domain type of CovJSON.
+ * Renderer for Coverages and Domains conforming to the `Grid` domain type of CovJSON.
  * For Domain objects, a dummy parameter and range data is created.
+ * 
+ * @see https://covjson.org/domain-types/#grid
  * 
  * @emits {DataLayer#afterAdd} Layer is initialized and was added to the map
  * @emits {DataLayer#dataLoading} Data loading has started
@@ -21,6 +23,7 @@ import {CoverageMixin} from './CoverageMixin.js'
  * @extends {L.GridLayer}
  * @extends {CoverageMixin}
  * @extends {PaletteMixin}
+ * @implements {DataLayer}
  */
 export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
   
@@ -241,7 +244,7 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
    * The currently active time on the temporal axis as Date object, 
    * or undefined if the grid has no time axis.
    * 
-   * @type {Date}
+   * @type {Date|undefined}
    */
   get time () {
     if (this.domain.axes.has('t')) {

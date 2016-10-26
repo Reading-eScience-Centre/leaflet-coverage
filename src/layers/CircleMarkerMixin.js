@@ -1,35 +1,27 @@
 import L from 'leaflet'
+import {cssToRGB} from './palettes.js'
 
 /**
  * A mixin that encapsulates the creation, update, and removal
  * of a CircleMarker.
  * 
- * See Point and VerticalProfile for usage.
+ * It provides the public methods `bindPopup`, `openPopup`, `closePopup`, and `redraw`.
  * 
- * @param {class} base The base class.
+ * See {@link Point} and {@link VerticalProfile} for usage.
+ * 
+ * @param {PointDataLayer} base The base class implementing the {@link PointDataLayer} interface.
  * @return {class} The base class with CircleMarkerMixin.
- * 
- * @private
  */
 export function CircleMarkerMixin (base) {
   return class extends base {
-  
-    /*
-     * The base class must supply the following functions/properties:
-     * 
-     * getValue()
-     * _getColor(val)
-     * getLatLng()
-     * coverage
-     * showNoData (default: false)
-     */
-  
+   
     _addMarker () {
       let val = this.getValue()
       if (val === null && !this.showNoData) {
         return
       }
-      let {r,g,b} = this._getColor(val)    
+      let color = this._getColor(val)
+      let {r,g,b} = typeof color === 'string' ? cssToRGB(color) : color    
       let latlng = this.getLatLng()
       
       let strokeBrightness = 0.7
@@ -62,7 +54,9 @@ export function CircleMarkerMixin (base) {
     }
     
     __updateMarker () {
-      this._marker.options.color = this._getColor()
+      let color = this._getColor(val)
+      let {r,g,b} = typeof color === 'string' ? cssToRGB(color) : color
+      this._marker.options.color = 'rgb(' + r + ',' + g + ',' + b + ')'
     }
     
     bindPopup (...args) {

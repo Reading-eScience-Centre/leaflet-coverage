@@ -8,19 +8,25 @@ import {PaletteMixin} from './PaletteMixin.js'
 import {DEFAULT_COLOR} from './Point.js'
   
 /**
- * Renderer for Coverages and Domains with (domain) profile Trajectory.
+ * Renderer for Coverages and Domains conforming to the CovJSON domain type `Trajectory`.
  * 
  * Displays the trajectory as a path with coloured points using
  * a given palette for a given parameter.
  * 
- * Events:
- * "add" - Layer is initialized and is about to be added to the map
- * "remove" - Layer is removed from the map
- * "dataLoading" - Data loading has started
- * "dataLoad" - Data loading has finished (also in case of errors)
- * "error" - Error when loading data
- * "paletteChange" - Palette has changed
- * "paletteExtentChange" - Palette extent has changed
+ * @see https://covjson.org/domain-types/#trajectory
+ * 
+ * @emits {DataLayer#afterAdd} Layer is initialized and was added to the map
+ * @emits {DataLayer#dataLoading} Data loading has started
+ * @emits {DataLayer#dataLoad} Data loading has finished (also in case of errors)
+ * @emits {DataLayer#error} Error when loading data
+ * @emits {PaletteMixin#paletteChange} Palette has changed
+ * @emits {PaletteMixin#paletteExtentChange} Palette extent has changed
+ * @emits {Point#click} when a point was clicked
+ * 
+ * @extends {L.FeatureGroup}
+ * @extends {CoverageMixin}
+ * @extends {PaletteMixin}
+ * @implements {DataLayer}
  * 
  */
 export class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGroup)) {
@@ -28,6 +34,22 @@ export class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGroup)) {
   // TODO FeatureGroup is not ideal since click events etc should not be blindly propagated
   //    (we use it for now to have getBounds() which LayerGroup misses)
   
+  /**
+   * @example
+   * var cov = ... // get Coverage data
+   * var layer = new C.Trajectory(cov, {
+   *   keys: ['salinity'],
+   *   defaultColor: 'black',
+   *   palette: C.linearPalette(['#FFFFFF', '#000000'])
+   * })
+   * 
+   * @param {Coverage|Domain} cov The coverage or domain object to visualize.
+   * @param {Object} [options] The options object.
+   * @param {Array<string>} [options.keys] The key of the parameter to display, not needed for domain objects.
+   * @param {Palette} [options.palette] The initial color palette to use, the default depends on the parameter type.
+   * @param {string} [options.paletteExtent='full'] The initial palette extent, either 'full' or specific: [-10,10].
+   * @param {string} [options.defaultColor='black'] The color to use for missing data or if no parameter is set.
+   */
   constructor (cov, options) {
     super()
     
@@ -42,11 +64,15 @@ export class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGroup)) {
     
     L.Util.setOptions(this, options)
     
-    this.cov = cov
-    this.param = options.keys ? cov.parameters.get(options.keys[0]) : null
-    this.defaultColor = options.color || DEFAULT_COLOR
+    this._cov = cov
+    this._param = options.keys ? cov.parameters.get(options.keys[0]) : null
+    this._defaultColor = options.defaultColor || DEFAULT_COLOR
   }
   
+  /**
+   * @ignore
+   * @override
+   */
   onAdd (map) {
     this._map = map
     
@@ -58,14 +84,29 @@ export class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGroup)) {
       })
   }
     
+  /**
+   * The coverage object associated to this layer.
+   * 
+   * @type {Coverage}
+   */
   get coverage () {
-    return this.cov
+    return this._cov
   }
   
+  /**
+   * The parameter that is visualized.
+   * 
+   * @type {Parameter}
+   */
   get parameter () {
-    return this.param
+    return this._param
   }
   
+  /**
+   * See {@link PaletteMixin}.
+   * 
+   * @ignore
+   */
   computePaletteExtent (extent) {
     let range = this.range
         
@@ -109,6 +150,8 @@ export class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGroup)) {
   
   /**
    * Returns the trajectory points as LatLng objects in the order they appear in the composite domain axis.
+   * 
+   * @return {Array<L.LatLng>}
    */
   getLatLngs () {
     let axis = this.domain.axes.get('composite')
@@ -129,6 +172,10 @@ export class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGroup)) {
    * Return the displayed value closest to the circle centre.
    * If no point exists within the circle, undefined is returned,
    * otherwise a number or null (for no-data).
+   * 
+   * @param {L.LatLng} latlng
+   * @param {number} maxDistance Maximum distance in meters between both points.
+   * @returns {number|null|undefined}
    */
   getValueAt (latlng, maxDistance) {
     let points = this.getLatLngs()
@@ -148,7 +195,7 @@ export class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGroup)) {
   }
   
   _getValue (index) {
-    if (this.param) {
+    if (this._param) {
       return this.range.get({composite: index})
     }
   }
@@ -157,10 +204,10 @@ export class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGroup)) {
   _getColor (val) {
     if (val === null) {
       // no-data
-      return this.defaultColor
+      return this._defaultColor
     } else if (val === undefined) {
       // not fixed to a param
-      return this.defaultColor
+      return this._defaultColor
     } else {
       // use a palette
       let idx = this.getPaletteIndex(val)
@@ -169,6 +216,9 @@ export class Trajectory extends PaletteMixin(CoverageMixin(L.FeatureGroup)) {
     }
   }
   
+  /**
+   * Redraw the layer.
+   */
   redraw () {
     this.clearLayers()
     this._addTrajectoryLayers()

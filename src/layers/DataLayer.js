@@ -2,6 +2,19 @@
  * A coverage data layer.
  * 
  * @typedef {L.Layer} DataLayer
+ * @property {Coverage} coverage
+ * @property {Parameter} parameter
+ * @property {function():L.LatLngBounds} getBounds()
+ */
+
+/**
+ * A coverage point-like data layer.
+ * 
+ * @typedef {DataLayer} PointDataLayer
+ * @property {function} getValue() Return the displayed value (number, or null for no-data), or undefined if no parameter is set.
+ * @property {function} _getColor(val) Returns a CSS color string or an  `{r: number, g: number, b: number}` array for the given data value.
+ * @property {function} getLatLng() Returns the geographical position of the coverage.
+ * @property {boolean} showNoData Whether to draw the point if there is no data.
  */
 
 /**

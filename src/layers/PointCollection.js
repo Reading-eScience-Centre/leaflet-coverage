@@ -7,11 +7,31 @@ import {enlargeExtentIfEqual} from './palettes.js'
 import {kdTree} from '../util/kdTree.js'
 
 /**
- * A collection of points sharing the same parameters / referencing.
+ * A collection of points sharing the same parameters and coordinate referencing system.
  * 
+ * @see https://covjson.org/domain-types/#point
+ * 
+ * @emits {DataLayer#afterAdd} Layer is initialized and was added to the map
+ * @emits {DataLayer#error} Error when loading data
+ * @emits {PaletteMixin#paletteChange} Palette has changed
+ * @emits {PaletteMixin#paletteExtentChange} Palette extent has changed
+ * @emits {Point#click} when the point was clicked
+ * 
+ * @extends {L.Layer}
+ * @extends {PaletteMixin} 
  */
 export class PointCollection extends PaletteMixin(L.Layer) {
-  constructor (covcoll, options) {
+  /**
+   * @param {CoverageCollection} covcoll The coverage collection to visualize.
+   * @param {Object} [options] The options object.
+   * @param {Array<string>} [options.keys] The key of the parameter to display.
+   * @param {Palette} [options.palette] The initial color palette to use, the default depends on the parameter type.
+   * @param {string} [options.paletteExtent='full'] The initial palette extent, either 'full', 'fov', or specific: [-10,10].
+   * @param {string} [options.defaultColor='black'] The color to use for missing data or if no parameter is set.
+   * @param {class} [options.pointClass=Point] The {@link PointDataLayer} class to use for the individual points.
+   * @param {function} [options.pointOptionsFn] A function that returns additional options to apply for each point class instance.  
+   */
+  constructor (covcoll, options={}) {
     super()
     
     // TODO how should we handle collection paging?
@@ -22,11 +42,11 @@ export class PointCollection extends PaletteMixin(L.Layer) {
     
     L.Util.setOptions(this, options)
 
-    this.covcoll = covcoll
-    this.param = options.keys ? covcoll.parameters.get(options.keys[0]) : null
-    this.defaultColor = options.color || DEFAULT_COLOR
-    this.pointClass = options.pointClass || Point
-    this.pointOptionsFn = options.pointOptionsFn
+    this._covcoll = covcoll
+    this._param = options.keys ? covcoll.parameters.get(options.keys[0]) : null
+    this._defaultColor = options.defaultColor || DEFAULT_COLOR
+    this._pointClass = options.pointClass || Point
+    this._pointOptionsFn = options.pointOptionsFn
         
     this._layerGroup = L.layerGroup()
     this._layers = []
@@ -44,25 +64,29 @@ export class PointCollection extends PaletteMixin(L.Layer) {
     })
   }
   
+  /**
+   * @ignore
+   * @override
+   */
   onAdd (map) {
     this._map = map
     this._layerLoadCount = 0
     this._layerErrors = []
     
     let options = {
-      keys: this.param ? [this.param.key] : undefined,
-      color: this.defaultColor,
+      keys: this._param ? [this._param.key] : undefined,
+      defaultColor: this._defaultColor,
       palette: this.palette,
       paletteExtent: this.paletteExtent
     }
-    if (this.pointOptionsFn) {
-      let opts = this.pointOptionsFn()
+    if (this._pointOptionsFn) {
+      let opts = this._pointOptionsFn()
       for (let key in opts) {
         options[key] = opts[key]
       }
     }
-    for (let cov of this.covcoll.coverages) {
-      let layer = new this.pointClass(cov, options)
+    for (let cov of this._covcoll.coverages) {
+      let layer = new this._pointClass(cov, options)
       this._attachListeners(layer, cov)
       this._layerGroup.addLayer(layer)
       this._layers.push(layer)
@@ -75,12 +99,21 @@ export class PointCollection extends PaletteMixin(L.Layer) {
     
   }
   
+  /**
+   * @ignore
+   * @override
+   */
   onRemove (map) {
     map.removeLayer(this._layerGroup)
     this._layerGroup = L.layerGroup()
     this._layers = []
   }
   
+  /**
+   * Binds a popup to each point instance.
+   * 
+   * @param {function(cov: Coverage):String|HTMLElement|L.Popup} fn Returns the popup for a given point coverage. 
+   */
   bindPopupEach (fn) {
     this._popupFn = fn
   }
@@ -122,6 +155,11 @@ export class PointCollection extends PaletteMixin(L.Layer) {
     this._kdtree = new kdTree(points, distance, dimensions)
   }
   
+  /**
+   * Returns the geographic bounds of the coverage collection.
+   * 
+   * @return {L.LatLngBounds}
+   */
   getBounds () {
     return L.latLngBounds(this._layers.map(layer => layer.getLatLng()))
   }
@@ -136,6 +174,7 @@ export class PointCollection extends PaletteMixin(L.Layer) {
    * @param {number} maxDistance
    *   Maximum distance in meters that the point coverage may be
    *   apart from the given position.
+   * @return {number|null|undefined}
    */
   getValueAt (latlng, maxDistance) {
     let points = this._kdtree.nearest(latlng, 1, maxDistance)
@@ -146,12 +185,22 @@ export class PointCollection extends PaletteMixin(L.Layer) {
     }
   }
   
+  /**
+   * The parameter that is visualized.
+   * 
+   * @type {Parameter}
+   */
   get parameter () {
-    return this.param
+    return this._param
   }
     
+  /**
+   * See {@link PaletteMixin}.
+   * 
+   * @ignore
+   */
   computePaletteExtent (extent) {
-    if (!this.param) {
+    if (!this._param) {
       throw new Error('palette extent cannot be set when no parameter has been chosen')
     }
     
@@ -178,6 +227,9 @@ export class PointCollection extends PaletteMixin(L.Layer) {
     return Promise.resolve(extent)
   }
   
+  /**
+   * Redraw each point layer.
+   */
   redraw () {
     for (let layer of this._layers) {
       layer.redraw()

@@ -36,9 +36,10 @@ export class ValuePopup extends L.Popup {
   
   /**
    * @param {DataLayer} layer The data layer to add.
+   * @return {this}
    */
   addCoverageLayer (layer) {
-    if (!layer.getValueAt) return
+    if (!layer.getValueAt) return this
     this.coverageLayers.add(layer)
     this.updateData()
     return this
@@ -46,6 +47,7 @@ export class ValuePopup extends L.Popup {
   
   /**
    * @param {DataLayer} layer The data layer to remove.
+   * @return {this}
    */
   removeCoverageLayer (layer) {
     this.coverageLayers.delete(layer)
@@ -95,6 +97,8 @@ export class ValuePopup extends L.Popup {
   /**
    * Updates the popup content from the data layers.
    * Gets called automatically when `setLatLng` is called.
+   * 
+   * @return {this}
    */
   updateData () {
     if (!this._map) return
