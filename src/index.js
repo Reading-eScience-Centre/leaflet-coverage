@@ -1,7 +1,9 @@
 export {legend} from './controls/Legend.js'
 export {DiscreteLegend} from './controls/DiscreteLegend.js'
+export {ContinuousLegend} from './controls/ContinuousLegend.js'
 export {TimeAxis} from './controls/TimeAxis.js'
 export {VerticalAxis} from './controls/VerticalAxis.js'
+export {Dropdown} from './controls/Dropdown.js'
 
 export * from './layers/factory.js'
 export {Grid} from './layers/Grid.js'
@@ -16,10 +18,14 @@ export {VerticalProfileCollection} from './layers/VerticalProfileCollection.js'
 
 export * from './layers/palettes.js'
 export {ParameterSync} from './layers/ParameterSync.js'
+export {PaletteMixin} from './layers/PaletteMixin.js'
+export {CoverageMixin} from './layers/CoverageMixin.js'
+export {CircleMarkerMixin} from './layers/CircleMarkerMixin.js'
 
 export {VerticalProfilePlot} from './popups/VerticalProfilePlot.js'
 export {TimeSeriesPlot} from './popups/TimeSeriesPlot.js'
 export {DraggableValuePopup} from './popups/DraggableValuePopup.js'
 export {ValuePopup} from './popups/ValuePopup.js'
+export {DraggablePopupMixin} from './popups/DraggablePopupMixin.js'
 
 export * from './util/constants.js'
