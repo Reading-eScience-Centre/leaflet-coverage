@@ -44,7 +44,7 @@ export class PointCollection extends PaletteMixin(L.Layer) {
 
     this._covcoll = covcoll
     let paramKey = options.keys ? options.keys[0] : options.parameter
-    this._param = paramKey ? cov.parameters.get(paramKey) : null
+    this._param = paramKey ? covcoll.parameters.get(paramKey) : null
     this._defaultColor = options.defaultColor || DEFAULT_COLOR
     this._pointClass = options.pointClass || Point
         
