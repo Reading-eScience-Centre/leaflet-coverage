@@ -47,7 +47,6 @@ export class PointCollection extends PaletteMixin(L.Layer) {
     this._param = paramKey ? cov.parameters.get(paramKey) : null
     this._defaultColor = options.defaultColor || DEFAULT_COLOR
     this._pointClass = options.pointClass || Point
-    this._pointOptionsFn = options.pointOptionsFn
         
     this._layerGroup = L.layerGroup()
     this._layers = []
@@ -80,8 +79,8 @@ export class PointCollection extends PaletteMixin(L.Layer) {
       palette: this.palette,
       paletteExtent: this.paletteExtent
     }
-    if (this._pointOptionsFn) {
-      let opts = this._pointOptionsFn()
+    if (this.options.pointOptionsFn) {
+      let opts = this.options.pointOptionsFn()
       for (let key in opts) {
         options[key] = opts[key]
       }

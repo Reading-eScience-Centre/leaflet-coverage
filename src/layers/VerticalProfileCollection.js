@@ -24,10 +24,11 @@ export class VerticalProfileCollection extends PointCollection {
    */
   constructor (covcoll, options) {
     options.pointClass = VerticalProfile
+    super(covcoll, options)
+    // has to be after super() as it references 'this'    
     options.pointOptionsFn = () => ({
       vertical: this._vertical
     })
-    super(covcoll, options)
     
     this._vertical = options.vertical
   }
