@@ -12,8 +12,9 @@ export const DEFAULT_COLOR = 'black'
 /**
  * The `click` event, signalling that a polygon has been clicked.
  * 
- * @typedef {L.Event} MultiPolygon#click
+ * @typedef {L.MouseEvent} MultiPolygon#click
  * @property {number} index The axis index of the polygon that was clicked.
+ * @property {L.LatLng} latlng The geographical point where the click event occured.
  */
 
 /**

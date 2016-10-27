@@ -31,7 +31,7 @@ import {DEFAULT_COLOR} from './Point.js'
  * @emits {DataLayer#axisChange} Axis coordinate has changed (e.axis === 'time')
  * @emits {PaletteMixin#paletteChange} Palette has changed
  * @emits {PaletteMixin#paletteExtentChange} Palette extent has changed
- * @emits {Point#click} when the point was clicked
+ * @emits {Point#click} when the polygon was clicked
  * 
  * @extends {L.Layer}
  * @extends {CoverageMixin}

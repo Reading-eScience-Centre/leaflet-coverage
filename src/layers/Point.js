@@ -14,8 +14,9 @@ export const DEFAULT_COLOR = 'black'
 /**
  * The `click` event, signalling that the point has been clicked.
  * 
- * @typedef {L.Event} Point#click
+ * @typedef {L.MouseEvent} Point#click
  * @property {Coverage} coverage
+ * @property {L.LatLng} latlng The geographical point where the click event occured.
  */
 
 /**
