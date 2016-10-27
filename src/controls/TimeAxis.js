@@ -1,6 +1,6 @@
 import L from 'leaflet'
 
-import {$$, fromTemplate, HTML} from './utils.js'
+import {$$, fromTemplate, inject, HTML} from './utils.js'
 import {EventMixin} from '../util/EventMixin.js'
 
 const DEFAULT_TEMPLATE_ID = 'template-coverage-timeaxis'
