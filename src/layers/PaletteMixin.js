@@ -66,6 +66,9 @@ export function PaletteMixin (base) {
         this._palette = options.palette
       } else if (parameter.preferredPalette) {
         this._palette = paletteFromObject(parameter.preferredPalette)
+        if (parameter.preferredPalette.extent) {
+          this._paletteExtent = parameter.preferredPalette.extent
+        }
       } else if (categories) {
         if (categories.every(cat => cat.preferredColor)) {
           this._palette = directPalette(categories.map(cat => cat.preferredColor))
