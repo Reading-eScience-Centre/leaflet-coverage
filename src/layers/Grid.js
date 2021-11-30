@@ -54,10 +54,15 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
    *  `subset` (computed from data of current time/vertical slice),
    *  `fov` (computed from data in map field of view; not implemented yet),
    *  or specific: [-10,10].
-   * @param {boolean} [options.valueToColor] If present, the value is converted to a color using the given function, and palette settings are ignored.
+   * @param {boolean} [options.valueToColor] If present, the value is converted to a color using the given function,
+   *  and palette settings are ignored.  The returned color should be of the form `{r: 0, g: 0, b: 0, a: 1}`.
    */
   constructor (cov, options={}) {
     super()
+
+    if (options.valueToColor) {
+      this.valueToColor = options.valueToColor
+    }
     
     if (isDomain(cov)) {
       cov = fromDomain(cov)
@@ -424,14 +429,14 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
 
     let setPixel
     if(this.valueToColor) {
+      let valueToColor = this.valueToColor
       setPixel = (tileY, tileX, val) => {
-        let color = this.valueToColor(val)
+        let color = valueToColor(val)
         if (color !== undefined && color !== null) {
-          const c = cssToRGB(color)
-          rgba.set(tileY, tileX, 0, c.r)
-          rgba.set(tileY, tileX, 1, c.g)
-          rgba.set(tileY, tileX, 2, c.b)
-          rgba.set(tileY, tileX, 3, 255)
+          rgba.set(tileY, tileX, 0, color.r)
+          rgba.set(tileY, tileX, 1, color.g)
+          rgba.set(tileY, tileX, 2, color.b)
+          rgba.set(tileY, tileX, 3, color.hasOwnProperty('a') ? color.a : 255)
         }
       }
     } else {
