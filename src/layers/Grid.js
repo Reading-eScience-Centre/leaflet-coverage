@@ -2,7 +2,7 @@ import L from 'leaflet'
 import ndarray from 'ndarray'
 import {indexOfNearest, isDomain, fromDomain, minMaxOfRange, getReferenceObject, isEllipsoidalCRS} from 'covutils'
 
-import {enlargeExtentIfEqual} from './palettes.js'
+import {cssToRGB, enlargeExtentIfEqual} from './palettes.js'
 import {PaletteMixin} from './PaletteMixin.js'
 import {CoverageMixin} from './CoverageMixin.js'
   
@@ -54,6 +54,7 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
    *  `subset` (computed from data of current time/vertical slice),
    *  `fov` (computed from data in map field of view; not implemented yet),
    *  or specific: [-10,10].
+   * @param {boolean} [options.valueToColor] If present, the value is converted to a color using the given function, and palette settings are ignored.
    */
   constructor (cov, options={}) {
     super()
@@ -420,19 +421,34 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
     let imgData = ctx.getImageData(0, 0, tileSize.x, tileSize.y)
     // Uint8ClampedArray, 1-dimensional, in order R,G,B,A,R,G,B,A,... row-major
     let rgba = ndarray(imgData.data, [tileSize.y, tileSize.x, 4])
-    
-    let {red, green, blue} = this.palette
-        
-    let getPaletteIndex = this.getPaletteIndex
-    let setPixel = (tileY, tileX, val) => {
-      let idx = getPaletteIndex(val)
-      if (idx !== undefined) {
-        rgba.set(tileY, tileX, 0, red[idx])
-        rgba.set(tileY, tileX, 1, green[idx])
-        rgba.set(tileY, tileX, 2, blue[idx])
-        rgba.set(tileY, tileX, 3, 255)
+
+    let setPixel
+    if(this.valueToColor) {
+      setPixel = (tileY, tileX, val) => {
+        let color = this.valueToColor(val)
+        if (color !== undefined && color !== null) {
+          const c = cssToRGB(color)
+          rgba.set(tileY, tileX, 0, c.r)
+          rgba.set(tileY, tileX, 1, c.g)
+          rgba.set(tileY, tileX, 2, c.b)
+          rgba.set(tileY, tileX, 3, 255)
+        }
+      }
+    } else {
+      let {red, green, blue} = this.palette
+          
+      let getPaletteIndex = this.getPaletteIndex
+      setPixel = (tileY, tileX, val) => {
+        let idx = getPaletteIndex(val)
+        if (idx !== undefined) {
+          rgba.set(tileY, tileX, 0, red[idx])
+          rgba.set(tileY, tileX, 1, green[idx])
+          rgba.set(tileY, tileX, 2, blue[idx])
+          rgba.set(tileY, tileX, 3, 255)
+        }
       }
     }
+    
     
     let vals = this._subsetRange.get
     
