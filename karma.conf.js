@@ -1,5 +1,8 @@
-// Karma configuration
-// Generated on Tue Aug 25 2015 14:22:52 GMT+0100 (GMT Daylight Time)
+if (process.env.CI) {
+  BROWSERS =  ['ChromeHeadless', 'FirefoxHeadless']
+} else {
+  BROWSERS =  ['ChromeHeadless']
+}
 
 module.exports = function(config) {
   config.set({
@@ -16,7 +19,6 @@ module.exports = function(config) {
       'test/**/*.js'
     ],
 
-
     // list of files to exclude
     exclude: [
     ],
@@ -30,15 +32,25 @@ module.exports = function(config) {
     
     browserify: {
       transform: [
-        ['babelify', {presets: ['es2015']}]
+        ['babelify', { "plugins": ["istanbul"] }]
+      ]
+    },
+
+    coverageReporter: {
+      reporters: [
+        {'type': 'text'},
+        {'type': 'lcovonly',
+         'subdir': function (browser) {
+           // normalize
+           return browser.toLowerCase().split(/[ /-]/)[0]
+         }}
       ]
     },
         
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
-
+    reporters: ['progress', 'coverage'],
 
     // web server port
     port: 9876,
@@ -59,7 +71,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: BROWSERS,
 
 
     // Continuous Integration mode

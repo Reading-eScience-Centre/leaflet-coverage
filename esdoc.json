@@ -4,6 +4,9 @@
   "excludes": ["kdTree"],
   "plugins": [
     {
+      "name": "esdoc-standard-plugin"
+    },
+    {
       "name": "esdoc-importpath-plugin",
       "option": {
         "replaces": [

@@ -46,7 +46,7 @@ export function CoverageMixin (base) {
         this.fire('dataLoad')
       }).catch(e => {
         console.error(e)
-        this.fire('error', e)
+        this.fire('error', {error: e})
         this.fire('dataLoad')
       })
       return promise

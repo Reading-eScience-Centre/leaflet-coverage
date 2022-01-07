@@ -82,17 +82,8 @@ export function PaletteMixin (base) {
             
       this._paletteExtent = this._paletteExtent || options.paletteExtent
 
-      if (options.hasOwnProperty('extendMax')) {
-        this._extendMax = options.extendMax
-      } else {
-        this._extendMax = false
-      }
-
-      if (options.hasOwnProperty('extendMin')) {
-        this._extendMin = options.extendMin
-      } else {
-        this._extendMin = false
-      }
+      this._extendMax = !!options.extendMax
+      this._extendMin = !!options.extendMin
       
       if (this.parameter.categoryEncoding) {
         // categorical parameter, does not depend on palette extent
@@ -121,15 +112,15 @@ export function PaletteMixin (base) {
         let extent = this.paletteExtent
         this.getPaletteIndex = val => {
           if (val === null) return
-          if(val > extent[1]) {
-            if(this._extendMax) {
+          if (val > extent[1]) {
+            if (this._extendMax) {
               return palette.steps - 1
             } else {
               return
             }
           }
-          if(val < extent[0]) {
-            if(this._extendMin) {
+          if (val < extent[0]) {
+            if (this._extendMin) {
               return 0
             } else {
               return

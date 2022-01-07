@@ -1,5 +1,10 @@
 {
+  "parser": "babel-eslint",
   "env": {
-    "browser": 1
+      "browser": true
+  },
+  "extends": "standard",
+  "rules": {
+    "no-new-func": "off"
   }
 }
