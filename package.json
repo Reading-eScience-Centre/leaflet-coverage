@@ -32,7 +32,7 @@
     "playground": "node tools/run-playground.js"
   },
   "dependencies": {
-    "covutils": "^0.6.0",
+    "covutils": "^0.6.1",
     "ndarray": "^1.0.18"
   },
   "peerDependencies": {
