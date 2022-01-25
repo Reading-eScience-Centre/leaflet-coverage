@@ -12,3 +12,6 @@
 /lib/
 /leaflet-coverage.min.js.map
 /leaflet-coverage.src.js.map
+/package-lock.json
+lcov.info
+/playground

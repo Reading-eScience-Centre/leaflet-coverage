@@ -2,7 +2,7 @@ import L from 'leaflet'
 import ndarray from 'ndarray'
 import {indexOfNearest, isDomain, fromDomain, minMaxOfRange, getReferenceObject, isEllipsoidalCRS} from 'covutils'
 
-import {cssToRGB, enlargeExtentIfEqual} from './palettes.js'
+import {enlargeExtentIfEqual} from './palettes.js'
 import {PaletteMixin} from './PaletteMixin.js'
 import {CoverageMixin} from './CoverageMixin.js'
   
@@ -55,14 +55,10 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
    *  `fov` (computed from data in map field of view; not implemented yet),
    *  or specific: [-10,10].
    * @param {boolean} [options.valueToColor] If present, the value is converted to a color using the given function,
-   *  and palette settings are ignored.  The returned color should be of the form `{r: 0, g: 0, b: 0, a: 1}`.
+   *  and palette settings are ignored.  The returned color should be of the form `{r: 0, g: 0, b: 0, a: 255}`.
    */
   constructor (cov, options={}) {
     super()
-
-    if (options.valueToColor) {
-      this.valueToColor = options.valueToColor
-    }
     
     if (isDomain(cov)) {
       cov = fromDomain(cov)
@@ -428,8 +424,8 @@ export class Grid extends PaletteMixin(CoverageMixin(L.GridLayer)) {
     let rgba = ndarray(imgData.data, [tileSize.y, tileSize.x, 4])
 
     let setPixel
-    if(this.valueToColor) {
-      let valueToColor = this.valueToColor
+    let valueToColor = this.options.valueToColor
+    if (valueToColor) {
       setPixel = (tileY, tileX, val) => {
         let color = valueToColor(val)
         if (color !== undefined && color !== null) {
