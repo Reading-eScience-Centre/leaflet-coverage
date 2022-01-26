@@ -204,7 +204,7 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
    */
   set time (val) {
     let old = this.time
-    this._axesSubset.t.coordPref = val ? val.toISOString() : undefined
+    this._axesSubset.t.coordPref = val ? new Date(asTime(val)).toISOString() : undefined
     
     this._loadCoverageSubset()
     if (old === this.time) return
