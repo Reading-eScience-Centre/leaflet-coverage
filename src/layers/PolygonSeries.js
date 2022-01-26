@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import {indexOfNearest, minMaxOfRange, isDomain, fromDomain, ensureClockwisePolygon, getPointInPolygonsFn} from 'covutils'
+import {indexOfNearest, minMaxOfRange, isDomain, fromDomain, ensureClockwisePolygon, getPointInPolygonsFn, asTime} from 'covutils'
 
 import {enlargeExtentIfEqual} from './palettes.js'
 import {CoverageMixin} from './CoverageMixin.js'
@@ -111,10 +111,14 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
     if (t.coordPref == undefined) {
       t.idx = t.coord = undefined
     } else {
-      let vals = this.domain.axes.get('t').values.map(v => v.getTime())
-      t.idx = indexOfNearest(vals, t.coordPref.getTime())
+      let vals = this.domain.axes.get('t').values.map(v => asTime(v))
+      t.idx = indexOfNearest(vals, asTime(t.coordPref))
       t.coord = vals[t.idx]
     }
+
+    this.coverage.loadRange(this.parameter.key).then(range => {
+      this.range = range
+    })
     
     // Note that we don't subset the coverage currently, since there is no real need for it
   }
@@ -271,7 +275,6 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
   
   _addPolygon () {
     let polygon = this._polygonLonLat
-    
     let geojson = {
       "type": "Feature",
       "properties": {
@@ -346,6 +349,7 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
     } else {
       // use a palette
       let idx = this.getPaletteIndex(val)
+      console.log('getting value', val, idx)
       let {red, green, blue} = this.palette
       return `rgb(${red[idx]}, ${green[idx]}, ${blue[idx]})`
     }
@@ -361,6 +365,9 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
    */
   redraw () {
     this._updatePolygon()
-    this._geojson.redraw()
+    
+    this._geojson.setStyle({
+      fillColor: this._getColor(this.getValue())
+    })
   }
 }
