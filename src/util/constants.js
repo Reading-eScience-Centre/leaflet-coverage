@@ -15,6 +15,8 @@ export const COVJSON_TRAJECTORY = COVJSON_DOMAINTYPES_NS + 'Trajectory'
 export const COVJSON_POLYGONSERIES = COVJSON_DOMAINTYPES_NS + 'PolygonSeries'
 /** @ignore */
 export const COVJSON_MULTIPOLYGON = COVJSON_DOMAINTYPES_NS + 'MultiPolygon'
+/** @ignore */
+export const COVJSON_MULTIPOLYGONSERIES = COVJSON_DOMAINTYPES_NS + 'MultiPolygonSeries'
 
 /** @ignore */
 export const COVJSON_DATATYPE_TUPLE = COVJSON_CORE_NS + 'tuple'
