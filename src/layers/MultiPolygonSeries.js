@@ -99,10 +99,14 @@ export class MultiPolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
     let ix = axis.coordinates.indexOf(this._projX)
     let iy = axis.coordinates.indexOf(this._projY)
     
-    this._polygonsLonLat = axis.values.map(polygon => polygon.map(ring => ring.map(coords => {
-      let {lat,lon} = unproject({x: coords[ix], y: coords[iy]})
-      return [lon,lat]
-    })))
+    this._polygonsLonLat = axis.values.map(
+      polygon => polygon.map(
+        ring => ring.map(coords => {
+          let {lat,lon} = unproject({x: coords[ix], y: coords[iy]})
+          return [lon,lat]
+        })
+      )
+    )
   }
     
   _loadCoverageSubset () {
@@ -351,7 +355,6 @@ export class MultiPolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
     } else {
       // use a palette
       let idx = this.getPaletteIndex(val)
-      console.log('getting value', val, idx)
       let {red, green, blue} = this.palette
       return `rgb(${red[idx]}, ${green[idx]}, ${blue[idx]})`
     }
