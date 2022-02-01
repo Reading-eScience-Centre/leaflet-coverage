@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import {isDomain, fromDomain, indexOfNearest, minMaxOfRange} from 'covutils'
+import {isDomain, fromDomain, indexOfNearest, minMaxOfRange, asTime} from 'covutils'
 
 import {enlargeExtentIfEqual} from './palettes.js'
 import {CoverageMixin} from './CoverageMixin.js'
@@ -99,18 +99,22 @@ export class PointSeries extends PaletteMixin(CircleMarkerMixin(CoverageMixin(L.
         this.fire('afterAdd')
       })
   }
-  
-  _loadCoverageSubset () {
+
+  _loadCoverageSubset() {
     // adapted from Grid.js
     let t = this._axesSubset.t
     if (t.coordPref == undefined) {
       t.idx = t.coord = undefined
     } else {
-      let vals = this.domain.axes.get('t').values.map(v => v.getTime())
-      t.idx = indexOfNearest(vals, t.coordPref.getTime())
+      let vals = this.domain.axes.get("t").values.map((v) => asTime(v))
+      t.idx = indexOfNearest(vals, asTime(t.coordPref))
       t.coord = vals[t.idx]
     }
-    
+
+    this.coverage.loadRange(this.parameter.key).then((range) => {
+      this.range = range
+    });
+
     // Note that we don't subset the coverage currently, since there is no real need for it
   }
   
@@ -130,7 +134,7 @@ export class PointSeries extends PaletteMixin(CircleMarkerMixin(CoverageMixin(L.
   getBounds () {
     return L.latLngBounds([this.getLatLng()])
   }
-  
+
   /**
    * Returns the geographical position of the coverage.
    * 
