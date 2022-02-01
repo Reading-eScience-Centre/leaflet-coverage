@@ -365,9 +365,5 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
    */
   redraw () {
     this._updatePolygon()
-    
-    this._geojson.setStyle({
-      fillColor: this._getColor(this.getValue())
-    })
   }
 }
