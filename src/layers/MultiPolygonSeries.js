@@ -212,10 +212,15 @@ export class MultiPolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
     
     this._loadCoverageSubset()
     if (old === this.time) return
-    this.redraw()
+    const layers = this._geojson.getLayers()
+    for (let i in layers) {
+      layers[i].setStyle({
+        fillColor: this._getColor(this._getValue(i)),
+      })
+    }
     this.fire('axisChange', {axis: 'time'})
   }
-  
+    
   /**
    * The currently active time on the temporal axis as Date object, 
    * or undefined if no time is set.
@@ -307,6 +312,10 @@ export class MultiPolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
         })
       }
     })
+
+    if(this._popup) {
+      this._geojson.bindPopup(...this._popup)
+    }
     
     this._geojson.addTo(this._map)
   }

@@ -208,7 +208,11 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
     
     this._loadCoverageSubset()
     if (old === this.time) return
-    this.redraw()
+    for (let layer of this._geojson.getLayers()) {
+      layer.setStyle({
+        fillColor: this._getColor(this.getValue()),
+      })
+    }
     this.fire('axisChange', {axis: 'time'})
   }
   
