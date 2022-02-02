@@ -84,7 +84,8 @@ export class MultiPolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
     this._map = map
 
     this.load()
-      .then(() => this.initializePalette())
+    .then(() => this._updateTimeIndex())
+    .then(() => this.initializePalette())
       .then(() => {
         this._unproject()
         this._addPolygons()
@@ -109,8 +110,7 @@ export class MultiPolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
     )
   }
     
-  _loadCoverageSubset () {
-    // adapted from Grid.js
+  _updateTimeIndex () {
     let t = this._axesSubset.t
     if (t.coordPref == undefined) {
       t.idx = t.coord = undefined
@@ -119,12 +119,6 @@ export class MultiPolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
       t.idx = indexOfNearest(vals, asTime(t.coordPref))
       t.coord = vals[t.idx]
     }
-
-    this.coverage.loadRange(this.parameter.key).then(range => {
-      this.range = range
-    })
-    
-    // Note that we don't subset the coverage currently, since there is no real need for it
   }
   
   /**
@@ -210,14 +204,9 @@ export class MultiPolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
     let old = this.time
     this._axesSubset.t.coordPref = val ? new Date(asTime(val)).toISOString() : undefined
     
-    this._loadCoverageSubset()
+    this._updateTimeIndex()
     if (old === this.time) return
-    const layers = this._geojson.getLayers()
-    for (let i in layers) {
-      layers[i].setStyle({
-        fillColor: this._getColor(this._getValue(i)),
-      })
-    }
+    this._updatePolygons()
     this.fire('axisChange', {axis: 'time'})
   }
     
@@ -319,6 +308,16 @@ export class MultiPolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
     
     this._geojson.addTo(this._map)
   }
+    
+  _updatePolygons () {
+    if (!this._geojson) return
+    const layers = this._geojson.getLayers()
+    for (let i in layers) {
+      layers[i].setStyle({
+        fillColor: this._getColor(this._getValue(i)),
+      })
+    }
+  }
   
   _removePolygon () {
     this._map.removeLayer(this._geojson)
@@ -369,15 +368,11 @@ export class MultiPolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
     }
   }
   
-  _updatePolygon () {
-    this._removePolygon()
-    this._addPolygons()
-  }
-  
   /**
    * Redraw the layer.
    */
   redraw () {
-    this._updatePolygon()
+    this._removePolygon()
+    this._addPolygons()
   }
 }

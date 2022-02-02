@@ -93,6 +93,7 @@ export class PointSeries extends PaletteMixin(CircleMarkerMixin(CoverageMixin(L.
     this._map = map
 
     this.load()
+      .then(() => this._updateTimeIndex())
       .then(() => this.initializePalette())
       .then(() => {
         this._addMarker()
@@ -100,7 +101,7 @@ export class PointSeries extends PaletteMixin(CircleMarkerMixin(CoverageMixin(L.
       })
   }
 
-  _loadCoverageSubset() {
+  _updateTimeIndex() {
     // adapted from Grid.js
     let t = this._axesSubset.t
     if (t.coordPref == undefined) {
@@ -110,12 +111,6 @@ export class PointSeries extends PaletteMixin(CircleMarkerMixin(CoverageMixin(L.
       t.idx = indexOfNearest(vals, asTime(t.coordPref))
       t.coord = vals[t.idx]
     }
-
-    this.coverage.loadRange(this.parameter.key).then((range) => {
-      this.range = range
-    });
-
-    // Note that we don't subset the coverage currently, since there is no real need for it
   }
   
   /**
@@ -174,7 +169,7 @@ export class PointSeries extends PaletteMixin(CircleMarkerMixin(CoverageMixin(L.
     let old = this.time
     this._axesSubset.t.coordPref = val ? val.toISOString() : undefined
     
-    this._loadCoverageSubset()
+    this._updateTimeIndex()
     if (old === this.time) return
     this.redraw()
     this.fire('axisChange', {axis: 'time'})
