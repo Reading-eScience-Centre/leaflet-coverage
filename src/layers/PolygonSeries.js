@@ -352,7 +352,6 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
     } else {
       // use a palette
       let idx = this.getPaletteIndex(val)
-      console.log('getting value', val, idx)
       let {red, green, blue} = this.palette
       return `rgb(${red[idx]}, ${green[idx]}, ${blue[idx]})`
     }
