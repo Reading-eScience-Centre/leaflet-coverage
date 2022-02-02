@@ -8,14 +8,14 @@ import {PaletteMixin} from './PaletteMixin.js'
 
 import {DEFAULT_COLOR} from './Point.js'
 
-// TODO nearly identical to VerticalProfile
+// TODO nearly identical to PolygonSeries
 
 /**
- * Renderer for Coverages conforming to the CovJSON domain type `PolygonSeries`.
+ * Renderer for Coverages conforming to the CovJSON domain type `MultiPolygonSeries`.
  * 
  * @example
  * var cov = ... // get Coverage data
- * var layer = new C.PolygonSeries(cov, {
+ * var layer = new C.MultiPolygonSeries(cov, {
  *   parameter: 'salinity',
  *   time: new Date('2015-01-01T12:00:00Z'),
  *   defaultColor: 'black',
@@ -38,7 +38,7 @@ import {DEFAULT_COLOR} from './Point.js'
  * @extends {PaletteMixin}
  * @implements {DataLayer}
  */
-export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
+export class MultiPolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
   
   /**
    * An optional time axis target value can be defined with the 'time' property.
@@ -84,11 +84,11 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
     this._map = map
 
     this.load()
-      .then(() => this._updateTimeIndex())
-      .then(() => this.initializePalette())
+    .then(() => this._updateTimeIndex())
+    .then(() => this.initializePalette())
       .then(() => {
         this._unproject()
-        this._addPolygon()
+        this._addPolygons()
         this._pointInPolygonPreprocess()
         this.fire('afterAdd')
       })
@@ -100,10 +100,14 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
     let ix = axis.coordinates.indexOf(this._projX)
     let iy = axis.coordinates.indexOf(this._projY)
     
-    this._polygonLonLat = axis.values[0].map(ring => ring.map(coords => {
-      let {lat,lon} = unproject({x: coords[ix], y: coords[iy]})
-      return [lon,lat]
-    }))
+    this._polygonsLonLat = axis.values.map(
+      polygon => polygon.map(
+        ring => ring.map(coords => {
+          let {lat,lon} = unproject({x: coords[ix], y: coords[iy]})
+          return [lon,lat]
+        })
+      )
+    )
   }
     
   _updateTimeIndex () {
@@ -202,10 +206,10 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
     
     this._updateTimeIndex()
     if (old === this.time) return
-    this._updatePolygon()
+    this._updatePolygons()
     this.fire('axisChange', {axis: 'time'})
   }
-  
+    
   /**
    * The currently active time on the temporal axis as Date object, 
    * or undefined if no time is set.
@@ -258,26 +262,30 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
   }
   
   _pointInPolygonPreprocess () {
-    let polygon = this._polygonLonLat
+    let polygons = this._polygonsLonLat
     // TODO we assume spherical coordinates for now
     let isCartesian = false
     // A bit evil since this modifies in-place, but nothing bad should happen.
-    ensureClockwisePolygon(polygon, isCartesian)
-    let pointInPolygons = getPointInPolygonsFn([polygon])
-    this._pointInPolygon = point => pointInPolygons(point) !== -1
+    polygons.forEach(p => ensureClockwisePolygon(p, isCartesian))
+    this._pointInPolygons = getPointInPolygonsFn(polygons)
   }
   
-  _addPolygon () {
-    let polygon = this._polygonLonLat
-    let geojson = {
-      "type": "Feature",
-      "properties": {
-        "color": this._getColor(this.getValue())
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": polygon
-      }
+  _addPolygons () {
+    let polygons = this._polygonsLonLat
+    
+    let geojson = []
+    for (let i=0; i < polygons.length; i++) {
+      geojson.push({
+        "type": "Feature",
+        "properties": {
+          "index": i,
+          "color": this._getColor(this._getValue(i))
+        },
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": polygons[i]
+        }
+      })
     }
     
     this._geojson = L.geoJson(geojson, {
@@ -287,29 +295,33 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
         stroke: false
       }),
       onEachFeature: (feature, layer) => {
-        layer.on('click', e => this.fire('click', e))
+        layer.on('click', e => {
+          e.index = feature.properties.index
+          this.fire('click', e)
+        })
       }
     })
-    
-    if (this._popup) {
+
+    if(this._popup) {
       this._geojson.bindPopup(...this._popup)
     }
     
     this._geojson.addTo(this._map)
   }
+    
+  _updatePolygons () {
+    if (!this._geojson) return
+    const layers = this._geojson.getLayers()
+    for (let i in layers) {
+      layers[i].setStyle({
+        fillColor: this._getColor(this._getValue(i)),
+      })
+    }
+  }
   
   _removePolygon () {
     this._map.removeLayer(this._geojson)
     delete this._geojson
-  }
-
-  _updatePolygon () {
-    if(!this._geojson) return
-    for (let layer of this._geojson.getLayers()) {
-      layer.setStyle({
-        fillColor: this._getColor(this.getValue()),
-      })
-    }
   }
     
   /**
@@ -318,13 +330,13 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
    * 
    * @returns {number|null|undefined}
    */
-  getValue () {
+  _getValue (index) {
     if (this._param && this._axesSubset.t.coord !== undefined) {
-      let val = this.range.get({t: this._axesSubset.t.idx})
+      let val = this.range.get({t: this._axesSubset.t.idx, composite: index})
       return val
     }    
   }
-  
+
   /**
    * Return the displayed value at a given geographic position.
    * If out of bounds, then undefined is returned, otherwise a number or null (for no data).
@@ -332,13 +344,12 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
    * @param {L.LatLng} latlng
    * @returns {number|null|undefined}
    */
-  getValueAt (latlng) {
-    if (!latlng) throw new Error('latlng parameter missing')
-    
+   getValueAt (latlng) {
     // TODO longitude wrapping
-    if (this._pointInPolygon([latlng.lng, latlng.lat])) {
-      return this.getValue()
-    }   
+    let i = this._pointInPolygons([latlng.lng, latlng.lat])
+    if (i >= 0) {
+      return this._getValue(i)
+    }    
   }
   
   // NOTE: this returns a string, not an {r,g,b} object as in other classes!
@@ -362,6 +373,6 @@ export class PolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
    */
   redraw () {
     this._removePolygon()
-    this._addPolygon()
+    this._addPolygons()
   }
 }

@@ -7,6 +7,7 @@ import {VerticalProfile} from './VerticalProfile.js'
 import {VerticalProfileCollection} from './VerticalProfileCollection.js'
 import {MultiPolygon} from './MultiPolygon.js'
 import {PolygonSeries} from './PolygonSeries.js'
+import {MultiPolygonSeries} from './MultiPolygonSeries.js'
 import {
   COVJSON_POINT, 
   COVJSON_POINTSERIES, 
@@ -15,6 +16,7 @@ import {
   COVJSON_TRAJECTORY, 
   COVJSON_MULTIPOLYGON,
   COVJSON_POLYGONSERIES,
+  COVJSON_MULTIPOLYGONSERIES,
   COVERAGE,
   COVERAGECOLLECTION,
   DOMAIN
@@ -27,7 +29,8 @@ const DOMAIN_LAYER_CLASSES = {
   [COVJSON_VERTICALPROFILE]: VerticalProfile,
   [COVJSON_TRAJECTORY]: Trajectory,
   [COVJSON_MULTIPOLYGON]: MultiPolygon,
-  [COVJSON_POLYGONSERIES]: PolygonSeries
+  [COVJSON_POLYGONSERIES]: PolygonSeries,
+  [COVJSON_MULTIPOLYGONSERIES]: MultiPolygonSeries
 }
   
 const COLLECTION_LAYER_CLASSES = {
