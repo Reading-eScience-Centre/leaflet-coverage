@@ -306,7 +306,18 @@ export class MultiPolygonSeries extends PaletteMixin(CoverageMixin(L.Layer)) {
       this._geojson.bindPopup(...this._popup)
     }
     
+    let renderers = []
+    for(let l in this._geojson._layers) {
+      renderers.push(this._geojson._layers[l]._renderer)
+    }
+    console.log(renderers)
     this._geojson.addTo(this._map)
+   
+    renderers = []
+    for(let l in this._geojson._layers) {
+      renderers.push(this._geojson._layers[l]._renderer)
+    }
+    console.log(renderers)
   }
     
   _updatePolygons () {
